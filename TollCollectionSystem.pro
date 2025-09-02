@@ -8,3 +8,4 @@ SUBDIRS +=  \
     3rdparty/Jcon \
     3rdparty/QJson \
     3rdparty/QSimpleUpdater \
+    Demos/InfoboardManager \
