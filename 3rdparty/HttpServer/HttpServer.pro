@@ -4,9 +4,6 @@ QT -= gui
 
 TARGET = HttpServer
 
-win32 {
-   DLLDESTDIR = $$MGS_BIN_PATH
-}
 DESTDIR = $$MGS_LIBRARY_PATH
 
 TEMPLATE = lib

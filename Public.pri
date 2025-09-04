@@ -85,6 +85,43 @@ MGS_OUTPUT_PATH = $$PWD
     MGS_BIN_PATH = $$MGS_OUTPUT_PATH/bin
 }
 
+# 函数定义，拷贝指定的动态库到目标目录 DESTDIR
+defineTest(copyLibsToDestdir) {
+    win32:  LIB_EXT = dll
+    unix:   LIB_EXT = so
+    macx:   LIB_EXT = dylib
+
+    FILE_NAME = $${1}.$${LIB_EXT}
+    src = $$MGS_LIBRARY_PATH/$$FILE_NAME
+    dst = $$DESTDIR/$$FILE_NAME
+
+    exists($$src) {
+        message("Will copy library: $$src -> $$dst")
+
+        # 确保目标目录存在（qmake 阶段生成到 post-link）
+        !exists($$DESTDIR) {
+            QMAKE_POST_LINK += $$QMAKE_MKDIR_CMD $$shell_quote($$DESTDIR) $$escape_expand(\\n\\t)
+        }
+
+        win32 {
+            SRC_WIN = $$src
+            DST_WIN = $$dst
+            SRC_WIN ~= s,/,\\,g
+            DST_WIN ~= s,/,\\,g
+            QMAKE_POST_LINK += cmd /c copy /y $$shell_quote($$SRC_WIN) $$shell_quote($$DST_WIN) $$escape_expand(\\n\\t)
+        }
+        else {
+            QMAKE_POST_LINK += $$QMAKE_INSTALL_FILE $$shell_quote($$src) $$shell_quote($$dst) $$escape_expand(\\n\\t)
+        }
+    }
+    else {
+        message("Warning: library not found in $$MGS_LIBRARY_PATH: $$FILE_NAME")
+    }
+
+    export(QMAKE_POST_LINK)
+    return(true)
+}
+
 # GCC 编译器（且不是 Clang），则添加编译选项 -Wno-noexcept-type。
 # 这个选项用于抑制 GCC 关于 noexcept 类型比较的警告
 gcc:!clang: QMAKE_CXXFLAGS += -Wno-noexcept-type

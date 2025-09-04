@@ -5,7 +5,7 @@ QT       *= core gui network
 TARGET = InfoboardManager
 TEMPLATE = app
 
-DESTDIR = $$MGS_BIN_PATH
+DESTDIR = $$MGS_BIN_PATH/$$TARGET
 
 include($$THIRD_PARTY_LIBRARY_PATH/utils/Utils.pri)
 
@@ -30,3 +30,5 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 LIBS *= -l$$qtLibraryTargetName(CuteLogger)
 
 INCLUDEPATH += $$THIRD_PARTY_LIBRARY_PATH/CuteLogger/include
+
+copyLibsToDestdir($$qtLibraryTargetName(CuteLogger))

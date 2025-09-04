@@ -6,9 +6,6 @@ QT -= gui
 
 TARGET = Jcon
 
-win32 {
-    DLLDESTDIR = $$MGS_BIN_PATH
-}
 DESTDIR = $$MGS_LIBRARY_PATH
 
 TEMPLATE = lib
