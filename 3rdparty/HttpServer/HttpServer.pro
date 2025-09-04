@@ -14,4 +14,4 @@ win32 {
    DEFINES += QTWEBAPPLIB_EXPORT
 }
 
-include($$PWD/httpserver.pri)
+include($$PWD/HttpServer.pri)

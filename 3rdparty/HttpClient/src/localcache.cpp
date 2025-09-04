@@ -41,9 +41,16 @@ QByteArray LocalCache::hash(const QByteArray &s) {
 }
 
 bool LocalCache::isCached(const QString &path) {
-    bool cached = QFile::exists(path) &&
-                  (maxSeconds == 0 || QFileInfo(path).birthTime().secsTo(
-                                              QDateTime::currentDateTimeUtc()) < maxSeconds);
+    QDateTime fileTime;
+    // 2025-09-05 第三方库修改 兼容Qt5.10以下版本
+    #if QT_VERSION >= QT_VERSION_CHECK(5, 10, 0)
+        fileTime = QFileInfo(path).birthTime();
+    #else
+        fileTime = QFileInfo(path).created();
+    #endif
+
+        bool cached = QFile::exists(path) &&
+                      (maxSeconds == 0 || fileTime.secsTo(QDateTime::currentDateTimeUtc()) < maxSeconds);
 #ifndef QT_NO_DEBUG_OUTPUT
     if (!cached) misses++;
 #endif
@@ -132,7 +139,15 @@ void LocalCache::expire() {
     while (it.hasNext()) {
         QString path = it.next();
         QFileInfo info = it.fileInfo();
-        cacheItems.insert(info.birthTime(), path);
+        QDateTime fileTime;
+    // 2025-09-05 第三方库修改 兼容Qt5.10以下版本
+#if QT_VERSION >= QT_VERSION_CHECK(5, 10, 0)
+        fileTime = info.birthTime();
+#else
+        fileTime = info.created();
+#endif
+
+        cacheItems.insert(fileTime, path);
         totalSize += info.size();
         qApp->processEvents();
     }

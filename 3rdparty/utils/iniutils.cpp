@@ -121,14 +121,14 @@ bool IniUtils::save()
 
             for (const auto &agroup : m_iniData.datas) {
                 if (!agroup.isHead) {
-                    ts << '[' << agroup.group << ']' << Qt::endl;
+                    ts << '[' << agroup.group << ']' << endl;
                 }
 
                 for (const auto &arow : agroup.rows) {
                     if (arow.isValid) {
-                        ts << arow.key << '=' << variantToString(arow.value) << Qt::endl;
+                        ts << arow.key << '=' << variantToString(arow.value) << endl;
                     } else {
-                        ts << arow.key << Qt::endl;
+                        ts << arow.key << endl;
                     }
                 }
             }

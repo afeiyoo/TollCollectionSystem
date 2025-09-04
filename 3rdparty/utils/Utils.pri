@@ -17,7 +17,6 @@ HEADERS += \
     $$PWD/sqlutils.h \
     $$PWD/stdafx.h \
 
-
 SOURCES += \
     $$PWD/bizutils.cpp \
     $$PWD/datadealutils.cpp \
@@ -28,7 +27,6 @@ SOURCES += \
     $$PWD/qtcassert.cpp \
     $$PWD/savefile.cpp \
     $$PWD/sqlutils.cpp \
-
 
 contains(QT, gui) {
     SOURCES += $$PWD/uiutils.cpp

@@ -36,7 +36,7 @@ bool SaveFile::open(OpenMode flags)
     }
 
     // 创建临时文件并打开
-    m_tempFile = std::make_unique<QTemporaryFile>(m_finalFileName);
+    m_tempFile.reset(new QTemporaryFile(m_finalFileName));
     m_tempFile->setAutoRemove(false);
     if (!m_tempFile->open())
         return false;

@@ -85,7 +85,7 @@ private: \
 #define Q_Q_CREATE(CLASS) \
 protected: \
     explicit CLASS(CLASS##Private &dd, CLASS *parent = nullptr); \
-    std::unique_ptr<CLASS##Private> d_ptr; \
+    QScopedPointer<CLASS##Private> d_ptr; \
 \
 private: \
     Q_DISABLE_COPY(CLASS) \

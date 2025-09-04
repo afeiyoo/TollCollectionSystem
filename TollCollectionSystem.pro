@@ -11,4 +11,5 @@ SUBDIRS +=  \
     src/Demos/InfoboardManager \
     src/Demos/ImageSendQueueDemo \
     src/Demos/SmartLaneControllerDemo \
-    src/LaneService
+    src/LaneService \
+    src/PadService

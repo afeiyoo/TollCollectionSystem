@@ -81,6 +81,11 @@ namespace stefanfrings {
   one with SLL and one without SSL (usually on public ports 80 and 443, or locally on 8080 and 8443).
 */
 
+// 2025-09-05 第三方库修改 兼容Qt5.10以下版本
+#if QT_VERSION < QT_VERSION_CHECK(5, 10, 0)
+typedef int qsizetype;
+#endif
+
 class DECLSPEC HttpConnectionHandlerPool : public QObject {
     Q_OBJECT
     Q_DISABLE_COPY(HttpConnectionHandlerPool)

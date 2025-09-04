@@ -1,7 +1,6 @@
 #include "fileutils.h"
 #include "savefile.h"
 
-#include "algorithm.h"
 #include "qtcassert.h"
 
 #include <QDataStream>
