@@ -62,9 +62,9 @@ bin/
 .svn/
 
 # temp
-Common/
-Devices/
-DTPV2/
-LaneSystem/
+src/Common/
+src/Devices/
+src/DTPV2/
+src/LaneSystem/
 lib/
 bin/
