@@ -5,7 +5,7 @@ QT *= core network
 TARGET = ImageSendQueueDemo
 TEMPLATE = app
 
-DESTDIR = $$MGS_BIN_PATH
+DESTDIR = $$MGS_BIN_PATH/$$TARGET
 
 # You can make your code fail to compile if it uses deprecated APIs.
 # In order to do so, uncomment the following line.
