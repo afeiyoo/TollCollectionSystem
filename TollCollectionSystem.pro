@@ -10,4 +10,5 @@ SUBDIRS +=  \
     3rdparty/QSimpleUpdater \
     src/Demos/InfoboardManager \
     src/Demos/ImageSendQueueDemo \
-    src/Demos/SmartLaneControllerDemo
+    src/Demos/SmartLaneControllerDemo \
+    src/LaneService

@@ -1,4 +1,4 @@
-include($$PWD/../../TollLanePublic.pri)
+include($$PWD/../../Public.pri)
 
 QT += core network
 
@@ -6,9 +6,6 @@ QT -= gui
 
 TARGET = LaneService
 
-win32 {
-    DLLDESTDIR = $$MGS_BIN_PATH
-}
 DESTDIR = $$MGS_LIBRARY_PATH
 
 TEMPLATE = lib
@@ -50,6 +47,6 @@ unix:!macx|win32: LIBS += \
 
 
 INCLUDEPATH += \
-    $$THIRD_PARTY_LIBRARY_PATH/CuteLogger/main/include \
+    $$THIRD_PARTY_LIBRARY_PATH/CuteLogger/include \
     $$THIRD_PARTY_LIBRARY_PATH/Jcon \
     $$THIRD_PARTY_LIBRARY_PATH/QJson/include
