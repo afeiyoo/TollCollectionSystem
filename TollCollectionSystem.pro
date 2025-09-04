@@ -8,6 +8,6 @@ SUBDIRS +=  \
     3rdparty/Jcon \
     3rdparty/QJson \
     3rdparty/QSimpleUpdater \
-    Demos/InfoboardManager \
-    Demos/ImageSendQueueDemo \
-    Demos/SmartLaneControllerDemo
+    src/Demos/InfoboardManager \
+    src/Demos/ImageSendQueueDemo \
+    src/Demos/SmartLaneControllerDemo

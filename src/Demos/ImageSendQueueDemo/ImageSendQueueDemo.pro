@@ -1,4 +1,4 @@
-include($$PWD/../../Public.pri)
+include($$PWD/../../../Public.pri)
 
 QT *= core network
 
