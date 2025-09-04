@@ -1,0 +1,575 @@
+#include "dataservice.h"
+
+#include "EasyQtSql/EasyQtSql.h"
+#include "Logger.h"
+#include "global/globalmanager.h"
+
+DataService::DataService(QObject *parent)
+    : QObject{parent}
+{}
+
+DataService::~DataService() {}
+
+bool DataService::getLatestOutTrade(const QString &vehPlate, QObject *obj, int type)
+{
+    QSqlDatabase sdb = GM_INSTANCE->m_dbFactory->getDatabase("oracle");
+    QString sql(
+        R"(SELECT * FROM %1 WHERE exvehplate = ? AND extime = (SELECT max(extime) FROM
+        (SELECT max(extime) AS extime FROM t_etc_out WHERE exvehplate = ? UNION
+        SELECT max(extime) AS extime FROM t_mtc_out WHERE exvehplate =?) t))");
+
+    if (type == 0) {
+        sql = sql.arg("t_etc_out");
+    } else {
+        sql = sql.arg("t_mtc_out");
+    }
+
+    EasyQtSql::Transaction t(sdb);
+    try {
+        EasyQtSql::PreparedQuery query = t.prepare(sql);
+        EasyQtSql::QueryResult res = query.exec(vehPlate, vehPlate, vehPlate);
+        QByteArray logSql = res.executedQuery().toUtf8();
+        LOG_INFO("执行SQL语句: %s", logSql.constData());
+        t.commit();
+
+        if (!res.next())
+            return false;
+
+        res.fetchObject(*obj);
+        return true;
+    } catch (EasyQtSql::DBException &e) {
+        t.rollback();
+        QByteArray logError = e.lastError.text().toUtf8();
+        QByteArray logLastQuery = e.lastQuery.toUtf8();
+        LOG_ERROR("%s\n%s", logError.constData(), logLastQuery.constData());
+        return false;
+    }
+}
+
+QVariantMap DataService::getEnInfo(const QString &passID)
+{
+    QSqlDatabase sdb = GM_INSTANCE->m_dbFactory->getDatabase("oracle");
+    QString sql(
+        R"(SELECT tradeid, TO_CHAR(entime, 'yyyy-mm-dd HH24:mi:ss') AS entime, cnlaneid, enstation, stationname
+       FROM t_mtc_in
+       WHERE passid = ?
+       UNION ALL
+       SELECT tradeid, TO_CHAR(entime, 'yyyy-mm-dd HH24:mi:ss') AS entime, cnlaneid, enstation, stationname
+       FROM t_etc_in
+       WHERE passid = ?)");
+
+    EasyQtSql::Transaction t(sdb);
+    try {
+        EasyQtSql::PreparedQuery query = t.prepare(sql);
+        EasyQtSql::QueryResult res = query.exec(passID, passID);
+        QByteArray logSql = res.executedQuery().toUtf8();
+        LOG_INFO("执行SQL语句: %s", logSql.constData());
+        t.commit();
+
+        if (!res.next())
+            return {};
+
+        QVariantMap resMap = res.toMap();
+        return resMap;
+    } catch (EasyQtSql::DBException &e) {
+        t.rollback();
+        QByteArray logError = e.lastError.text().toUtf8();
+        QByteArray logLastQuery = e.lastQuery.toUtf8();
+        LOG_ERROR("%s\n%s", logError.constData(), logLastQuery.constData());
+        return {};
+    }
+}
+
+QList<QVariantMap> DataService::getGantryInfos(const QString &passId)
+{
+    QSqlDatabase sdb = GM_INSTANCE->m_dbFactory->getDatabase("oracle");
+    QString sql(
+        R"(SELECT g.gantryid AS gantryid, e.tradetime AS tradetime, e.flagid AS flagid, g.flagname AS flagname, e.errcode
+        FROM t_ff_etcTrade e, t_etcflag g WHERE e.passid = ? AND e.flagid = g.flagid
+        UNION ALL
+        SELECT g.gantryid AS gantryid, e.tradetime AS tradetime, e.flagid AS flagid, g.flagname AS flagname, e.errcode
+        FROM t_ff_cpcrecord e, t_etcflag g WHERE e.passid = ? AND e.flagid = g.flagid ORDER BY tradetime)");
+
+    EasyQtSql::Transaction t(sdb);
+    try {
+        EasyQtSql::PreparedQuery query = t.prepare(sql);
+        EasyQtSql::QueryResult res = query.exec(passId, passId);
+        QByteArray logSql = res.executedQuery().toUtf8();
+        LOG_INFO("执行SQL语句: %s", logSql.constData());
+        t.commit();
+
+        QList<QVariantMap> records;
+        while (res.next()) {
+            QVariantMap record = res.toMap();
+            records.append(record);
+        }
+
+        return records;
+    } catch (EasyQtSql::DBException &e) {
+        t.rollback();
+        QByteArray logError = e.lastError.text().toUtf8();
+        QByteArray logLastQuery = e.lastQuery.toUtf8();
+        LOG_ERROR("%s\n%s", logError.constData(), logLastQuery.constData());
+        return {};
+    }
+}
+
+QString DataService::getGantryNodeID(const QString &nodeHex)
+{
+    QSqlDatabase sdb = GM_INSTANCE->m_dbFactory->getDatabase("oracle");
+    QString sql(R"(SELECT nodeid FROM t_cnfeenode WHERE nodetype = 1 AND hexnode = ?)");
+
+    EasyQtSql::Transaction t(sdb);
+    try {
+        EasyQtSql::PreparedQuery query = t.prepare(sql);
+        EasyQtSql::QueryResult res = query.exec(nodeHex);
+        QByteArray logSql = res.executedQuery().toUtf8();
+        LOG_INFO("执行SQL语句: %s", logSql.constData());
+        t.commit();
+
+        if (!res.next())
+            return "";
+
+        QString data = res.value("nodeid").toString();
+        return data;
+    } catch (EasyQtSql::DBException &e) {
+        t.rollback();
+        QByteArray logError = e.lastError.text().toUtf8();
+        QByteArray logLastQuery = e.lastQuery.toUtf8();
+        LOG_ERROR("%s\n%s", logError.constData(), logLastQuery.constData());
+        return "";
+    }
+}
+
+QString DataService::getGantryNodeName(const QString &nodeId)
+{
+    QSqlDatabase sdb = GM_INSTANCE->m_dbFactory->getDatabase("oracle");
+    QString sql(R"(SELECT nodename FROM t_cnfeenode WHERE nodetype = 1 AND nodeid = ?)");
+
+    EasyQtSql::Transaction t(sdb);
+    try {
+        EasyQtSql::PreparedQuery query = t.prepare(sql);
+        EasyQtSql::QueryResult res = query.exec(nodeId);
+        QByteArray logSql = res.executedQuery().toUtf8();
+        LOG_INFO("执行SQL语句: %s", logSql.constData());
+        t.commit();
+
+        if (!res.next())
+            return "";
+
+        QString data = res.value("nodename").toString();
+        return data;
+    } catch (EasyQtSql::DBException &e) {
+        t.rollback();
+        QByteArray logError = e.lastError.text().toUtf8();
+        QByteArray logLastQuery = e.lastQuery.toUtf8();
+        LOG_ERROR("%s\n%s", logError.constData(), logLastQuery.constData());
+        return "";
+    }
+}
+
+QString DataService::getGantryHexNode(const QString &nodeId)
+{
+    QSqlDatabase sdb = GM_INSTANCE->m_dbFactory->getDatabase("oracle");
+    QString sql(R"(SELECT hexnode FROM t_cnfeenode WHERE nodetype = 1 AND nodeid = ?)");
+
+    EasyQtSql::Transaction t(sdb);
+    try {
+        EasyQtSql::PreparedQuery query = t.prepare(sql);
+        EasyQtSql::QueryResult res = query.exec(nodeId);
+        QByteArray logSql = res.executedQuery().toUtf8();
+        LOG_INFO("执行SQL语句: %s", logSql.constData());
+        t.commit();
+
+        if (!res.next())
+            return "";
+
+        QString data = res.value("hexnode").toString();
+        return data;
+    } catch (EasyQtSql::DBException &e) {
+        t.rollback();
+        QByteArray logError = e.lastError.text().toUtf8();
+        QByteArray logLastQuery = e.lastQuery.toUtf8();
+        LOG_ERROR("%s\n%s", logError.constData(), logLastQuery.constData());
+        return "";
+    }
+}
+
+bool DataService::getSplitOut(const QString &tradeId, QObject *obj)
+{
+    QSqlDatabase sdb = GM_INSTANCE->m_dbFactory->getDatabase("oracle");
+    QString sql(R"(SELECT * FROM t_split_out WHERE tradeid = ? AND provincenum = 35)");
+
+    EasyQtSql::Transaction t(sdb);
+    try {
+        EasyQtSql::PreparedQuery query = t.prepare(sql);
+        EasyQtSql::QueryResult res = query.exec(tradeId);
+        QByteArray logSql = res.executedQuery().toUtf8();
+        LOG_INFO("执行SQL语句: %s", logSql.constData());
+        t.commit();
+
+        if (!res.next())
+            return false;
+
+        res.fetchObject(*obj);
+        return true;
+    } catch (EasyQtSql::DBException &e) {
+        t.rollback();
+        QByteArray logError = e.lastError.text().toUtf8();
+        QByteArray logLastQuery = e.lastQuery.toUtf8();
+        LOG_ERROR("%s\n%s", logError.constData(), logLastQuery.constData());
+        return false;
+    }
+}
+
+QString DataService::getUserID(const QString &cardId)
+{
+    QSqlDatabase sdb = GM_INSTANCE->m_dbFactory->getDatabase("oracle");
+    QString sql(R"(SELECT userid FROM t_user WHERE isvalid = 1 AND idtcardnum = ?)");
+
+    EasyQtSql::Transaction t(sdb);
+    try {
+        EasyQtSql::PreparedQuery query = t.prepare(sql);
+        EasyQtSql::QueryResult res = query.exec(cardId);
+        QByteArray logSql = res.executedQuery().toUtf8();
+        LOG_INFO("执行SQL语句: %s", logSql.constData());
+        t.commit();
+
+        if (!res.next())
+            return "";
+
+        QString data = res.value("userid").toString();
+        return data;
+    } catch (EasyQtSql::DBException &e) {
+        t.rollback();
+        QByteArray logError = e.lastError.text().toUtf8();
+        QByteArray logLastQuery = e.lastQuery.toUtf8();
+        LOG_ERROR("%s\n%s", logError.constData(), logLastQuery.constData());
+        return "";
+    }
+}
+
+QString DataService::getUserName(const QString &param, int type)
+{
+    QSqlDatabase sdb = GM_INSTANCE->m_dbFactory->getDatabase("oracle");
+    QString sql(R"(SELECT username FROM t_user WHERE isvalid = 1 AND %1 = ?)");
+
+    if (type == 0) {
+        sql = sql.arg("idtcardnum");
+    } else {
+        sql = sql.arg("userid");
+    }
+
+    EasyQtSql::Transaction t(sdb);
+    try {
+        EasyQtSql::PreparedQuery query = t.prepare(sql);
+        EasyQtSql::QueryResult res = query.exec(param);
+        QByteArray logSql = res.executedQuery().toUtf8();
+        LOG_INFO("执行SQL语句: %s", logSql.constData());
+        t.commit();
+
+        if (!res.next())
+            return "";
+
+        QString data = res.value("username").toString();
+        return data;
+    } catch (EasyQtSql::DBException &e) {
+        t.rollback();
+        QByteArray logError = e.lastError.text().toUtf8();
+        QByteArray logLastQuery = e.lastQuery.toUtf8();
+        LOG_ERROR("%s\n%s", logError.constData(), logLastQuery.constData());
+        return "";
+    }
+}
+
+QString DataService::getStationIP(const QString &stationId)
+{
+    QSqlDatabase sdb = GM_INSTANCE->m_dbFactory->getDatabase("oracle");
+    QString sql(R"(SELECT ipaddr FROM t_station WHERE stationid = ? AND ipaddr NOT IN ('0000', '0.0.0.0'))");
+
+    EasyQtSql::Transaction t(sdb);
+    try {
+        EasyQtSql::PreparedQuery query = t.prepare(sql);
+        EasyQtSql::QueryResult res = query.exec(stationId);
+        QByteArray logSql = res.executedQuery().toUtf8();
+        LOG_INFO("执行SQL语句: %s", logSql.constData());
+        t.commit();
+
+        if (!res.next())
+            return "";
+
+        QString data = res.value("ipaddr").toString();
+        return data;
+    } catch (EasyQtSql::DBException &e) {
+        t.rollback();
+        QByteArray logError = e.lastError.text().toUtf8();
+        QByteArray logLastQuery = e.lastQuery.toUtf8();
+        LOG_ERROR("%s\n%s", logError.constData(), logLastQuery.constData());
+        return "";
+    }
+}
+
+QString DataService::getStationName(const QString &nodeId)
+{
+    QSqlDatabase sdb = GM_INSTANCE->m_dbFactory->getDatabase("oracle");
+    QString sql(R"(SELECT nodename FROM t_cnfeenode WHERE hexnode = ?)");
+
+    EasyQtSql::Transaction t(sdb);
+    try {
+        EasyQtSql::PreparedQuery query = t.prepare(sql);
+        EasyQtSql::QueryResult res = query.exec(nodeId);
+        QByteArray logSql = res.executedQuery().toUtf8();
+        LOG_INFO("执行SQL语句: %s", logSql.constData());
+        t.commit();
+
+        if (!res.next())
+            return "";
+
+        QString data = res.value("nodename").toString();
+        return data;
+    } catch (EasyQtSql::DBException &e) {
+        t.rollback();
+        QByteArray logError = e.lastError.text().toUtf8();
+        QByteArray logLastQuery = e.lastQuery.toUtf8();
+        LOG_ERROR("%s\n%s", logError.constData(), logLastQuery.constData());
+        return "";
+    }
+}
+
+QString DataService::getGrayCardRemark(const QString &cardId)
+{
+    QSqlDatabase sdb = GM_INSTANCE->m_dbFactory->getDatabase("oracle");
+    QString sql(R"(SELECT remark FROM t_graycard  WHERE cardid = ? AND isvalid = 1)");
+
+    EasyQtSql::Transaction t(sdb);
+    try {
+        EasyQtSql::PreparedQuery query = t.prepare(sql);
+        EasyQtSql::QueryResult res = query.exec(cardId);
+        QByteArray logSql = res.executedQuery().toUtf8();
+        LOG_INFO("执行SQL语句: %s", logSql.constData());
+        t.commit();
+
+        if (!res.next())
+            return "";
+
+        QString data = res.value("remark").toString();
+        return data;
+    } catch (EasyQtSql::DBException &e) {
+        t.rollback();
+        QByteArray logError = e.lastError.text().toUtf8();
+        QByteArray logLastQuery = e.lastQuery.toUtf8();
+        LOG_ERROR("%s\n%s", logError.constData(), logLastQuery.constData());
+        return "";
+    }
+}
+
+QString DataService::getGrayVehicleRemark(const QString &plate)
+{
+    QSqlDatabase sdb = GM_INSTANCE->m_dbFactory->getDatabase("oracle");
+    QString sql(R"(SELECT remark FROM t_grayvehicle  WHERE vehplate = ? AND isvalid = 1)");
+
+    EasyQtSql::Transaction t(sdb);
+    try {
+        EasyQtSql::PreparedQuery query = t.prepare(sql);
+        EasyQtSql::QueryResult res = query.exec(plate);
+        QByteArray logSql = res.executedQuery().toUtf8();
+        LOG_INFO("执行SQL语句: %s", logSql.constData());
+        t.commit();
+
+        if (!res.next())
+            return "";
+
+        QString data = res.value("remark").toString();
+        return data;
+    } catch (EasyQtSql::DBException &e) {
+        t.rollback();
+        QByteArray logError = e.lastError.text().toUtf8();
+        QByteArray logLastQuery = e.lastQuery.toUtf8();
+        LOG_ERROR("%s\n%s", logError.constData(), logLastQuery.constData());
+        return "";
+    }
+}
+
+int DataService::getGreenPassBanType(const QString &plate)
+{
+    QSqlDatabase sdb = GM_INSTANCE->m_dbFactory->getDatabase("oracle");
+    QString sql(R"(SELECT bantype FROM t_greenpassban WHERE vehplate = ? AND isvalid = 1 AND
+                CURRENT_TIMESTAMP BETWEEN starttime AND endtime)");
+
+    EasyQtSql::Transaction t(sdb);
+    try {
+        EasyQtSql::PreparedQuery query = t.prepare(sql);
+        EasyQtSql::QueryResult res = query.exec(plate);
+        QByteArray logSql = res.executedQuery().toUtf8();
+        LOG_INFO("执行SQL语句: %s", logSql.constData());
+        t.commit();
+
+        if (!res.next())
+            return -1;
+
+        int data = res.value("bantype").toInt();
+        return data;
+    } catch (EasyQtSql::DBException &e) {
+        t.rollback();
+        QByteArray logError = e.lastError.text().toUtf8();
+        QByteArray logLastQuery = e.lastQuery.toUtf8();
+        LOG_ERROR("%s\n%s", logError.constData(), logLastQuery.constData());
+        return -1;
+    }
+}
+
+bool DataService::getGreenPassAppointment(const QString &plate)
+{
+    QSqlDatabase sdb = GM_INSTANCE->m_dbFactory->getDatabase("oracle");
+    QString sql(R"(SELECT count(*) as count FROM t_appointment WHERE vehicleid = ?)");
+
+    EasyQtSql::Transaction t(sdb);
+    try {
+        EasyQtSql::PreparedQuery query = t.prepare(sql);
+        EasyQtSql::QueryResult res = query.exec(plate);
+        QByteArray logSql = res.executedQuery().toUtf8();
+        LOG_INFO("执行SQL语句: %s", logSql.constData());
+        t.commit();
+
+        if (!res.next())
+            return false;
+
+        int data = res.value("count").toInt();
+        return data > 0;
+    } catch (EasyQtSql::DBException &e) {
+        t.rollback();
+        QByteArray logError = e.lastError.text().toUtf8();
+        QByteArray logLastQuery = e.lastQuery.toUtf8();
+        LOG_ERROR("%s\n%s", logError.constData(), logLastQuery.constData());
+        return false;
+    }
+}
+
+QVariantList DataService::getFreeTempVehicles(const QString &plate)
+{
+    QSqlDatabase sdb = GM_INSTANCE->m_dbFactory->getDatabase("oracle");
+    QString sql(R"(SELECT * FROM t_freetempvehicle WHERE vehplate = ? AND isvalid = 1)");
+
+    EasyQtSql::Transaction t(sdb);
+    try {
+        EasyQtSql::PreparedQuery query = t.prepare(sql);
+        EasyQtSql::QueryResult res = query.exec(plate);
+        QByteArray logSql = res.executedQuery().toUtf8();
+        LOG_INFO("执行SQL语句: %s", logSql.constData());
+        t.commit();
+
+        QVariantList records;
+        while (res.next()) {
+            QVariantMap record = res.toMap();
+            records.append(record);
+        }
+        return records;
+    } catch (EasyQtSql::DBException &e) {
+        t.rollback();
+        QByteArray logError = e.lastError.text().toUtf8();
+        QByteArray logLastQuery = e.lastQuery.toUtf8();
+        LOG_ERROR("%s\n%s", logError.constData(), logLastQuery.constData());
+        return {};
+    }
+}
+
+QString DataService::getEmgcSeqNum(const QString &stationId)
+{
+    QSqlDatabase sdb = GM_INSTANCE->m_dbFactory->getDatabase("oracle");
+    QString sql(R"(SELECT kitem FROM t_emgcdict WHERE stationid = ? AND laneid = 0 AND ktype = 1)");
+
+    EasyQtSql::Transaction t(sdb);
+    try {
+        EasyQtSql::PreparedQuery query = t.prepare(sql);
+        EasyQtSql::QueryResult res = query.exec(stationId);
+        QByteArray logSql = res.executedQuery().toUtf8();
+        LOG_INFO("执行SQL语句: %s", logSql.constData());
+        t.commit();
+
+        if (!res.next())
+            return "0";
+
+        QString data = res.value("kitem").toString();
+        return data;
+    } catch (EasyQtSql::DBException &e) {
+        t.rollback();
+        QByteArray logError = e.lastError.text().toUtf8();
+        QByteArray logLastQuery = e.lastQuery.toUtf8();
+        LOG_ERROR("%s\n%s", logError.constData(), logLastQuery.constData());
+        return "";
+    }
+}
+
+bool DataService::updateEmgcSeqNum(const QString &stationId, const QString &lastSeqNum)
+{
+    QSqlDatabase sdb = GM_INSTANCE->m_dbFactory->getDatabase("oracle");
+
+    EasyQtSql::Transaction t(sdb);
+    try {
+        int newSeqNum = lastSeqNum.toInt() + 1;
+        EasyQtSql::NonQueryResult res = t.update("t_emgcdict")
+                                            .set("kitem", QString::number(newSeqNum))
+                                            .where("stationid = ? AND laneid = 0 AND ktype = 1", stationId);
+        QByteArray logSql = res.executedQuery().toUtf8();
+        LOG_INFO("执行SQL语句: %s", logSql.constData());
+
+        return t.commit();
+    } catch (EasyQtSql::DBException &e) {
+        t.rollback();
+        QByteArray logError = e.lastError.text().toUtf8();
+        QByteArray logLastQuery = e.lastQuery.toUtf8();
+        LOG_ERROR("%s\n%s", logError.constData(), logLastQuery.constData());
+        return false;
+    }
+}
+
+bool DataService::insertEmgcSeqNum(const QString &stationId)
+{
+    QSqlDatabase sdb = GM_INSTANCE->m_dbFactory->getDatabase("oracle");
+
+    EasyQtSql::Transaction t(sdb);
+    try {
+        EasyQtSql::NonQueryResult res = t.insertInto(
+                                             "t_emgcdict (stationid, laneid, ktype, kitem, kvalueint, kvaluestring)")
+                                            .values(stationId, 0, 1, "1", 0, "")
+                                            .exec();
+        QByteArray logSql = res.executedQuery().toUtf8();
+        LOG_INFO("执行SQL语句: %s", logSql.constData());
+
+        return t.commit();
+    } catch (EasyQtSql::DBException &e) {
+        t.rollback();
+        QByteArray logError = e.lastError.text().toUtf8();
+        QByteArray logLastQuery = e.lastQuery.toUtf8();
+        LOG_ERROR("%s\n%s", logError.constData(), logLastQuery.constData());
+        return false;
+    }
+}
+
+QVariantMap DataService::getTicketUseInfo(int laneId, const QString &shiftDate, const QString &id)
+{
+    QSqlDatabase sdb = GM_INSTANCE->m_dbFactory->getDatabase(id);
+
+    QString sql(R"(SELECT * from t_ticketusemanage WHERE laneid = ? AND shiftdate = ?)");
+
+    EasyQtSql::Transaction t(sdb);
+    try {
+        EasyQtSql::PreparedQuery query = t.prepare(sql);
+        EasyQtSql::QueryResult res = query.exec(laneId, shiftDate);
+        QByteArray logSql = res.executedQuery().toUtf8();
+        LOG_INFO("执行SQL语句: %s", logSql.constData());
+        t.commit();
+
+        if (!res.next())
+            return {};
+
+        QVariantMap resMap = res.toMap();
+        return resMap;
+    } catch (EasyQtSql::DBException &e) {
+        t.rollback();
+        QByteArray logError = e.lastError.text().toUtf8();
+        QByteArray logLastQuery = e.lastQuery.toUtf8();
+        LOG_ERROR("%s\n%s", logError.constData(), logLastQuery.constData());
+        return {};
+    }
+}
