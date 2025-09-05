@@ -16,8 +16,9 @@ HttpHandler::~HttpHandler() {}
 void HttpHandler::service(HttpRequest &request, HttpResponse &response)
 {
     QByteArray reqBody = request.getBody();
-    QByteArray logReqBody = reqBody.left(1024);
-    LOG_INFO("request size: %d ==>\n%s", reqBody.size(), logReqBody.constData());
+    LOG_INFO().noquote() << QString("request size: %1 ==>\n%2")
+                                .arg(reqBody.size())
+                                .arg(QString::fromUtf8(reqBody.left(1024)));
 
     if (reqBody.size() <= 0)
         return;
@@ -41,8 +42,9 @@ void HttpHandler::service(HttpRequest &request, HttpResponse &response)
         aMap.insert("data", dealtData);
         QByteArray sendData = GM_INSTANCE->m_jsonSerializer->serialize(aMap);
 
-        QByteArray logSendData = sendData.left(1024);
-        LOG_INFO("response size: %d <==\n%s", sendData.size(), logSendData.constData());
+        LOG_INFO().noquote() << QString("response size: %1 <==\n%2")
+                                    .arg(sendData.size())
+                                    .arg(QString::fromUtf8(sendData.left(1024)));
         response.write(sendData, true);
     } catch (const BaseException &e) {
         QString dealtData = QString::fromUtf8(R"({"status":"%1","desc":"%2"})").arg(e.status()).arg(e.desc());
@@ -51,8 +53,9 @@ void HttpHandler::service(HttpRequest &request, HttpResponse &response)
         aMap.insert("data", dealtData);
         QByteArray sendData = GM_INSTANCE->m_jsonSerializer->serialize(aMap);
 
-        QByteArray logSendData = sendData.left(1024);
-        LOG_INFO("response size: %d <==\n%s", sendData.size(), logSendData.constData());
+        LOG_INFO().noquote() << QString("response size: %1 <==\n%2")
+                                    .arg(sendData.size())
+                                    .arg(QString::fromUtf8(sendData.left(1024)));
         response.write(sendData, true);
     }
 }

@@ -26,37 +26,36 @@ bool DtpSender::initDtp(QString s)
         dtp_lib = new QLibrary(s);
         if (dtp_lib->load()) {
             dtp_connect = (fn_dtp_connect) dtp_lib->resolve("dtp_connect");
-            std::string errorStr = dtp_lib->errorString().toStdString();
+            QString errorStr = dtp_lib->errorString();
             if (!dtp_connect) {
-                LOG_ERROR("dtp_connect resolve failed: %s", errorStr.c_str());
+                LOG_ERROR().noquote() << "dtp_connect resolve failed: " << errorStr;
             }
             dtp_disconn = (fn_dtp_disconn) dtp_lib->resolve("dtp_disconn");
             if (!dtp_disconn) {
-                LOG_ERROR("dtp_disconn resolve failed: %s", errorStr.c_str());
+                LOG_ERROR().noquote() << "dtp_disconn resolve failed: " << errorStr;
             }
             dtp_login = (fn_dtp_login) dtp_lib->resolve("dtp_login");
             if (!dtp_login) {
-                LOG_ERROR("dtp_login resolve failed: %s", errorStr.c_str());
+                LOG_ERROR().noquote() << "dtp_login resolve failed: " << errorStr;
             }
             dtp_logout = (fn_dtp_logout) dtp_lib->resolve("dtp_logout");
             if (!dtp_logout) {
-                LOG_ERROR("dtp_logout resolve failed: %s", errorStr.c_str());
+                LOG_ERROR().noquote() << "dtp_logout resolve failed: " << errorStr;
             }
             dtp_putmsg = (fn_dtp_putmsg) dtp_lib->resolve("dtp_putmsg");
             if (!dtp_putmsg) {
-                LOG_ERROR("dtp_putmsg resolve failed: %s", errorStr.c_str());
+                LOG_ERROR().noquote() << "dtp_putmsg resolve failed: " << errorStr;
             }
             dtp_getmsg = (fn_dtp_getmsg) dtp_lib->resolve("dtp_getmsg");
             if (!dtp_getmsg) {
-                LOG_ERROR("dtp_getmsg resolve failed: %s", errorStr.c_str());
+                LOG_ERROR().noquote() << "dtp_getmsg resolve failed: " << errorStr;
             }
             dtp_storemsg = (fn_dtp_storemsg) dtp_lib->resolve("dtp_storemsg");
             if (!dtp_storemsg) {
-                LOG_ERROR("dtp_storemsg resolve failed: %s", errorStr.c_str());
+                LOG_ERROR().noquote() << "dtp_storemsg resolve failed: " << errorStr;
             }
         } else {
-            std::string errorStr = dtp_lib->errorString().toStdString();
-            LOG_ERROR("Load dtp dll failed: %s", errorStr.c_str());
+            LOG_ERROR().noquote() << "Load dtp dll failed: " << dtp_lib->errorString();
             delete dtp_lib;
             dtp_lib = NULL;
         }
@@ -75,24 +74,24 @@ int DtpSender::connectDtpServer(QString serverIP, int port)
     int nRole = 0;
     // 连接数据库
     nRes = dtp_connect(&m_dtpHandle, serverIP.toStdString().c_str(), port);
-    LOG_INFO("连接DtpServer,返回Handle:%d,Result:%d", m_dtpHandle, nRes);
+    LOG_INFO().noquote() << "连接DtpServer,返回Handle: " << m_dtpHandle << " ,Result: " << nRes;
     if (nRes != 0) {
         m_LoginDtp = false;
-        LOG_ERROR("连接[%s:%d]DTP服务失败,尝试重连!ErrCode:%d", serverIP.toStdString().c_str(), port, nRes);
+        LOG_ERROR().noquote() << QString("连接[%1:%2]DTP服务失败,尝试重连! ErrCode:%3").arg(serverIP).arg(port, nRes);
         m_dtpHandle = 0;
         return -1;
     }
     // 如果没有登陆过，尝试登陆
     if (!m_LoginDtp)
         nRes = dtp_login(m_dtpHandle, "admin", "admin", &nRole);
-    LOG_INFO("开始登录DtpServer,返回handle:%d,Res:%d", m_dtpHandle, nRes);
+    LOG_INFO().noquote() << "开始登录DtpServer,返回handle: " << m_dtpHandle << " ,Res: " << nRes;
     // 登陆失败处理
     if (nRes != 0) {
         if (m_dtpHandle) {
-            LOG_INFO("断开DtpServer连接Hanlde:%d", m_dtpHandle);
+            LOG_INFO().noquote() << "断开DtpServer连接Hanlde: " << m_dtpHandle;
             dtp_disconn(m_dtpHandle);
         }
-        LOG_ERROR("%s登陆DTP服务失败,再次尝试!", "admin");
+        LOG_ERROR().noquote() << "admin登陆DTP服务失败,再次尝试!";
         m_dtpHandle = 0;
         m_LoginDtp = false;
         return -2;
@@ -121,16 +120,16 @@ int DtpSender::sendMsgToDtp(QString serverIP, int port, QString queue, QString l
                       3);
     // 发送失败
     if (nRes) {
-        LOG_ERROR(QString("向[%1: %2]DTP发送数据失败重连.错误码:%3").arg(serverIP, queue).arg(nRes));
+        LOG_ERROR().noquote() << QString("向[%1: %2]DTP发送数据失败重连.错误码:%3").arg(serverIP, queue).arg(nRes);
         if (m_dtpHandle) {
-            LOG_INFO("断开DtpServer连接Hanlde:%d", m_dtpHandle);
+            LOG_INFO().noquote() << "断开DtpServer连接Hanlde: " << m_dtpHandle;
             dtp_disconn(m_dtpHandle);
         }
         m_dtpHandle = 0;
     }
     // 发送成功
     else {
-        LOG_INFO(QString("向[%1: %2]发送 Done.").arg(serverIP, queue));
+        LOG_INFO().noquote() << QString("向[%1: %2]发送 Done.").arg(serverIP, queue);
     }
     return nRes;
 }

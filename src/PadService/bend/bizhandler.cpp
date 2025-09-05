@@ -92,7 +92,7 @@ QString BizHandler::doDealCmd01(const QVariantMap &aMap)
     QString stationName = m_ds.getStationName("3501" + stationID);
 
     QString msg = QString("%1(%2), 车道号: %3, 工号: %4").arg(stationName, stationID).arg(laneID).arg(operatorID);
-    LOG_INFO(QString("%1 稽核业务登录成功").arg(msg));
+    LOG_INFO().noquote() << QString("%1 稽核业务登录成功").arg(msg);
 
     QVariantMap resMap;
     resMap["loginStatus"] = 0;
@@ -144,7 +144,7 @@ QString BizHandler::getVehicleWayFromPlate(const QString &plateNumber)
     if (m_ds.getLatestOutTrade(plateNumber, &objEtc, 0)) {
         // ETC出口记录
         if (objEtc.ExShiftDate <= QDateTime::fromString("20200101", "yyyyMMdd")) {
-            LOG_INFO(QString("取消省界站前数据无效 %1").arg(objEtc.ExShiftDate.toString("yyyy-MM-dd")));
+            LOG_INFO().noquote() << QString("取消省界站前数据无效 %1").arg(objEtc.ExShiftDate.toString("yyyy-MM-dd"));
             throw BaseException(1, "响应失败: 数据无效(取消省界站前数据)");
         }
         passID = objEtc.PassID;
@@ -175,7 +175,7 @@ QString BizHandler::getVehicleWayFromPlate(const QString &plateNumber)
     } else if (m_ds.getLatestOutTrade(plateNumber, &objMtc, 1)) {
         // MTC出口记录
         if (objMtc.ExShiftDate <= QDateTime::fromString("20200101", "yyyyMMdd")) {
-            LOG_INFO(QString("取消省界站前数据无效 %1").arg(objMtc.ExShiftDate.toString("yyyy-MM-dd")));
+            LOG_INFO().noquote() << QString("取消省界站前数据无效 %1").arg(objMtc.ExShiftDate.toString("yyyy-MM-dd"));
             throw BaseException(1, "响应失败: 数据无效(取消省界站前数据)");
         }
         passID = objMtc.PassID;
@@ -210,9 +210,9 @@ QString BizHandler::getVehicleWayFromPlate(const QString &plateNumber)
     if (passID.isEmpty())
         throw BaseException(1, "响应失败: 获取出口信息失败(passid为空)");
 
-    LOG_INFO(QString("查询出口信息结果返回: exitFeeType %1, passID %2, name %3, tradeId %4")
-                 .arg(exitFeeType)
-                 .arg(passID, exNode.nodeName, tradeID));
+    LOG_INFO().noquote() << QString("查询出口信息结果返回: exitFeeType %1, passID %2, name %3, tradeId %4")
+                                .arg(exitFeeType)
+                                .arg(passID, exNode.nodeName, tradeID);
 
     // 查询入口信息
     ST_Node enNode;
@@ -227,14 +227,14 @@ QString BizHandler::getVehicleWayFromPlate(const QString &plateNumber)
     }
 
     if (enInfo.isEmpty() || enNode.captureId.isEmpty()) {
-        LOG_INFO("查询入口信息为空，使用出口记录中的入口信息");
+        LOG_INFO().noquote() << "查询入口信息为空，使用出口记录中的入口信息";
         enNode.captureId = "";
         enNode.passTime = enTime;
         enNode.nodeHex = enNetHex + enHex;
         enNode.nodeId = m_ds.getGantryNodeID(enNode.nodeHex);
         enNode.nodeName = enName;
     }
-    LOG_INFO(QString("查询入口信息结果返回 passID %1, name %2").arg(passID, enNode.nodeName));
+    LOG_INFO().noquote() << QString("查询入口信息结果返回 passID %1, name %2").arg(passID, enNode.nodeName);
 
     // 组装发送报文
     ST_PathFitting pathFitting;
@@ -255,13 +255,13 @@ QString BizHandler::getVehicleWayFromPlate(const QString &plateNumber)
         getGantryNodeSplitOut(tradeID, pathFitting.tollIntervalIDs, pathFitting.tollIntervalIDsTime);
     }
     QString sendJson = packFeePath(pathFitting, exitFeeType);
-    LOG_INFO(QString("发送地图路径请求 %1").arg(sendJson));
+    LOG_INFO().noquote() << QString("发送地图路径请求 %1").arg(sendJson);
 
     QUrl url(GM_INSTANCE->m_config->m_baseConfig.mapUrl);
     auto reply = Http().instance().post(url, sendJson.toUtf8(), "application/json");
 
     QString result = blockUtilResponse(reply, Http().instance().getReadTimeout());
-    LOG_INFO(QString("接收地图路径完成 %1").arg(result.left(1024)));
+    LOG_INFO().noquote() << QString("接收地图路径完成 %1").arg(result.left(1024));
 
     QVariantMap resMap = GM_INSTANCE->m_jsonParser->parse(result.toUtf8()).toMap();
     QVariantMap bizContent = resMap.value("bizContent", {}).toMap();
@@ -284,13 +284,13 @@ QString BizHandler::getVehicleWayFromScan(const QString &scan)
     aMap.insert("bizContent", GM_INSTANCE->m_jsonSerializer->serialize(tempMap));
 
     QString sendJson = GM_INSTANCE->m_jsonSerializer->serialize(aMap);
-    LOG_INFO(QString("传扫描内容：%1").arg(sendJson));
+    LOG_INFO().noquote() << QString("传扫描内容：%1").arg(sendJson);
 
     QUrl url(GM_INSTANCE->m_config->m_baseConfig.mapUrl);
     auto reply = Http().instance().post(url, sendJson.toUtf8(), "application/json");
 
     QString result = blockUtilResponse(reply, Http().instance().getReadTimeout());
-    LOG_INFO(QString("返回扫描结果: %1").arg(result));
+    LOG_INFO().noquote() << QString("返回扫描结果: %1").arg(result);
 
     QVariantMap resMap = GM_INSTANCE->m_jsonParser->parse(result.toUtf8()).toMap();
     QVariant bizContent;
@@ -412,13 +412,13 @@ void BizHandler::getGantryNodeSplitOut(const QString &sTradeID, QString &tollInt
     // 查t_SplitOut
     T_SplitOut splitOut;
     if (!m_ds.getSplitOut(sTradeID, &splitOut)) {
-        LOG_INFO("未查询到门架信息");
+        LOG_INFO().noquote() << "未查询到门架信息";
         return;
     }
 
     tollIntervalsGroup = splitOut.TollIntervalsGroup;
     transTimeGroup = splitOut.TransTimeGroup;
-    LOG_INFO(QString("门架信息：%1, %2").arg(tollIntervalsGroup, transTimeGroup));
+    LOG_INFO().noquote() << QString("门架信息：%1, %2").arg(tollIntervalsGroup, transTimeGroup);
 }
 
 QString BizHandler::doDealCmd19(const QVariantMap &aMap)
@@ -521,9 +521,9 @@ QString BizHandler::getGreenVehicleInfoFromPlate(const QString &plateNumber)
         throw BaseException(1, "响应失败: 获取出口信息失败(passid为空)");
     }
 
-    LOG_INFO(QString("查询出口信息结果返回: exitFeeType %1, passID %2, name %3, tradeId %4")
-                 .arg(exitFeeType)
-                 .arg(passID, exNode.nodeName, tradeID));
+    LOG_INFO().noquote() << QString("查询出口信息结果返回: exitFeeType %1, passID %2, name %3, tradeId %4")
+                                .arg(exitFeeType)
+                                .arg(passID, exNode.nodeName, tradeID);
 
     // 查询入口信息
     ST_Node enNode;
@@ -538,14 +538,14 @@ QString BizHandler::getGreenVehicleInfoFromPlate(const QString &plateNumber)
     }
 
     if (enInfo.isEmpty() || enNode.captureId.isEmpty()) {
-        LOG_INFO("查询入口信息为空，使用出口记录中的入口信息");
+        LOG_INFO().noquote() << "查询入口信息为空，使用出口记录中的入口信息";
         enNode.captureId = "";
         enNode.passTime = enTime;
         enNode.nodeHex = enNetHex + enHex;
         enNode.nodeId = m_ds.getGantryNodeID(enNode.nodeHex);
         enNode.nodeName = enName;
     }
-    LOG_INFO(QString("查询入口信息结果返回 passID %1, name %2").arg(passID, enNode.nodeName));
+    LOG_INFO().noquote() << QString("查询入口信息结果返回 passID %1, name %2").arg(passID, enNode.nodeName);
 
     // 判断是否允许绿通通行
     QString greenPassMsg;
@@ -628,7 +628,7 @@ QString BizHandler::getGreenVehicleWayFromScan(const QString &scan)
     }
 
     if (enInfo.isEmpty() || enNode.captureId.isEmpty()) {
-        LOG_INFO("查询入口信息为空，使用出口记录中的入口信息");
+        LOG_INFO().noquote() << "查询入口信息为空，使用出口记录中的入口信息";
         enNode.captureId = "";
         enNode.passTime = QDateTime::fromString(scanInfo.passId.right(14), "yyyyMMddhhmmss")
                               .toString("yyyy-MM-dd hh:mm:ss");
@@ -636,7 +636,7 @@ QString BizHandler::getGreenVehicleWayFromScan(const QString &scan)
         enNode.nodeId = m_ds.getGantryNodeID(enNode.nodeHex);
         enNode.nodeName = m_ds.getGantryNodeName(scanInfo.enStationId);
     }
-    LOG_INFO(QString("查询入口信息结果返回 passID %1, name %2").arg(passID, enNode.nodeName));
+    LOG_INFO().noquote() << QString("查询入口信息结果返回 passID %1, name %2").arg(passID, enNode.nodeName);
 
     // 组装发送报文
     ST_PathFitting pathFitting;
@@ -655,12 +655,12 @@ QString BizHandler::getGreenVehicleWayFromScan(const QString &scan)
     getGantryNodes(passID, pathFitting.gantryUnits);
     QString sendJson = packFeePath(pathFitting, exitFeeType);
 
-    LOG_INFO(QString("发送地图路径请求: %1").arg(sendJson));
+    LOG_INFO().noquote() << QString("发送地图路径请求: %1").arg(sendJson);
     QUrl url(GM_INSTANCE->m_config->m_baseConfig.mapUrl);
     auto reply = Http().instance().post(url, sendJson.toUtf8(), "application/json");
 
     QString result = blockUtilResponse(reply, Http().instance().getReadTimeout());
-    LOG_INFO(QString("接收地图路径完成 %1").arg(result.left(1024)));
+    LOG_INFO().noquote() << QString("接收地图路径完成 %1").arg(result.left(1024));
 
     QVariantMap resMap = GM_INSTANCE->m_jsonParser->parse(result.toUtf8()).toMap();
     QVariantMap bizMap = resMap.value("bizContent", {}).toMap();
@@ -755,13 +755,13 @@ QString BizHandler::getGantryImage(const QString &plateNumber, const QString &ga
     sendMap["tradeTime"] = tradeTime;
     sendMap["vehPlate"] = plateNumber;
     QString sendData = GM_INSTANCE->m_jsonSerializer->serialize(sendMap);
-    LOG_INFO(QString("获取门架图片请求 %1").arg(sendData));
+    LOG_INFO().noquote() << QString("获取门架图片请求 %1").arg(sendData);
 
     QUrl url(GM_INSTANCE->m_config->m_baseConfig.gantryPicUrl);
     auto reply = Http().instance().post(url, sendData.toUtf8(), "application/json");
 
     QString result = blockUtilResponse(reply, Http().instance().getReadTimeout());
-    LOG_INFO(QString("返回门架图片数据: %1").arg(result.left(1024)));
+    LOG_INFO().noquote() << QString("返回门架图片数据: %1").arg(result.left(1024));
 
     return result;
 }
@@ -775,13 +775,13 @@ QString BizHandler::getLaneImage(const QString &captureId)
     sendMap["tradeId"] = captureId;
     sendMap["orgId"] = captureId.left(4);
     QString sendData = GM_INSTANCE->m_jsonSerializer->serialize(sendMap);
-    LOG_INFO(QString("获取车道图片请求: %1").arg(sendData));
+    LOG_INFO().noquote() << QString("获取车道图片请求: %1").arg(sendData);
 
     QUrl url(GM_INSTANCE->m_config->m_baseConfig.lanePicUrl);
     auto reply = Http().instance().post(url, sendData.toUtf8(), "application/json");
 
     QString result = blockUtilResponse(reply, Http().instance().getReadTimeout());
-    LOG_INFO(QString("返回车道图片数据: %1").arg(result.left(1024)));
+    LOG_INFO().noquote() << QString("返回车道图片数据: %1").arg(result.left(1024));
 
     return result;
 }
@@ -794,29 +794,28 @@ QString BizHandler::getLocalImage(const QString &picName)
     Utils::FileName picturePath = GM_INSTANCE->m_pictureDir + QString("/%1").arg(picName);
 
     if (!picturePath.exists()) {
-        LOG_WARNING(QString("图片文件不存在 %1.jgp").arg(picName));
+        LOG_WARNING().noquote() << QString("图片文件不存在 %1.jgp").arg(picName);
         throw BaseException(1, "响应失败: 图片文件不存在");
     }
 
     Utils::FileReader fileReader;
     bool ok = fileReader.fetch(picturePath.toString());
     if (!ok) {
-        LOG_ERROR(QString("读取图片文件 %1.jgp 失败").arg(picName));
+        LOG_ERROR().noquote() << QString("读取图片文件 %1.jgp 失败").arg(picName);
         throw BaseException(1, "响应失败: 读取图片文件失败");
     }
 
     QByteArray imageData = fileReader.data();
 
     QString result = imageData.toBase64();
-    LOG_INFO(QString("返回本地图片数据: %1").arg(result.left(1024)));
+    LOG_INFO().noquote() << QString("返回本地图片数据: %1").arg(result.left(1024));
     return result;
 }
 
 QString BizHandler::doDealCmd24(const QByteArray &reqBody)
 {
     QByteArray sendData = reqBody;
-    QString logData = QString::fromUtf8(sendData.left(1024));
-    LOG_INFO(QString("车牌识别获取请求: %1").arg(logData));
+    LOG_INFO().noquote() << QString("车牌识别获取请求: %1").arg(QString::fromUtf8(sendData.left(1024)));
 
     QUrl url(GM_INSTANCE->m_config->m_baseConfig.plateOcrUrl);
     auto reply = Http().instance().post(url, sendData, "application/json");
@@ -827,7 +826,7 @@ QString BizHandler::doDealCmd24(const QByteArray &reqBody)
     if (!ok)
         throw BaseException(1, "响应失败: 解析车牌识别返回内容异常");
     QString data = GM_INSTANCE->m_jsonSerializer->serialize(resMap["data"]);
-    LOG_INFO(QString("车牌识别内容返回: %1").arg(data));
+    LOG_INFO().noquote() << QString("车牌识别内容返回: %1").arg(data);
     return data;
 }
 
@@ -847,13 +846,13 @@ QString BizHandler::doDealCmd25(const QVariantMap &aMap)
     map["vehicleId"] = vehicleId;
     map["cardNum"] = cardId;
     QString sendData = GM_INSTANCE->m_jsonSerializer->serialize(map);
-    LOG_INFO(QString("状态名单信息查询请求: %1").arg(sendData));
+    LOG_INFO().noquote() << QString("状态名单信息查询请求: %1").arg(sendData);
 
     QString url(GM_INSTANCE->m_config->m_baseConfig.blackStatusUrl);
     auto reply = Http().instance().post(url, sendData.toUtf8(), "application/json");
 
     QString result = blockUtilResponse(reply, Http().instance().getReadTimeout());
-    LOG_INFO(QString("返回状态名单信息查询结果: %1").arg(result));
+    LOG_INFO().noquote() << QString("返回状态名单信息查询结果: %1").arg(result);
 
     return result;
 }
@@ -890,13 +889,13 @@ QString BizHandler::doDealCmd26(const QVariantMap &aMap)
     T_LaneInputShift laneInputShift;
     QJson::QObjectHelper::qvariant2qobject(aMap, &laneInputShift);
     laneInputShift.UpdateTime = QDateTime::currentDateTime();
-    LOG_INFO(QString("交接班数据: %1").arg(laneInputShift.toString()));
+    LOG_INFO().noquote() << QString("交接班数据: %1").arg(laneInputShift.toString());
 
     QString dtpContent = Utils::BizUtils::makeDtpContentFromObj(laneInputShift);
     QString fromNode = stationId.rightJustified(4, QLatin1Char('0'))
                        + QString::number(laneId).rightJustified(2, QLatin1Char('0'));
     QString dtpXml = Utils::BizUtils::makeDtpXml(dtpContent, "531", fromNode, stationId, 1);
-    LOG_INFO(QString("交接班数据DTP报文: %1").arg(dtpXml));
+    LOG_INFO().noquote() << QString("交接班数据DTP报文: %1").arg(dtpXml);
 
     QString stationIP = m_ds.getStationIP(stationId);
     int res = m_dtpSender->sendMsgToDtp(stationIP, 13591, "TradeQ", "", dtpXml);
@@ -977,13 +976,13 @@ QString BizHandler::doDealCmd27(const QVariantMap &aMap)
 
     resMap["specialType"] = specialSubType; // NOTE 特别处理
     QJson::QObjectHelper::qvariant2qobject(resMap, &specialCard);
-    LOG_INFO(QString("特情卡记录: %1").arg(specialCard.toString()));
+    LOG_INFO().noquote() << QString("特情卡记录: %1").arg(specialCard.toString());
 
     QString dtpContent = Utils::BizUtils::makeDtpContentFromObj(specialCard);
     QString fromNode = stationID.rightJustified(4, QLatin1Char('0'))
                        + QString::number(specialCard.LaneID).rightJustified(2, QLatin1Char('0'));
     QString dtpXml = Utils::BizUtils::makeDtpXml(dtpContent, "532", fromNode, stationID, 1);
-    LOG_INFO(QString("特情卡记录DTP报文: %1").arg(dtpXml));
+    LOG_INFO().noquote() << QString("特情卡记录DTP报文: %1").arg(dtpXml);
 
     QString stationIP = m_ds.getStationIP(stationID);
     int res = m_dtpSender->sendMsgToDtp(stationIP, 13591, "TradeQ", "", dtpXml);
@@ -1012,7 +1011,7 @@ QString BizHandler::doDealCmd28(const QVariantMap &aMap)
     if (userId.isEmpty() && userName.isEmpty())
         throw BaseException(1, "响应失败: 未查询到相关用户信息");
 
-    LOG_INFO(QString("返回用户信息: cardId %1, userName %2, userId %3").arg(cardId, userName, userId));
+    LOG_INFO().noquote() << QString("返回用户信息: cardId %1, userName %2, userId %3").arg(cardId, userName, userId);
     QVariantMap map;
     map["status"] = "0";
     map["desc"] = "";
@@ -1034,7 +1033,7 @@ QString BizHandler::doDealCmd30(QVariantMap aMap)
     int colorIndex = Utils::BizUtils::getColorCodeFromPlate(vehicleId);
     QString plateNoColor = Utils::BizUtils::getPlateNoColor(vehicleId);
 
-    LOG_INFO(QString("查询逃漏费车辆 %1 欠费列表").arg(vehicleId));
+    LOG_INFO().noquote() << QString("查询逃漏费车辆 %1 欠费列表").arg(vehicleId);
     QString encodedVehicleId = QUrl::toPercentEncoding(QString("%1_%2").arg(plateNoColor).arg(colorIndex));
     QUrl url(GM_INSTANCE->m_config->m_baseConfig.arrearsUrl + "/" + encodedVehicleId);
     // 跳过证书校验
@@ -1043,7 +1042,7 @@ QString BizHandler::doDealCmd30(QVariantMap aMap)
 
     QString result = blockUtilResponse(reply, Http().instance().getReadTimeout() * 3);
     Http().instance().setSkipVerify(false);
-    LOG_INFO(QString("返回逃漏费车辆欠费列表: %1").arg(result.left(1024)));
+    LOG_INFO().noquote() << QString("返回逃漏费车辆欠费列表: %1").arg(result.left(1024));
 
     QVariantMap resMap = GM_INSTANCE->m_jsonParser->parse(result.toUtf8()).toMap();
     bool success = resMap["success"].toBool();
@@ -1127,7 +1126,7 @@ QString BizHandler::doDealCmd39(const QVariantMap &aMap)
     sendMap["dataType"] = 4;
 
     QString sendData = GM_INSTANCE->m_jsonSerializer->serialize(sendMap);
-    LOG_INFO(QString("本站绿通流水查询请求: %1").arg(sendData));
+    LOG_INFO().noquote() << QString("本站绿通流水查询请求: %1").arg(sendData);
 
     QString stationIP = m_ds.getStationIP(stationID);
     QString stationServiceUrl = QString("http://%1:8082").arg(stationIP);
@@ -1135,12 +1134,12 @@ QString BizHandler::doDealCmd39(const QVariantMap &aMap)
     auto reply = Http().instance().post(url, sendData.toUtf8(), "application/json");
 
     QString result = blockUtilResponse(reply, Http().instance().getReadTimeout());
-    LOG_INFO(QString("返回本站绿通流水查询结果: %1").arg(result));
+    LOG_INFO().noquote() << QString("返回本站绿通流水查询结果: %1").arg(result);
 
     QVariantMap resMap = GM_INSTANCE->m_jsonParser->parse(result.toUtf8()).toMap();
     if (resMap["errCode"].toInt() == 1) {
         QString errorMessage = resMap["errorMessage"].toString();
-        LOG_ERROR(QString("站级服务返回查询失败 %1").arg(errorMessage));
+        LOG_ERROR().noquote() << QString("站级服务返回查询失败 %1").arg(errorMessage);
         throw BaseException(1, QString("响应失败: 站级服务返回查询失败 %1").arg(errorMessage));
     }
 

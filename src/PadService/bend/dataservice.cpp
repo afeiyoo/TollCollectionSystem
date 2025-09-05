@@ -28,8 +28,7 @@ bool DataService::getLatestOutTrade(const QString &vehPlate, QObject *obj, int t
     try {
         EasyQtSql::PreparedQuery query = t.prepare(sql);
         EasyQtSql::QueryResult res = query.exec(vehPlate, vehPlate, vehPlate);
-        QByteArray logSql = res.executedQuery().toUtf8();
-        LOG_INFO("执行SQL语句: %s", logSql.constData());
+        LOG_INFO().noquote() << QString("执行SQL语句: %1").arg(res.executedQuery());
         t.commit();
 
         if (!res.next())
@@ -39,9 +38,7 @@ bool DataService::getLatestOutTrade(const QString &vehPlate, QObject *obj, int t
         return true;
     } catch (EasyQtSql::DBException &e) {
         t.rollback();
-        QByteArray logError = e.lastError.text().toUtf8();
-        QByteArray logLastQuery = e.lastQuery.toUtf8();
-        LOG_ERROR("%s\n%s", logError.constData(), logLastQuery.constData());
+        LOG_ERROR().noquote() << e.lastError.text() << endl << e.lastQuery;
         return false;
     }
 }
@@ -62,8 +59,8 @@ QVariantMap DataService::getEnInfo(const QString &passID)
     try {
         EasyQtSql::PreparedQuery query = t.prepare(sql);
         EasyQtSql::QueryResult res = query.exec(passID, passID);
-        QByteArray logSql = res.executedQuery().toUtf8();
-        LOG_INFO("执行SQL语句: %s", logSql.constData());
+
+        LOG_INFO().noquote() << QString("执行SQL语句: %1").arg(res.executedQuery());
         t.commit();
 
         if (!res.next())
@@ -73,9 +70,7 @@ QVariantMap DataService::getEnInfo(const QString &passID)
         return resMap;
     } catch (EasyQtSql::DBException &e) {
         t.rollback();
-        QByteArray logError = e.lastError.text().toUtf8();
-        QByteArray logLastQuery = e.lastQuery.toUtf8();
-        LOG_ERROR("%s\n%s", logError.constData(), logLastQuery.constData());
+        LOG_ERROR().noquote() << e.lastError.text() << endl << e.lastQuery;
         return {};
     }
 }
@@ -94,8 +89,8 @@ QList<QVariantMap> DataService::getGantryInfos(const QString &passId)
     try {
         EasyQtSql::PreparedQuery query = t.prepare(sql);
         EasyQtSql::QueryResult res = query.exec(passId, passId);
-        QByteArray logSql = res.executedQuery().toUtf8();
-        LOG_INFO("执行SQL语句: %s", logSql.constData());
+
+        LOG_INFO().noquote() << QString("执行SQL语句: %1").arg(res.executedQuery());
         t.commit();
 
         QList<QVariantMap> records;
@@ -107,9 +102,7 @@ QList<QVariantMap> DataService::getGantryInfos(const QString &passId)
         return records;
     } catch (EasyQtSql::DBException &e) {
         t.rollback();
-        QByteArray logError = e.lastError.text().toUtf8();
-        QByteArray logLastQuery = e.lastQuery.toUtf8();
-        LOG_ERROR("%s\n%s", logError.constData(), logLastQuery.constData());
+        LOG_ERROR().noquote() << e.lastError.text() << endl << e.lastQuery;
         return {};
     }
 }
@@ -123,8 +116,8 @@ QString DataService::getGantryNodeID(const QString &nodeHex)
     try {
         EasyQtSql::PreparedQuery query = t.prepare(sql);
         EasyQtSql::QueryResult res = query.exec(nodeHex);
-        QByteArray logSql = res.executedQuery().toUtf8();
-        LOG_INFO("执行SQL语句: %s", logSql.constData());
+
+        LOG_INFO().noquote() << QString("执行SQL语句: %1").arg(res.executedQuery());
         t.commit();
 
         if (!res.next())
@@ -134,9 +127,7 @@ QString DataService::getGantryNodeID(const QString &nodeHex)
         return data;
     } catch (EasyQtSql::DBException &e) {
         t.rollback();
-        QByteArray logError = e.lastError.text().toUtf8();
-        QByteArray logLastQuery = e.lastQuery.toUtf8();
-        LOG_ERROR("%s\n%s", logError.constData(), logLastQuery.constData());
+        LOG_ERROR().noquote() << e.lastError.text() << endl << e.lastQuery;
         return "";
     }
 }
@@ -150,8 +141,8 @@ QString DataService::getGantryNodeName(const QString &nodeId)
     try {
         EasyQtSql::PreparedQuery query = t.prepare(sql);
         EasyQtSql::QueryResult res = query.exec(nodeId);
-        QByteArray logSql = res.executedQuery().toUtf8();
-        LOG_INFO("执行SQL语句: %s", logSql.constData());
+
+        LOG_INFO().noquote() << QString("执行SQL语句: %1").arg(res.executedQuery());
         t.commit();
 
         if (!res.next())
@@ -161,9 +152,7 @@ QString DataService::getGantryNodeName(const QString &nodeId)
         return data;
     } catch (EasyQtSql::DBException &e) {
         t.rollback();
-        QByteArray logError = e.lastError.text().toUtf8();
-        QByteArray logLastQuery = e.lastQuery.toUtf8();
-        LOG_ERROR("%s\n%s", logError.constData(), logLastQuery.constData());
+        LOG_ERROR().noquote() << e.lastError.text() << endl << e.lastQuery;
         return "";
     }
 }
@@ -177,8 +166,8 @@ QString DataService::getGantryHexNode(const QString &nodeId)
     try {
         EasyQtSql::PreparedQuery query = t.prepare(sql);
         EasyQtSql::QueryResult res = query.exec(nodeId);
-        QByteArray logSql = res.executedQuery().toUtf8();
-        LOG_INFO("执行SQL语句: %s", logSql.constData());
+
+        LOG_INFO().noquote() << QString("执行SQL语句: %1").arg(res.executedQuery());
         t.commit();
 
         if (!res.next())
@@ -188,9 +177,7 @@ QString DataService::getGantryHexNode(const QString &nodeId)
         return data;
     } catch (EasyQtSql::DBException &e) {
         t.rollback();
-        QByteArray logError = e.lastError.text().toUtf8();
-        QByteArray logLastQuery = e.lastQuery.toUtf8();
-        LOG_ERROR("%s\n%s", logError.constData(), logLastQuery.constData());
+        LOG_ERROR().noquote() << e.lastError.text() << endl << e.lastQuery;
         return "";
     }
 }
@@ -204,8 +191,8 @@ bool DataService::getSplitOut(const QString &tradeId, QObject *obj)
     try {
         EasyQtSql::PreparedQuery query = t.prepare(sql);
         EasyQtSql::QueryResult res = query.exec(tradeId);
-        QByteArray logSql = res.executedQuery().toUtf8();
-        LOG_INFO("执行SQL语句: %s", logSql.constData());
+
+        LOG_INFO().noquote() << QString("执行SQL语句: %1").arg(res.executedQuery());
         t.commit();
 
         if (!res.next())
@@ -215,9 +202,7 @@ bool DataService::getSplitOut(const QString &tradeId, QObject *obj)
         return true;
     } catch (EasyQtSql::DBException &e) {
         t.rollback();
-        QByteArray logError = e.lastError.text().toUtf8();
-        QByteArray logLastQuery = e.lastQuery.toUtf8();
-        LOG_ERROR("%s\n%s", logError.constData(), logLastQuery.constData());
+        LOG_ERROR().noquote() << e.lastError.text() << endl << e.lastQuery;
         return false;
     }
 }
@@ -231,8 +216,8 @@ QString DataService::getUserID(const QString &cardId)
     try {
         EasyQtSql::PreparedQuery query = t.prepare(sql);
         EasyQtSql::QueryResult res = query.exec(cardId);
-        QByteArray logSql = res.executedQuery().toUtf8();
-        LOG_INFO("执行SQL语句: %s", logSql.constData());
+
+        LOG_INFO().noquote() << QString("执行SQL语句: %1").arg(res.executedQuery());
         t.commit();
 
         if (!res.next())
@@ -242,9 +227,7 @@ QString DataService::getUserID(const QString &cardId)
         return data;
     } catch (EasyQtSql::DBException &e) {
         t.rollback();
-        QByteArray logError = e.lastError.text().toUtf8();
-        QByteArray logLastQuery = e.lastQuery.toUtf8();
-        LOG_ERROR("%s\n%s", logError.constData(), logLastQuery.constData());
+        LOG_ERROR().noquote() << e.lastError.text() << endl << e.lastQuery;
         return "";
     }
 }
@@ -264,8 +247,8 @@ QString DataService::getUserName(const QString &param, int type)
     try {
         EasyQtSql::PreparedQuery query = t.prepare(sql);
         EasyQtSql::QueryResult res = query.exec(param);
-        QByteArray logSql = res.executedQuery().toUtf8();
-        LOG_INFO("执行SQL语句: %s", logSql.constData());
+
+        LOG_INFO().noquote() << QString("执行SQL语句: %1").arg(res.executedQuery());
         t.commit();
 
         if (!res.next())
@@ -275,9 +258,7 @@ QString DataService::getUserName(const QString &param, int type)
         return data;
     } catch (EasyQtSql::DBException &e) {
         t.rollback();
-        QByteArray logError = e.lastError.text().toUtf8();
-        QByteArray logLastQuery = e.lastQuery.toUtf8();
-        LOG_ERROR("%s\n%s", logError.constData(), logLastQuery.constData());
+        LOG_ERROR().noquote() << e.lastError.text() << endl << e.lastQuery;
         return "";
     }
 }
@@ -291,8 +272,8 @@ QString DataService::getStationIP(const QString &stationId)
     try {
         EasyQtSql::PreparedQuery query = t.prepare(sql);
         EasyQtSql::QueryResult res = query.exec(stationId);
-        QByteArray logSql = res.executedQuery().toUtf8();
-        LOG_INFO("执行SQL语句: %s", logSql.constData());
+
+        LOG_INFO().noquote() << QString("执行SQL语句: %1").arg(res.executedQuery());
         t.commit();
 
         if (!res.next())
@@ -302,9 +283,7 @@ QString DataService::getStationIP(const QString &stationId)
         return data;
     } catch (EasyQtSql::DBException &e) {
         t.rollback();
-        QByteArray logError = e.lastError.text().toUtf8();
-        QByteArray logLastQuery = e.lastQuery.toUtf8();
-        LOG_ERROR("%s\n%s", logError.constData(), logLastQuery.constData());
+        LOG_ERROR().noquote() << e.lastError.text() << endl << e.lastQuery;
         return "";
     }
 }
@@ -318,8 +297,8 @@ QString DataService::getStationName(const QString &nodeId)
     try {
         EasyQtSql::PreparedQuery query = t.prepare(sql);
         EasyQtSql::QueryResult res = query.exec(nodeId);
-        QByteArray logSql = res.executedQuery().toUtf8();
-        LOG_INFO("执行SQL语句: %s", logSql.constData());
+
+        LOG_INFO().noquote() << QString("执行SQL语句: %1").arg(res.executedQuery());
         t.commit();
 
         if (!res.next())
@@ -329,9 +308,7 @@ QString DataService::getStationName(const QString &nodeId)
         return data;
     } catch (EasyQtSql::DBException &e) {
         t.rollback();
-        QByteArray logError = e.lastError.text().toUtf8();
-        QByteArray logLastQuery = e.lastQuery.toUtf8();
-        LOG_ERROR("%s\n%s", logError.constData(), logLastQuery.constData());
+        LOG_ERROR().noquote() << e.lastError.text() << endl << e.lastQuery;
         return "";
     }
 }
@@ -345,8 +322,8 @@ QString DataService::getGrayCardRemark(const QString &cardId)
     try {
         EasyQtSql::PreparedQuery query = t.prepare(sql);
         EasyQtSql::QueryResult res = query.exec(cardId);
-        QByteArray logSql = res.executedQuery().toUtf8();
-        LOG_INFO("执行SQL语句: %s", logSql.constData());
+
+        LOG_INFO().noquote() << QString("执行SQL语句: %1").arg(res.executedQuery());
         t.commit();
 
         if (!res.next())
@@ -356,9 +333,7 @@ QString DataService::getGrayCardRemark(const QString &cardId)
         return data;
     } catch (EasyQtSql::DBException &e) {
         t.rollback();
-        QByteArray logError = e.lastError.text().toUtf8();
-        QByteArray logLastQuery = e.lastQuery.toUtf8();
-        LOG_ERROR("%s\n%s", logError.constData(), logLastQuery.constData());
+        LOG_ERROR().noquote() << e.lastError.text() << endl << e.lastQuery;
         return "";
     }
 }
@@ -372,8 +347,8 @@ QString DataService::getGrayVehicleRemark(const QString &plate)
     try {
         EasyQtSql::PreparedQuery query = t.prepare(sql);
         EasyQtSql::QueryResult res = query.exec(plate);
-        QByteArray logSql = res.executedQuery().toUtf8();
-        LOG_INFO("执行SQL语句: %s", logSql.constData());
+
+        LOG_INFO().noquote() << QString("执行SQL语句: %1").arg(res.executedQuery());
         t.commit();
 
         if (!res.next())
@@ -383,9 +358,7 @@ QString DataService::getGrayVehicleRemark(const QString &plate)
         return data;
     } catch (EasyQtSql::DBException &e) {
         t.rollback();
-        QByteArray logError = e.lastError.text().toUtf8();
-        QByteArray logLastQuery = e.lastQuery.toUtf8();
-        LOG_ERROR("%s\n%s", logError.constData(), logLastQuery.constData());
+        LOG_ERROR().noquote() << e.lastError.text() << endl << e.lastQuery;
         return "";
     }
 }
@@ -400,8 +373,8 @@ int DataService::getGreenPassBanType(const QString &plate)
     try {
         EasyQtSql::PreparedQuery query = t.prepare(sql);
         EasyQtSql::QueryResult res = query.exec(plate);
-        QByteArray logSql = res.executedQuery().toUtf8();
-        LOG_INFO("执行SQL语句: %s", logSql.constData());
+
+        LOG_INFO().noquote() << QString("执行SQL语句: %1").arg(res.executedQuery());
         t.commit();
 
         if (!res.next())
@@ -411,9 +384,7 @@ int DataService::getGreenPassBanType(const QString &plate)
         return data;
     } catch (EasyQtSql::DBException &e) {
         t.rollback();
-        QByteArray logError = e.lastError.text().toUtf8();
-        QByteArray logLastQuery = e.lastQuery.toUtf8();
-        LOG_ERROR("%s\n%s", logError.constData(), logLastQuery.constData());
+        LOG_ERROR().noquote() << e.lastError.text() << endl << e.lastQuery;
         return -1;
     }
 }
@@ -427,8 +398,8 @@ bool DataService::getGreenPassAppointment(const QString &plate)
     try {
         EasyQtSql::PreparedQuery query = t.prepare(sql);
         EasyQtSql::QueryResult res = query.exec(plate);
-        QByteArray logSql = res.executedQuery().toUtf8();
-        LOG_INFO("执行SQL语句: %s", logSql.constData());
+
+        LOG_INFO().noquote() << QString("执行SQL语句: %1").arg(res.executedQuery());
         t.commit();
 
         if (!res.next())
@@ -438,9 +409,7 @@ bool DataService::getGreenPassAppointment(const QString &plate)
         return data > 0;
     } catch (EasyQtSql::DBException &e) {
         t.rollback();
-        QByteArray logError = e.lastError.text().toUtf8();
-        QByteArray logLastQuery = e.lastQuery.toUtf8();
-        LOG_ERROR("%s\n%s", logError.constData(), logLastQuery.constData());
+        LOG_ERROR().noquote() << e.lastError.text() << endl << e.lastQuery;
         return false;
     }
 }
@@ -454,8 +423,8 @@ QVariantList DataService::getFreeTempVehicles(const QString &plate)
     try {
         EasyQtSql::PreparedQuery query = t.prepare(sql);
         EasyQtSql::QueryResult res = query.exec(plate);
-        QByteArray logSql = res.executedQuery().toUtf8();
-        LOG_INFO("执行SQL语句: %s", logSql.constData());
+
+        LOG_INFO().noquote() << QString("执行SQL语句: %1").arg(res.executedQuery());
         t.commit();
 
         QVariantList records;
@@ -466,9 +435,7 @@ QVariantList DataService::getFreeTempVehicles(const QString &plate)
         return records;
     } catch (EasyQtSql::DBException &e) {
         t.rollback();
-        QByteArray logError = e.lastError.text().toUtf8();
-        QByteArray logLastQuery = e.lastQuery.toUtf8();
-        LOG_ERROR("%s\n%s", logError.constData(), logLastQuery.constData());
+        LOG_ERROR().noquote() << e.lastError.text() << endl << e.lastQuery;
         return {};
     }
 }
@@ -482,8 +449,8 @@ QString DataService::getEmgcSeqNum(const QString &stationId)
     try {
         EasyQtSql::PreparedQuery query = t.prepare(sql);
         EasyQtSql::QueryResult res = query.exec(stationId);
-        QByteArray logSql = res.executedQuery().toUtf8();
-        LOG_INFO("执行SQL语句: %s", logSql.constData());
+
+        LOG_INFO().noquote() << QString("执行SQL语句: %1").arg(res.executedQuery());
         t.commit();
 
         if (!res.next())
@@ -493,9 +460,7 @@ QString DataService::getEmgcSeqNum(const QString &stationId)
         return data;
     } catch (EasyQtSql::DBException &e) {
         t.rollback();
-        QByteArray logError = e.lastError.text().toUtf8();
-        QByteArray logLastQuery = e.lastQuery.toUtf8();
-        LOG_ERROR("%s\n%s", logError.constData(), logLastQuery.constData());
+        LOG_ERROR().noquote() << e.lastError.text() << endl << e.lastQuery;
         return "";
     }
 }
@@ -510,15 +475,13 @@ bool DataService::updateEmgcSeqNum(const QString &stationId, const QString &last
         EasyQtSql::NonQueryResult res = t.update("t_emgcdict")
                                             .set("kitem", QString::number(newSeqNum))
                                             .where("stationid = ? AND laneid = 0 AND ktype = 1", stationId);
-        QByteArray logSql = res.executedQuery().toUtf8();
-        LOG_INFO("执行SQL语句: %s", logSql.constData());
+
+        LOG_INFO().noquote() << QString("执行SQL语句: %1").arg(res.executedQuery());
 
         return t.commit();
     } catch (EasyQtSql::DBException &e) {
         t.rollback();
-        QByteArray logError = e.lastError.text().toUtf8();
-        QByteArray logLastQuery = e.lastQuery.toUtf8();
-        LOG_ERROR("%s\n%s", logError.constData(), logLastQuery.constData());
+        LOG_ERROR().noquote() << e.lastError.text() << endl << e.lastQuery;
         return false;
     }
 }
@@ -533,15 +496,13 @@ bool DataService::insertEmgcSeqNum(const QString &stationId)
                                              "t_emgcdict (stationid, laneid, ktype, kitem, kvalueint, kvaluestring)")
                                             .values(stationId, 0, 1, "1", 0, "")
                                             .exec();
-        QByteArray logSql = res.executedQuery().toUtf8();
-        LOG_INFO("执行SQL语句: %s", logSql.constData());
+
+        LOG_INFO().noquote() << QString("执行SQL语句: %1").arg(res.executedQuery());
 
         return t.commit();
     } catch (EasyQtSql::DBException &e) {
         t.rollback();
-        QByteArray logError = e.lastError.text().toUtf8();
-        QByteArray logLastQuery = e.lastQuery.toUtf8();
-        LOG_ERROR("%s\n%s", logError.constData(), logLastQuery.constData());
+        LOG_ERROR().noquote() << e.lastError.text() << endl << e.lastQuery;
         return false;
     }
 }
@@ -556,8 +517,8 @@ QVariantMap DataService::getTicketUseInfo(int laneId, const QString &shiftDate, 
     try {
         EasyQtSql::PreparedQuery query = t.prepare(sql);
         EasyQtSql::QueryResult res = query.exec(laneId, shiftDate);
-        QByteArray logSql = res.executedQuery().toUtf8();
-        LOG_INFO("执行SQL语句: %s", logSql.constData());
+
+        LOG_INFO().noquote() << QString("执行SQL语句: %1").arg(res.executedQuery());
         t.commit();
 
         if (!res.next())
@@ -567,9 +528,7 @@ QVariantMap DataService::getTicketUseInfo(int laneId, const QString &shiftDate, 
         return resMap;
     } catch (EasyQtSql::DBException &e) {
         t.rollback();
-        QByteArray logError = e.lastError.text().toUtf8();
-        QByteArray logLastQuery = e.lastQuery.toUtf8();
-        LOG_ERROR("%s\n%s", logError.constData(), logLastQuery.constData());
+        LOG_ERROR().noquote() << e.lastError.text() << endl << e.lastQuery;
         return {};
     }
 }
