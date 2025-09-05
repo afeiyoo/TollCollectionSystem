@@ -85,40 +85,39 @@ MGS_OUTPUT_PATH = $$PWD
     MGS_BIN_PATH = $$MGS_OUTPUT_PATH/bin
 }
 
-# 函数定义，拷贝指定的动态库到目标目录 DESTDIR
+# 函数定义，拷贝指定的动态库到目标目录 DESTDIR（仅 Windows）
 defineTest(copyLibsToDestdir) {
-    win32:  LIB_EXT = dll
-    unix:   LIB_EXT = so
-    macx:   LIB_EXT = dylib
+    win32 {
+        LIB_EXT = dll
+        FILE_NAME = $${1}.$${LIB_EXT}
+        src = $$MGS_LIBRARY_PATH/$$FILE_NAME
+        dst = $$DESTDIR/$$FILE_NAME
 
-    FILE_NAME = $${1}.$${LIB_EXT}
-    src = $$MGS_LIBRARY_PATH/$$FILE_NAME
-    dst = $$DESTDIR/$$FILE_NAME
+        exists($$src) {
+            message("Will copy library: $$src -> $$dst")
 
-    exists($$src) {
-        message("Will copy library: $$src -> $$dst")
+            # 确保目标目录存在（mkdir 已存在也不报错）
+            DEST_WIN = $$DESTDIR
+            DEST_WIN ~= s,/,\\,g
+            QMAKE_POST_LINK += if not exist $$shell_quote($$DEST_WIN) mkdir $$shell_quote($$DEST_WIN) $$escape_expand(\\n\\t)
 
-        # 确保目标目录存在（qmake 阶段生成到 post-link）
-        !exists($$DESTDIR) {
-            QMAKE_POST_LINK += $$QMAKE_MKDIR_CMD $$shell_quote($$DESTDIR) $$escape_expand(\\n\\t)
-        }
-
-        win32 {
+            # 转换路径为 Windows 风格
             SRC_WIN = $$src
             DST_WIN = $$dst
             SRC_WIN ~= s,/,\\,g
             DST_WIN ~= s,/,\\,g
+
             QMAKE_POST_LINK += cmd /c copy /y $$shell_quote($$SRC_WIN) $$shell_quote($$DST_WIN) $$escape_expand(\\n\\t)
         }
         else {
-            QMAKE_POST_LINK += $$QMAKE_INSTALL_FILE $$shell_quote($$src) $$shell_quote($$dst) $$escape_expand(\\n\\t)
+            message("Warning: library not found in $$MGS_LIBRARY_PATH: $$FILE_NAME")
         }
+
+        export(QMAKE_POST_LINK)
     }
     else {
-        message("Warning: library not found in $$MGS_LIBRARY_PATH: $$FILE_NAME")
+        message("Note: copyLibsToDestdir skipped on non-Windows system. Use rpath or system library path.")
     }
-
-    export(QMAKE_POST_LINK)
     return(true)
 }
 
