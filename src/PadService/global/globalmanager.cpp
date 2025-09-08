@@ -62,10 +62,10 @@ void GlobalManager::init()
     EasyQtSql::SqlFactory::DBSetting setting;
     if (dbType == "QODBC") {
         QString connectionString = QString("Driver={%1};DBQ=%2;UID=%3;PWD=%4")
-                                       .arg(m_config->m_dbConfig.driver)
-                                       .arg(m_config->m_dbConfig.dbName)
-                                       .arg(m_config->m_dbConfig.user)
-                                       .arg(m_config->m_dbConfig.password);
+                                       .arg(m_config->m_dbConfig.driver,
+                                            m_config->m_dbConfig.dbName,
+                                            m_config->m_dbConfig.user,
+                                            m_config->m_dbConfig.password);
         setting = EasyQtSql::SqlFactory::DBSetting(dbType, connectionString);
     } else {
         setting = EasyQtSql::SqlFactory::DBSetting(dbType,

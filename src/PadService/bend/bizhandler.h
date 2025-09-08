@@ -72,7 +72,7 @@ private:
     QString doDealCmd28(const QVariantMap &aMap);
 
     // 3.3.30 查询逃费车辆欠费信息
-    QString doDealCmd30(QVariantMap aMap);
+    QString doDealCmd30(const QVariantMap &aMap);
 
     // 3.3.31 省内逃漏费车辆补费上传
     QString doDealCmd31(QVariantMap aMap);

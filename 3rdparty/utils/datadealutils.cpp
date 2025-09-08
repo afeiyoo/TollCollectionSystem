@@ -5,6 +5,8 @@
 #if QT_VERSION >= QT_VERSION_CHECK(5, 10, 0)
     #include <QRandomGenerator>
 #endif
+#include <QMetaProperty>
+#include <QVariant>
 
 using namespace Utils;
 
@@ -853,4 +855,111 @@ int DataDealUtils::getRandomNum(quint32 boundary)
 #else
     return qrand() % boundary;
 #endif
+}
+
+QString DataDealUtils::getInsertSql(QObject *obj)
+{
+    QString colInc = obj->property("auto_inc").toString();
+    QString tableName = obj->metaObject()->className();
+
+    QStringList colList;
+    QStringList valList;
+
+    for (int i = 0; i < obj->metaObject()->propertyCount(); ++i) {
+        QMetaProperty prp = obj->metaObject()->property(i);
+        QString colName = prp.name();
+
+        if (colName == "objectName" || colName == "tbl_pk" || colName == "auto_inc" || colName == colInc)
+            continue;
+
+        QVariant val = obj->property(prp.name());
+        QString strVal;
+        switch (val.type()) {
+        case QVariant::String:
+            strVal = "'" + val.toString().replace("'", "''") + "'";
+            break;
+        case QVariant::Date:
+            strVal = "'" + val.toDate().toString("yyyy-MM-dd") + "'";
+            break;
+        case QVariant::DateTime:
+            strVal = "'" + val.toDateTime().toString("yyyy-MM-dd HH:mm:ss") + "'";
+            break;
+        default:
+            strVal = val.toString();
+        }
+
+        colList << colName.toLower();
+        valList << strVal;
+    }
+
+    // 没有可插入字段
+    if (colList.isEmpty())
+        return QString();
+
+    QString sql = QString("INSERT INTO %1(%2) VALUES(%3)").arg(tableName.toLower(), colList.join(","), valList.join(","));
+
+    return sql;
+}
+
+QString DataDealUtils::getUpdateSql(QObject *obj)
+{
+    QString colInc = obj->property("auto_inc").toString();
+    QString tableName = obj->metaObject()->className();
+#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+    QStringList pkList = obj->property("tbl_pk").toString().split(",", Qt::SkipEmptyParts);
+#else
+    QStringList pkList = obj->property("tbl_pk").toString().split(",", QString::SkipEmptyParts);
+#endif
+
+    auto formatValue = [&](const QVariant &val) -> QString {
+        QString strVal;
+        switch (val.type()) {
+        case QVariant::String:
+            strVal = "'" + val.toString().replace("'", "''") + "'";
+            break;
+        case QVariant::Date:
+            strVal = "'" + val.toDate().toString("yyyy-MM-dd") + "'";
+            break;
+        case QVariant::DateTime:
+            strVal = "'" + val.toDateTime().toString("yyyy-MM-dd HH:mm:ss") + "'";
+            break;
+        default:
+            strVal = val.toString();
+        }
+        return strVal;
+    };
+
+    // 构建 SET 子句
+    QStringList setClauses;
+    for (int i = 0; i < obj->metaObject()->propertyCount(); ++i) {
+        QMetaProperty prp = obj->metaObject()->property(i);
+        QString colName = prp.name();
+
+        if (colName == "objectName" || colName == "tbl_pk" || colName == "auto_inc" || colName == colInc)
+            continue;
+        // 跳过主键字段，不在 SET 中更新
+        if (pkList.contains(colName, Qt::CaseSensitive))
+            continue;
+        QVariant val = obj->property(prp.name());
+        QString formattedVal = formatValue(val);
+
+        setClauses << QString("%1=%2").arg(colName.toLower(), formattedVal);
+    }
+
+    // 没有可更新字段
+    if (setClauses.isEmpty())
+        return QString();
+
+    // 构建 WHERE 子句
+    QStringList whereClauses;
+    whereClauses << QStringLiteral("1=1");
+    for (const QString &pk : pkList) {
+        QVariant val = obj->property(pk.toUtf8().constData());
+        QString formattedVal = formatValue(val);
+        whereClauses << QString("%1=%2").arg(pk.toLower(), formattedVal);
+    }
+
+    QString sql = QString("UPDATE %1 SET %2 WHERE %3")
+                      .arg(tableName.toLower(), setClauses.join(","), whereClauses.join(" AND "));
+    return sql;
 }

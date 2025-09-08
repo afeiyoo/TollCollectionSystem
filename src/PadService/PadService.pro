@@ -27,6 +27,7 @@ SOURCES += \
         main.cpp
 
 HEADERS += \
+    bean/t_auditpayback.h \
     bean/t_etcout.h \
     bean/t_laneinputshift.h \
     bean/t_mtcout.h \

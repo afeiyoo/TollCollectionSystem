@@ -1,13 +1,17 @@
-#ifndef T_AUDITPAYBACK_H
-#define T_AUDITPAYBACK_H
+#pragma once
 
 #include <QDateTime>
 #include <QObject>
 
-class T_AUDITPAYBACK : public QObject {
+class T_AuditPayBack : public QObject
+{
     Q_OBJECT
 public:
-    explicit T_AUDITPAYBACK(QObject* parent = nullptr) : QObject{parent} { tbl_pk = "TradeNum"; }
+    explicit T_AuditPayBack(QObject *parent = nullptr)
+        : QObject{parent}
+    {
+        tbl_pk = "TradeNum";
+    }
 
 public:
     QString tbl_pk;
@@ -79,5 +83,3 @@ public:
     QString EscapeTypeDesc;
     Q_PROPERTY(QString EscapeTypeDesc MEMBER EscapeTypeDesc)
 };
-
-#endif  // T_AUDITPAYBACK_H

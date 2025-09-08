@@ -134,6 +134,15 @@ public:
     // 生成指定范围(0~doundary)的随机数
     // Qt5.10前的版本，在获取随机数前需要先调用 qsrand(seed), 生成随机数种子
     static int getRandomNum(quint32 boundary);
+
+    /*******************************************************/
+    /****                   SQL 相关                    ****/
+    /*******************************************************/
+    // 解析obj对象，获取对应的插入Sql
+    static QString getInsertSql(QObject *obj);
+
+    // 解析obj对象，获取对应的更新Sql
+    static QString getUpdateSql(QObject *obj);
 };
 
 } // namespace Utils
