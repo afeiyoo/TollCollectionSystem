@@ -510,7 +510,9 @@ QVariantMap DataService::getTicketUseInfo(int laneId, const QString &shiftDate, 
 {
     QSqlDatabase sdb = GM_INSTANCE->m_dbFactory->getDatabase(id);
 
-    QString sql(R"(SELECT * from t_ticketusemanage WHERE laneid = ? AND shiftdate = ?)");
+    QString sql(
+        R"(SELECT TOP 1 * FROM t_ticketusemanage WHERE laneid = ? AND shiftdate = ? AND isused = 1 AND lastnum != stopnum
+        AND remark LIKE '%SPT-POS:30%' ORDER BY operatetime)");
 
     EasyQtSql::Transaction t(sdb);
     try {
@@ -529,5 +531,27 @@ QVariantMap DataService::getTicketUseInfo(int laneId, const QString &shiftDate, 
         t.rollback();
         LOG_ERROR().noquote() << e.lastError.text() << "\n" << e.lastQuery;
         return {};
+    }
+}
+
+bool DataService::updateTicketUseInfo(int laneId, const QString &shiftDate, int newSeqNum, const QString &id)
+{
+    QSqlDatabase sdb = GM_INSTANCE->m_dbFactory->getDatabase(id);
+
+    EasyQtSql::Transaction t(sdb);
+    try {
+        EasyQtSql::NonQueryResult res = t.update("t_ticketusemanage")
+                                            .set("lastnum", newSeqNum)
+                                            .where("laneid = ? AND shiftdate = ? AND isused = 1 AND lastnum != stopnum",
+                                                   laneId,
+                                                   shiftDate);
+
+        LOG_INFO().noquote() << "执行SQL语句: " << res.executedQuery();
+
+        return t.commit();
+    } catch (EasyQtSql::DBException &e) {
+        t.rollback();
+        LOG_ERROR().noquote() << e.lastError.text() << "\n" << e.lastQuery;
+        return false;
     }
 }

@@ -20,7 +20,7 @@ private:
     QString doDealCmd01(const QVariantMap &aMap);
 
     // 3.3.16 稽核补费打票
-    QString doDealCmd16(QVariantMap aMap);
+    QString doDealCmd16(const QVariantMap &aMap);
 
     // 3.3.18 路径展示
     QString doDealCmd18(const QVariantMap &aMap);

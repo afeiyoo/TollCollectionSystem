@@ -68,4 +68,7 @@ public:
 
     // 获取票据段信息
     QVariantMap getTicketUseInfo(int laneId, const QString &shiftDate, const QString &id);
+
+    // 更新票据段信息
+    bool updateTicketUseInfo(int laneId, const QString &shiftDate, int newSeqNum, const QString &id);
 };

@@ -8,6 +8,7 @@
 #include "bean/t_freetempvehicle.h"
 #include "bean/t_laneinputshift.h"
 #include "bean/t_mtcout.h"
+#include "bean/t_mticketuse.h"
 #include "bean/t_specialcards.h"
 #include "bean/t_splitout.h"
 #include "bend/dtpsender.h"
@@ -35,6 +36,9 @@ QString BizHandler::doMainDeal(int cmdType, const QVariantMap &dataMap, const QB
     switch (cmdType) {
     case 1:
         dealtData = doDealCmd01(dataMap); // 稽核登录
+        break;
+    case 16:
+        dealtData = doDealCmd16(dataMap); // 稽核补费打票
         break;
     case 18:
         dealtData = doDealCmd18(dataMap); // 路径展示
@@ -112,6 +116,143 @@ QString BizHandler::doDealCmd01(const QVariantMap &aMap)
 
     QString dealtData = GM_INSTANCE->m_jsonSerializer->serialize(resMap);
     return dealtData;
+}
+
+QString BizHandler::doDealCmd16(const QVariantMap &aMap)
+{
+    int tradeType = 0;
+    QString tradeId;
+    QString ticketNum;
+    QString operatorId;
+    QString startNum;
+    QString stopNum;
+    QString shiftDate;
+    int shiftNum = 0;
+    int laneID = 0;
+    QString stationID;
+
+    if (aMap.contains("tradeID"))
+        tradeId = aMap["tradeID"].toString();
+    if (aMap.contains("tradeType"))
+        tradeType = aMap["tradeType"].toInt();
+    if (aMap.contains("ticketNum"))
+        ticketNum = aMap["ticketNum"].toString();
+    if (aMap.contains("operatorID"))
+        operatorId = aMap["operatorID"].toString();
+    if (aMap.contains("startNum"))
+        startNum = aMap["startNum"].toString();
+    if (aMap.contains("stopNum"))
+        stopNum = aMap["stopNum"].toString();
+    if (aMap.contains("shiftDate"))
+        shiftDate = aMap["shiftDate"].toString();
+    if (aMap.contains("laneID"))
+        laneID = aMap["laneID"].toInt();
+    if (aMap.contains("stationID"))
+        stationID = aMap["stationID"].toString();
+    if (aMap.contains("shiftNum"))
+        shiftNum = aMap["shiftNum"].toInt();
+
+    if (tradeType == 0)
+        throw BaseException(1, "响应失败: 操作类型异常");
+    if (laneID == 0)
+        throw BaseException(1, "响应失败: 车道号为空");
+    if (shiftDate.isEmpty())
+        throw BaseException(1, "响应失败: 班次日期为空");
+    if (stationID.isEmpty())
+        throw BaseException(1, "响应失败: 站代码为空");
+
+    if (tradeType == 7) {
+        // 补费票段设置
+        if (startNum.isEmpty())
+            throw BaseException(1, "响应失败: 起始票据号为空");
+        if (stopNum.isEmpty())
+            throw BaseException(1, "响应失败: 终止票据号为空");
+
+// TODO 测试完成后需要取消注释
+#if 0
+        QString stationIP = m_ds.getStationIP(stationID);
+        SINGLETON_GM->createSqlServerConnection(stationIP);
+        // 获取票据信息
+        QString id = QString("sqlserver_%1").arg(stationIP);
+        QVariantMap resMap = m_ds.getTicketUseInfo(laneID, shiftDate, id);
+        if (resMap.isEmpty()) throw BaseException(1, "响应失败: 未查询到相关票据信息");
+        // 获取票据段
+        int startNumFromDB = resMap["StartNum"].toInt();
+        int stopNumFromDB = resMap["StopNum"].toInt();
+        if (!(startNum.toInt() >= startNumFromDB && stopNum.toInt() <= stopNumFromDB &&
+              startNum.toInt() <= stopNum.toInt()))
+            throw BaseException(1, "响应失败: 票据段与下发票据段不符");
+#endif
+
+        QVariantMap map;
+        map["status"] = "0";
+        map["desc"] = "成功设置补费票段";
+        QString dealtData = GM_INSTANCE->m_jsonSerializer->serialize(map);
+        return dealtData;
+    } else if (tradeType == 8) {
+        // 稽核打票
+        if (tradeId.isEmpty())
+            throw BaseException(1, "响应失败: 交易号为空");
+        if (ticketNum.isEmpty())
+            throw BaseException(1, "响应失败: 票据号为空");
+        if (operatorId.isEmpty())
+            throw BaseException(1, "响应失败: 操作员编号为空");
+        if (shiftNum == 0)
+            throw BaseException(1, "响应失败: 班次号为空");
+
+        QString stationIP = m_ds.getStationIP(stationID);
+        GM_INSTANCE->createSqlServerConnection(stationIP);
+        // 获取票据信息
+        QString id = QString("sqlserver_%1").arg(stationIP);
+        QVariantMap resMap = m_ds.getTicketUseInfo(laneID, shiftDate, id);
+        if (resMap.isEmpty())
+            throw BaseException(1, "响应失败: 未查询到相关票据信息");
+
+        // 获取票据段
+        int startNumFromDB = resMap["StartNum"].toInt();
+        int stopNumFromDB = resMap["StopNum"].toInt();
+        if (ticketNum.toInt() < startNumFromDB || ticketNum.toInt() > stopNumFromDB)
+            throw BaseException(1, "响应失败: 票据号不在票据段内");
+
+        // 下发票据信息报文到收费站
+        T_MTicketUse ticketUse;
+        ticketUse.TradeNum = tradeId.midRef(6).toInt();
+        ticketUse.TradeID = QString::number(ticketUse.TradeNum);
+        ticketUse.TicketType = resMap["TicketType"].toInt();
+        ticketUse.FaceType = resMap["FaceType"].toInt();
+        ticketUse.TicketYear = resMap["TicketYear"].toInt();
+        ticketUse.StartNum = ticketNum.toInt();
+        ticketUse.EndNum = ticketNum.toInt();
+        ticketUse.Amount = 1;
+        ticketUse.LaneID = laneID;
+        ticketUse.ShiftDate = QDateTime::fromString(shiftDate, "yyyy-MM-dd hh:mm:ss");
+        ticketUse.ShiftNum = shiftNum;
+        ticketUse.ShiftUser = operatorId;
+        ticketUse.IsValid = 1;
+        ticketUse.OperaterID = operatorId;
+        ticketUse.OperateTime = QDateTime::currentDateTime();
+        ticketUse.BillCode = resMap["BillCode"].toString();
+
+        QString dtpContent = Utils::BizUtils::makeDtpContentFromStr(QStringList()
+                                                                    << Utils::DataDealUtils::getInsertSql(&ticketUse));
+        QString dtpXml = Utils::BizUtils::makeDtpXml(dtpContent, "610", "1590", stationID, 1);
+        LOG_INFO().noquote() << "票据信息DTP报文: " << dtpXml;
+
+        int res = GM_INSTANCE->m_dtpSender->sendMsgToDtp(stationIP, 13591, "TradeQ", "", dtpXml);
+
+        if (res < 0)
+            throw BaseException(1, "响应失败: 站级数据传输异常");
+
+        // 更新LastNum
+        m_ds.updateTicketUseInfo(laneID, shiftDate, ticketNum.toInt(), id);
+
+        QVariantMap map;
+        map["status"] = "0";
+        map["desc"] = "成功录入票据信息";
+        QString dealtData = GM_INSTANCE->m_jsonSerializer->serialize(map);
+        return dealtData;
+    }
+    return "";
 }
 
 QString BizHandler::doDealCmd18(const QVariantMap &aMap)
