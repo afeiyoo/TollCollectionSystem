@@ -29,10 +29,12 @@ SOURCES += \
 HEADERS += \
     bean/t_auditpayback.h \
     bean/t_etcout.h \
+    bean/t_freetempvehicle.h \
     bean/t_laneinputshift.h \
     bean/t_mtcout.h \
     bean/t_specialcards.h \
     bean/t_splitout.h \
+    bean/t_mticketuse.h \
     bend/bizhandler.h \
     bend/dataservice.h \
     bend/dtpsender.h \

@@ -1,29 +1,31 @@
-#ifndef T_MTICKETUSE_H
-#define T_MTICKETUSE_H
+#pragma once
 
 #include <QDateTime>
 #include <QObject>
 
-class T_MTICKETUSE : public QObject {
+class T_MTicketUse : public QObject
+{
     Q_OBJECT
 public:
-    explicit T_MTICKETUSE(QObject* parent = nullptr) : QObject{parent} {
+    explicit T_MTicketUse(QObject *parent = nullptr)
+        : QObject{parent}
+    {
         tbl_pk = "DataID";
         auto_inc = "DataID";
     }
 
-    QString toString() const {
-        QString result =
-            QString(
-                "DataID %1, TradeNum %2, TradeID %3, TicketType %4, FaceType %5, TicketYear %6, StartNum %7, EndNum %8")
-                .arg(DataID)
-                .arg(TradeNum)
-                .arg(TradeID)
-                .arg(TicketType)
-                .arg(FaceType)
-                .arg(TicketYear)
-                .arg(StartNum)
-                .arg(EndNum);
+    QString toString() const
+    {
+        QString result = QString("DataID %1, TradeNum %2, TradeID %3, TicketType %4, FaceType %5, TicketYear %6, "
+                                 "StartNum %7, EndNum %8")
+                             .arg(DataID)
+                             .arg(TradeNum)
+                             .arg(TradeID)
+                             .arg(TicketType)
+                             .arg(FaceType)
+                             .arg(TicketYear)
+                             .arg(StartNum)
+                             .arg(EndNum);
         return result;
     }
 
@@ -67,5 +69,3 @@ public:
     QString BillCode;
     Q_PROPERTY(QString BillCode MEMBER BillCode)
 };
-
-#endif  // T_MTICKETUSE_H

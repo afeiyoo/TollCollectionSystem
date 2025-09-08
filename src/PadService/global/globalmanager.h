@@ -10,6 +10,7 @@
 
 #define GM_INSTANCE GlobalManager::instance()
 
+class DtpSender;
 class Config;
 class GlobalManager : public QObject
 {
@@ -36,4 +37,6 @@ public:
     // Json解析对象
     QJson::Serializer *m_jsonSerializer = nullptr;
     QJson::Parser *m_jsonParser = nullptr;
+    // DTP传输对象
+    DtpSender *m_dtpSender = nullptr;
 };

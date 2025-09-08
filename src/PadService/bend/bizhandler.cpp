@@ -5,6 +5,7 @@
 #include "QJson/include/qobjecthelper.h"
 #include "bean/t_auditpayback.h"
 #include "bean/t_etcout.h"
+#include "bean/t_freetempvehicle.h"
 #include "bean/t_laneinputshift.h"
 #include "bean/t_mtcout.h"
 #include "bean/t_specialcards.h"
@@ -24,9 +25,6 @@ BizHandler::BizHandler(QObject *parent)
 {
     // 每次有新请求到来时，清除30天前的图片文件
     Utils::FileUtils::autoDeleteFiles(GM_INSTANCE->m_pictureDir.toString(), ".jpg", 30);
-    // Dtp发送对象初始化
-    m_dtpSender = new DtpSender(this);
-    m_dtpSender->initDtp("./libDtp-Client.so");
 }
 
 BizHandler::~BizHandler() {}
@@ -73,6 +71,9 @@ QString BizHandler::doMainDeal(int cmdType, const QVariantMap &dataMap, const QB
         break;
     case 33:
         dealtData = doDealCmd33(dataMap); // 集装箱车预约信息列表查询
+        break;
+    case 34:
+        dealtData = doDealCmd34(dataMap); // 临时免征车列表查询
         break;
     case 39:
         dealtData = doDealCmd39(dataMap); // 本站绿通流水查询
@@ -907,7 +908,7 @@ QString BizHandler::doDealCmd26(const QVariantMap &aMap)
     LOG_INFO().noquote() << "交接班数据DTP报文: " << dtpXml;
 
     QString stationIP = m_ds.getStationIP(stationId);
-    int res = m_dtpSender->sendMsgToDtp(stationIP, 13591, "TradeQ", "", dtpXml);
+    int res = GM_INSTANCE->m_dtpSender->sendMsgToDtp(stationIP, 13591, "TradeQ", "", dtpXml);
 
     if (res < 0)
         throw BaseException(1, "响应失败: 站级数据传输异常");
@@ -994,7 +995,7 @@ QString BizHandler::doDealCmd27(const QVariantMap &aMap)
     LOG_INFO().noquote() << "特情卡记录DTP报文: " << dtpXml;
 
     QString stationIP = m_ds.getStationIP(stationID);
-    int res = m_dtpSender->sendMsgToDtp(stationIP, 13591, "TradeQ", "", dtpXml);
+    int res = GM_INSTANCE->m_dtpSender->sendMsgToDtp(stationIP, 13591, "TradeQ", "", dtpXml);
 
     if (res < 0)
         throw BaseException(1, "响应失败: 站级数据传输异常");
@@ -1281,7 +1282,7 @@ QString BizHandler::doDealCmd31(QVariantMap aMap)
             LOG_INFO().noquote() << "稽核补费DTP报文: " << dtpXml;
 
             QString stationIP = m_ds.getStationIP(stationId);
-            int res = m_dtpSender->sendMsgToDtp(stationIP, 13591, "TradeQ", "", dtpXml);
+            int res = GM_INSTANCE->m_dtpSender->sendMsgToDtp(stationIP, 13591, "TradeQ", "", dtpXml);
             QVariantMap map;
             if (res < 0) {
                 map["status"] = 1;
@@ -1636,6 +1637,38 @@ void BizHandler::saveAndReplaceContainerPic(const QString &base64Data, QVariantM
         infoMap[key] = "";
     }
     saver.finalize();
+}
+
+QString BizHandler::doDealCmd34(const QVariantMap &aMap)
+{
+    QString vehicleId;
+    if (aMap.contains("vehicleId"))
+        vehicleId = aMap["vehicleId"].toString();
+
+    if (vehicleId.isEmpty())
+        throw BaseException(1, "响应失败: 车牌号为空");
+
+    auto tempFreeTempVehicles = m_ds.getFreeTempVehicles(vehicleId);
+
+    if (tempFreeTempVehicles.isEmpty())
+        throw BaseException(1, "响应失败: 未查询到相关数据");
+
+    // 从数据库中直接取到的记录，键和数据库中的一致，需要做下转换
+    QVariantList freeTempVehicles;
+    foreach (auto item, tempFreeTempVehicles) {
+        T_FreeTempVehicle freeTempVehicle;
+        QJson::QObjectHelper::qvariant2qobject(item.toMap(), &freeTempVehicle);
+        QVariantMap map = QJson::QObjectHelper::qobject2qvariant(&freeTempVehicle);
+        freeTempVehicles.append(map);
+    }
+
+    QVariantMap resMap;
+    resMap["freeTempVehicles"] = freeTempVehicles;
+    resMap["status"] = "0";
+    resMap["desc"] = "";
+
+    QString dealtData = GM_INSTANCE->m_jsonSerializer->serialize(resMap);
+    return dealtData;
 }
 
 QString BizHandler::doDealCmd39(const QVariantMap &aMap)

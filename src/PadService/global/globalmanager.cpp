@@ -3,6 +3,7 @@
 #include "ConsoleAppender.h"
 #include "Logger.h"
 #include "RollingFileAppender.h"
+#include "bend/dtpsender.h"
 #include "config/config.h"
 #include "utils/fileutils.h"
 
@@ -81,6 +82,10 @@ void GlobalManager::init()
     m_jsonParser = new QJson::Parser();
     m_jsonSerializer = new QJson::Serializer();
     m_jsonSerializer->setIndentMode(QJson::IndentCompact);
+
+    // Dtp发送对象初始化
+    m_dtpSender = new DtpSender(this);
+    m_dtpSender->initDtp("./libDtp-Client.so");
 }
 
 void GlobalManager::createSqlServerConnection(const QString &stationIP)

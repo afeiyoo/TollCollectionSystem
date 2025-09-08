@@ -1,13 +1,15 @@
-#ifndef T_FREE_TEMPVEHICLE_H
-#define T_FREE_TEMPVEHICLE_H
+#pragma once
 
 #include <QDateTime>
 #include <QObject>
 
-class T_FREE_TEMPVEHICLE : public QObject {
+class T_FreeTempVehicle : public QObject
+{
     Q_OBJECT
 public:
-    explicit T_FREE_TEMPVEHICLE(QObject* parent = nullptr) : QObject{parent} {}
+    explicit T_FreeTempVehicle(QObject *parent = nullptr)
+        : QObject{parent}
+    {}
 
 public:
     int TradeNum;
@@ -57,5 +59,3 @@ public:
     int VerifyFlag;
     Q_PROPERTY(int VerifyFlag MEMBER VerifyFlag)
 };
-
-#endif  // T_FREE_TEMPVEHICLE_H

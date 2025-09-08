@@ -6,7 +6,6 @@
 #include "bend/dataservice.h"
 #include "global/defs.h"
 
-class DtpSender;
 class BizHandler : public QObject
 {
     Q_OBJECT
@@ -96,7 +95,7 @@ private:
     void saveAndReplaceContainerPic(const QString &base64Data, QVariantMap &infoMap, const QString &key);
 
     // 3.3.34 临时免征车查询列表
-    QString doDealCmd34(QVariantMap aMap);
+    QString doDealCmd34(const QVariantMap &aMap);
 
     // 3.3.39 获取出口绿通流水
     QString doDealCmd39(const QVariantMap &aMap);
@@ -105,6 +104,5 @@ private:
 
 private:
     DataService m_ds;
-    DtpSender *m_dtpSender = nullptr;
     static QMap<QString, ST_AuditInfo> m_auditInfos;
 };
