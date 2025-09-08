@@ -88,7 +88,7 @@ private:
     QString getErrInfo(int errorCode);
 
     // 3.3.32 大件运输车预约信息查询
-    QString doDealCmd32(QVariantMap aMap);
+    QString doDealCmd32(const QVariantMap &aMap);
 
     // 3.3.33 集装箱预约信息查询
     QString doDealCmd33(QVariantMap aMap);

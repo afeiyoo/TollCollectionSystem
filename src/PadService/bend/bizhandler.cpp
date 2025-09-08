@@ -68,6 +68,9 @@ QString BizHandler::doMainDeal(int cmdType, const QVariantMap &dataMap, const QB
     case 31:
         dealtData = doDealCmd31(dataMap); // 逃漏费车辆补费上传
         break;
+    case 32:
+        dealtData = doDealCmd32(dataMap); // 大件运输车预约信息查询
+        break;
     case 39:
         dealtData = doDealCmd39(dataMap); // 本站绿通流水查询
         break;
@@ -1511,6 +1514,41 @@ QString BizHandler::getErrInfo(int errorCode)
         errInfo = "其他内部错误";
     }
     return errInfo;
+}
+
+QString BizHandler::doDealCmd32(const QVariantMap &aMap)
+{
+    QString vehicleId;
+    if (aMap.contains("vehicleId"))
+        vehicleId = aMap["vehicleId"].toString();
+
+    if (vehicleId.isEmpty())
+        throw BaseException(1, "响应失败: 车牌号为空");
+
+    QVariantMap map;
+    map["vehplate"] = vehicleId;
+    map["stationid"] = "";
+    map["flag"] = 0;
+    QByteArray sendData = GM_INSTANCE->m_jsonSerializer->serialize(map);
+    LOG_INFO().noquote() << "获取大件运输车信息(多条)请求: " << sendData.constData();
+
+    QUrl url(GM_INSTANCE->m_config->m_baseConfig.multiBulkUrl);
+    auto reply = Http().instance().post(url, sendData, "application/json");
+
+    QString result = blockUtilResponse(reply, Http().instance().getReadTimeout());
+    LOG_INFO().noquote() << "返回大件运输车信息(多条): " << result.left(1024);
+
+    QVariantList bulkInfos = GM_INSTANCE->m_jsonParser->parse(result.toUtf8()).toList();
+    if (bulkInfos.isEmpty())
+        throw BaseException(1, "响应失败: 未查询到相关信息");
+
+    QVariantMap tempMap;
+    tempMap["bulkInfos"] = bulkInfos;
+    tempMap["status"] = "0";
+    tempMap["desc"] = "";
+
+    QString dealtData = GM_INSTANCE->m_jsonSerializer->serialize(tempMap);
+    return dealtData;
 }
 
 QString BizHandler::doDealCmd39(const QVariantMap &aMap)
