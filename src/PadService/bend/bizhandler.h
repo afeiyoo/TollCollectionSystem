@@ -91,7 +91,7 @@ private:
     QString doDealCmd32(const QVariantMap &aMap);
 
     // 3.3.33 集装箱预约信息查询
-    QString doDealCmd33(QVariantMap aMap);
+    QString doDealCmd33(const QVariantMap &aMap);
     // 保存集装箱图片到本地，并将图片的UUID返回给手持机
     void saveAndReplaceContainerPic(const QString &base64Data, QVariantMap &infoMap, const QString &key);
 

@@ -71,6 +71,9 @@ QString BizHandler::doMainDeal(int cmdType, const QVariantMap &dataMap, const QB
     case 32:
         dealtData = doDealCmd32(dataMap); // 大件运输车预约信息查询
         break;
+    case 33:
+        dealtData = doDealCmd33(dataMap); // 集装箱车预约信息列表查询
+        break;
     case 39:
         dealtData = doDealCmd39(dataMap); // 本站绿通流水查询
         break;
@@ -1549,6 +1552,90 @@ QString BizHandler::doDealCmd32(const QVariantMap &aMap)
 
     QString dealtData = GM_INSTANCE->m_jsonSerializer->serialize(tempMap);
     return dealtData;
+}
+
+QString BizHandler::doDealCmd33(const QVariantMap &aMap)
+{
+    QString vehicleId;
+    if (aMap.contains("vehicleId"))
+        vehicleId = aMap["vehicleId"].toString();
+
+    if (vehicleId.isEmpty())
+        throw BaseException(1, "响应失败: 车牌号为空");
+
+    QVariantMap map;
+    map["vehicleid"] = vehicleId;
+    map["lanetype"] = 1;
+    map["entime"] = Utils::DataDealUtils::curDateTimeStr();
+    QByteArray sendData = GM_INSTANCE->m_jsonSerializer->serialize(map);
+    LOG_INFO().noquote() << "获取集装箱信息请求: " << QString::fromUtf8(sendData);
+
+    QUrl url(GM_INSTANCE->m_config->m_baseConfig.containerConfirmUrl);
+    auto reply = Http().instance().post(url, sendData, "application/json");
+
+    QString result = blockUtilResponse(reply, Http().instance().getReadTimeout());
+    LOG_INFO().noquote() << "返回集装箱信息: " << result.left(1024);
+
+    // 保存集装箱图片到本地
+    QVariantMap infoMap = GM_INSTANCE->m_jsonParser->parse(result.toUtf8()).toMap();
+    int containerConfirm = infoMap["containerconfirm"].toInt();
+    if (containerConfirm == 1) {
+        for (auto it = infoMap.begin(); it != infoMap.end(); ++it) {
+            if (it.value().isNull())
+                it.value() = QString("");
+        }
+
+        QString startHeadOfTruckPicBase64 = infoMap.value("startheadoftruckpic", "").toString();
+        QString startBodyOfTruckPicBase64 = infoMap.value("startbodyoftruckpic1", "").toString();
+        QString startTailOfTruckPicBase64 = infoMap.value("starttailoftruckpic", "").toString();
+        QString tailTruckPicOfTailBase64 = infoMap.value("tailtruckpicoftail", "").toString();
+        QString drivingLicensePicBase64 = infoMap.value("drivinglicensepic", "").toString();
+        QString wayBillPicBase64 = infoMap.value("waybillpic", "").toString();
+        QString tailTruckDrivingLicensePicBase64 = infoMap.value("tailtruckdrivinglicensepic", "").toString();
+        QString tailTruckTransportationTripPicBase64 = infoMap.value("tailtrucktransportationtrippic", "").toString();
+        QString businessLicensePicBase64 = infoMap.value("businesslicensepic", "").toString();
+
+        // 保存图片到本地，返回图片Id给请求方
+        saveAndReplaceContainerPic(startHeadOfTruckPicBase64, infoMap, "startheadoftruckpic");
+        saveAndReplaceContainerPic(startBodyOfTruckPicBase64, infoMap, "startbodyoftruckpic1");
+        saveAndReplaceContainerPic(startTailOfTruckPicBase64, infoMap, "starttailoftruckpic");
+        saveAndReplaceContainerPic(tailTruckPicOfTailBase64, infoMap, "tailtruckpicoftail");
+        saveAndReplaceContainerPic(drivingLicensePicBase64, infoMap, "drivinglicensepic");
+        saveAndReplaceContainerPic(wayBillPicBase64, infoMap, "waybillpic");
+        saveAndReplaceContainerPic(tailTruckDrivingLicensePicBase64, infoMap, "tailtruckdrivinglicensepic");
+        saveAndReplaceContainerPic(tailTruckTransportationTripPicBase64, infoMap, "tailtrucktransportationtrippic");
+        saveAndReplaceContainerPic(businessLicensePicBase64, infoMap, "businesslicensepic");
+    } else {
+        throw BaseException(1, "响应失败: 未查询到预约信息");
+    }
+
+    infoMap["status"] = 0;
+    infoMap["desc"] = "";
+    QString dealtData = GM_INSTANCE->m_jsonSerializer->serialize(infoMap);
+    return dealtData;
+}
+
+void BizHandler::saveAndReplaceContainerPic(const QString &base64Data, QVariantMap &infoMap, const QString &key)
+{
+    if (base64Data.isEmpty())
+        infoMap[key] = "";
+#if QT_VERSION <= QT_VERSION_CHECK(5, 11, 0)
+    QString picUUID = QUuid::createUuid().toString();
+    picUUID = picUUID.mid(1, picUUID.length() - 2);
+#else
+    QString picUUID = QUuid::createUuid().toString(QUuid::WithoutBraces);
+#endif
+    QString picName = QString("%1.jpg").arg(picUUID);
+    QString targetPath = (GM_INSTANCE->m_pictureDir + picName).toString();
+
+    Utils::FileSaver saver(targetPath);
+    bool ok = saver.write(QByteArray::fromBase64(base64Data.toUtf8()));
+    if (ok) {
+        infoMap[key] = picName;
+    } else {
+        infoMap[key] = "";
+    }
+    saver.finalize();
 }
 
 QString BizHandler::doDealCmd39(const QVariantMap &aMap)
