@@ -13,18 +13,19 @@ DESTDIR = $$MGS_BIN_PATH/$$TARGET
 
 include($$THIRD_PARTY_LIBRARY_PATH/EasyQtSql/EasyQtSql.pri)
 include($$THIRD_PARTY_LIBRARY_PATH/HttpClient/HttpClient.pri)
+include($$THIRD_PARTY_LIBRARY_PATH/CuteLogger/CuteLogger.pri)
 include($$THIRD_PARTY_LIBRARY_PATH/utils/Utils.pri)
 include($$THIRD_PARTY_LIBRARY_PATH/HttpServer/HttpServer.pri)
 
 SOURCES += \
-        bend/bizhandler.cpp \
-        bend/dataservice.cpp \
-        bend/dtpsender.cpp \
-        bend/httphandler.cpp \
-        config/baseexception.cpp \
-        config/config.cpp \
-        global/globalmanager.cpp \
-        main.cpp
+    bend/bizhandler.cpp \
+    bend/dataservice.cpp \
+    bend/dtpsender.cpp \
+    bend/httphandler.cpp \
+    config/baseexception.cpp \
+    config/config.cpp \
+    global/globalmanager.cpp \
+    main.cpp
 
 HEADERS += \
     bean/t_auditpayback.h \
@@ -46,12 +47,9 @@ HEADERS += \
 
 # 引入第三方库
 unix:!macx|win32: LIBS += \
-    -l$$qtLibraryTargetName(CuteLogger) \
     -l$$qtLibraryTargetName(QJson) \
 
 INCLUDEPATH += \
-    $$THIRD_PARTY_LIBRARY_PATH/CuteLogger/include \
     $$THIRD_PARTY_LIBRARY_PATH/QJson/include \
 
-copyLibsToDestdir($$qtLibraryTargetName(CuteLogger))
 copyLibsToDestdir($$qtLibraryTargetName(QJson))

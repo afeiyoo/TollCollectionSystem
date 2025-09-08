@@ -28,20 +28,6 @@ GlobalManager *GlobalManager::instance()
 
 void GlobalManager::init()
 {
-    // 配置加载
-    Utils::FileName configPath = Utils::FileName::fromString(Utils::FileUtils::curApplicationDirPath()
-                                                             + "/config/config.ini");
-    m_config->loadConfig(configPath);
-
-    // 系统环境初始化
-    m_pictureDir = Utils::FileName::fromString(QCoreApplication::applicationDirPath() + "/pictures");
-    Utils::FileUtils::makeSureDirExist(m_pictureDir);
-    Utils::FileUtils::autoDeleteFiles(m_pictureDir.toString(), ".jpg", 30);
-
-#if QT_VERSION <= QT_VERSION_CHECK(5, 10, 0)
-    qsrand(QTime(0, 0, 0).secsTo(QTime::currentTime())); // 随机数种子初始化
-#endif
-
     // 日志初始化
     ConsoleAppender *consoleAppender = new ConsoleAppender;
     consoleAppender->setFormat(m_config->m_logConfig.format);
@@ -57,6 +43,20 @@ void GlobalManager::init()
     rollingFileAppender->setFlushOnWrite(true);
     rollingFileAppender->setDatePattern(RollingFileAppender::DatePattern::DailyRollover);
     cuteLogger->registerAppender(rollingFileAppender);
+
+    // 配置加载
+    Utils::FileName configPath = Utils::FileName::fromString(Utils::FileUtils::curApplicationDirPath()
+                                                             + "/config/config.ini");
+    m_config->loadConfig(configPath);
+
+    // 系统环境初始化
+    m_pictureDir = Utils::FileName::fromString(QCoreApplication::applicationDirPath() + "/pictures");
+    Utils::FileUtils::makeSureDirExist(m_pictureDir);
+    Utils::FileUtils::autoDeleteFiles(m_pictureDir.toString(), ".jpg", 30);
+
+#if QT_VERSION <= QT_VERSION_CHECK(5, 10, 0)
+    qsrand(QTime(0, 0, 0).secsTo(QTime::currentTime())); // 随机数种子初始化
+#endif
 
     // 数据库连接初始化
     QString dbType = m_config->m_dbConfig.type;

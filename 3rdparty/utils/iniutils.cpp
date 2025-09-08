@@ -30,15 +30,15 @@ IniUtils::~IniUtils()
 
 void IniUtils::dumpInfo() const
 {
-    LOG_INFO() << "dump ini info";
+    LOG_INFO().noquote() << "dump ini info";
 
     for (const auto &agroup : m_iniData.datas) {
         if (!agroup.isHead)
-            LOG_INFO() << "【group】" << agroup.group;
+            LOG_INFO().noquote() << "【group】" << agroup.group;
 
         for (const auto &arow : agroup.rows) {
             if (arow.isValid) {
-                LOG_INFO() << "\t【key】" << arow.key << "【value】" << arow.value;
+                LOG_INFO().noquote() << "\t【key】" << arow.key << "【value】" << arow.value;
             }
         }
     }
@@ -64,23 +64,23 @@ QStringList IniUtils::keys(const QString &group) const
 
 QVariant IniUtils::value(const QString &group, const QString &key, const QVariant &def, Qt::CaseSensitivity cs) const
 {
-    int groupIndex = getStrListIndex(m_iniData.allgroups,group,cs);
+    int groupIndex = getStrListIndex(m_iniData.allgroups, group, cs);
     if (group.isEmpty() || key.isEmpty() || groupIndex < 0)
         return def.toString();
 
-    int keyIndex = getStrListIndex(m_iniData.datas.at(groupIndex).allkeys,key,cs);
+    int keyIndex = getStrListIndex(m_iniData.datas.at(groupIndex).allkeys, key, cs);
     if (keyIndex < 0)
         return def.toString();
 
     return m_iniData.datas.at(groupIndex).rows.at(keyIndex).value;
 }
 
-void IniUtils::setValue(const QString &group, const QString &key, const QVariant &value,Qt::CaseSensitivity cs)
+void IniUtils::setValue(const QString &group, const QString &key, const QVariant &value, Qt::CaseSensitivity cs)
 {
     if (group.isEmpty() || key.isEmpty())
         return;
     // 如果是不存在的分组则创建
-    int groupIndex = getStrListIndex(m_iniData.allgroups,group,cs);
+    int groupIndex = getStrListIndex(m_iniData.allgroups, group, cs);
     if (groupIndex < 0) {
         IniGroup iniGroup;
         iniGroup.isHead = false;
@@ -90,7 +90,7 @@ void IniUtils::setValue(const QString &group, const QString &key, const QVariant
         groupIndex = m_iniData.allgroups.count() - 1;
     }
     // 如果不存在key则创建
-    int keyIndex = getStrListIndex(m_iniData.datas.at(groupIndex).allkeys,key,cs);
+    int keyIndex = getStrListIndex(m_iniData.datas.at(groupIndex).allkeys, key, cs);
     if (keyIndex < 0) {
         IniRow iniRow;
         iniRow.isValid = true;
@@ -112,7 +112,7 @@ bool IniUtils::save()
     QTC_ASSERT(!(QIODevice::ReadOnly == m_iniMode), return false);
 
     if (m_iniData.change && isWritable()) {
-        LOG_INFO() << "save ini" << m_iniPath;
+        LOG_INFO().noquote() << "save ini" << m_iniPath;
         QFile file(m_iniPath);
         // QIODevice::Text on windows endl=\r\n
         if (file.open(QIODevice::WriteOnly | QIODevice::Truncate | QIODevice::Text)) {
@@ -142,8 +142,7 @@ bool IniUtils::save()
 
 void IniUtils::load(const QString &filepath)
 {
-    QTC_ASSERT(!(m_iniMode & ~(QIODevice::WriteOnly | QIODevice::ReadOnly | QIODevice::ReadWrite)),
-               return);
+    QTC_ASSERT(!(m_iniMode & ~(QIODevice::WriteOnly | QIODevice::ReadOnly | QIODevice::ReadWrite)), return);
 
     // 保存当前的
     save();
@@ -153,12 +152,11 @@ void IniUtils::load(const QString &filepath)
     m_iniPath = path;
 
     QFile file(path);
-    if ((QIODevice::WriteOnly == m_iniMode) || !file.exists()
-        || !file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+    if ((QIODevice::WriteOnly == m_iniMode) || !file.exists() || !file.open(QIODevice::ReadOnly | QIODevice::Text)) {
         return;
     }
 
-    LOG_INFO() << "loading ini" << m_iniPath;
+    LOG_INFO().noquote() << "loading ini" << m_iniPath;
 
     IniData iniData;
     IniGroup iniGroup;
@@ -180,7 +178,7 @@ void IniUtils::load(const QString &filepath)
 
             iniGroup.rows.push_back(iniRow);
             iniGroup.allkeys.push_back(QString());
-            // LOG_INFO() << "invalid" << lineData;
+            // LOG_INFO().noquote() << "invalid" << lineData;
         } else if (lineData[0] == '[' && lineData[lineData.length() - 1] == ']') {
             // 分组
             iniData.datas.push_back(iniGroup);
@@ -191,14 +189,13 @@ void IniUtils::load(const QString &filepath)
 
             iniGroup.rows.clear();
             iniGroup.allkeys.clear();
-            // LOG_INFO() << "group" << iniGroup.group;
+            // LOG_INFO().noquote() << "group" << iniGroup.group;
         } else {
             iniRow.isValid = false;
             int split_index = lineData.indexOf('=');
             if (split_index > 0 && split_index < lineData.length() - 1) {
                 QString key = lineData.mid(0, split_index).trimmed();
-                QString value = lineData.mid(split_index + 1, lineData.length() - split_index - 1)
-                                    .trimmed();
+                QString value = lineData.mid(split_index + 1, lineData.length() - split_index - 1).trimmed();
                 if (!key.isEmpty() && !value.isEmpty()) {
                     iniRow.isValid = true;
                     iniRow.key = key;
@@ -206,7 +203,7 @@ void IniUtils::load(const QString &filepath)
 
                     iniGroup.rows.push_back(iniRow);
                     iniGroup.allkeys.push_back(key);
-                    // LOG_INFO() << "key-value" << key << value;
+                    // LOG_INFO().noquote() << "key-value" << key << value;
                 }
             }
             if (!iniRow.isValid) {
@@ -215,7 +212,7 @@ void IniUtils::load(const QString &filepath)
 
                 iniGroup.rows.push_back(iniRow);
                 iniGroup.allkeys.push_back(QString());
-                // LOG_INFO() << "invalid" << lineData;
+                // LOG_INFO().noquote() << "invalid" << lineData;
             }
         }
     }
@@ -254,8 +251,8 @@ int IniUtils::getStrListIndex(const QList<QString> &strList, const QString &key,
 {
     int index = -1;
     //大小写不敏感
-    for(int i = 0; i < strList.size(); i++){
-        if(strList[i].compare(key,cs) == 0){
+    for (int i = 0; i < strList.size(); i++) {
+        if (strList[i].compare(key, cs) == 0) {
             index = i;
             break;
         }
@@ -274,8 +271,7 @@ QString IniUtils::variantToString(const QVariant &v)
 
     case QVariant::ByteArray: {
         QByteArray a = v.toByteArray();
-        result = QLatin1String("@ByteArray(") + QLatin1String(a.constData(), a.size())
-                 + QLatin1Char(')');
+        result = QLatin1String("@ByteArray(") + QLatin1String(a.constData(), a.size()) + QLatin1Char(')');
         break;
     }
 
@@ -330,8 +326,7 @@ QString IniUtils::variantToString(const QVariant &v)
             s << v;
         }
 
-        result = QLatin1String(typeSpec) + QLatin1String(a.constData(), a.size())
-                 + QLatin1Char(')');
+        result = QLatin1String(typeSpec) + QLatin1String(a.constData(), a.size()) + QLatin1Char(')');
 #else
         Q_ASSERT(!"stringToVariant: Cannot save custom types without QDataStream support");
 #endif
@@ -350,8 +345,7 @@ QVariant IniUtils::stringToVariant(const QString &s)
                 return QVariant(s.midRef(11, s.size() - 12).toLatin1());
             } else if (s.startsWith(QLatin1String("@String("))) {
                 return QVariant(s.midRef(8, s.size() - 9).toString());
-            } else if (s.startsWith(QLatin1String("@Variant("))
-                       || s.startsWith(QLatin1String("@DateTime("))) {
+            } else if (s.startsWith(QLatin1String("@Variant(")) || s.startsWith(QLatin1String("@DateTime("))) {
 #ifndef QT_NO_DATASTREAM
                 QDataStream::Version version;
                 int offset;
@@ -375,8 +369,7 @@ QVariant IniUtils::stringToVariant(const QString &s)
             } else if (s.startsWith(QLatin1String("@Rect("))) {
                 QStringList args = splitArgs(s, 5);
                 if (args.size() == 4)
-                    return QVariant(
-                        QRect(args[0].toInt(), args[1].toInt(), args[2].toInt(), args[3].toInt()));
+                    return QVariant(QRect(args[0].toInt(), args[1].toInt(), args[2].toInt(), args[3].toInt()));
             } else if (s.startsWith(QLatin1String("@Size("))) {
                 QStringList args = splitArgs(s, 5);
                 if (args.size() == 2)

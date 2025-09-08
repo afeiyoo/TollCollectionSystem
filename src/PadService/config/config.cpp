@@ -7,7 +7,11 @@
 
 Config::Config(QObject *parent)
     : QObject{parent}
-{}
+{
+    // 日志配置
+    m_logConfig.format = "%{time} [%{type}] [%{threadid}] %{message}\n\n";
+    m_logConfig.filesLimit = 180;
+}
 
 Config::~Config() {}
 
@@ -52,8 +56,4 @@ void Config::loadConfig(const Utils::FileName &configPath)
                                     .toString();
     m_baseConfig.refundUrl
         = m_ini->value("BaseEnv", "refundUrl", "http://35.16.1.75:18080/SPTWebService/api/trade/pay/Refund").toString();
-
-    // 日志配置
-    m_logConfig.format = m_ini->value("Logger", "format", "%{time} [%{type}] [%{threadid}] %{message}\n\n").toString();
-    m_logConfig.filesLimit = m_ini->value("Logger", "filesLimit", 180).toUInt();
 }
