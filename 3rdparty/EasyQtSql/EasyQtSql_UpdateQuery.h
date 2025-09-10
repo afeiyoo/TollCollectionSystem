@@ -146,8 +146,15 @@ public:
         QString sql = "UPDATE " + m_table + " SET ";
         QStringList fieldValuePairs;
 
-        for (auto it = m_updateMap.begin(); it != m_updateMap.end(); ++it) {
-            fieldValuePairs.append(it.key() + "=:" + it.key());
+        if (!m_namedParams.isEmpty()) {
+            // 使用名字绑定
+            for (auto it = m_updateMap.begin(); it != m_updateMap.end(); ++it) {
+                fieldValuePairs.append(it.key() + "=:" + it.key());
+            }
+        } else {
+            for (auto it = m_updateMap.begin(); it != m_updateMap.end(); ++it) {
+                fieldValuePairs.append(it.key() + "=?");
+            }
         }
 
         sql += fieldValuePairs.join(",");
@@ -159,15 +166,17 @@ public:
         q.prepare(sql);
 
         // set子句使用命名绑定
-        for (auto it = m_updateMap.begin(); it != m_updateMap.end(); ++it) {
-            q.bindValue(":" + it.key(), it.value());
-        }
-
         if (!m_namedParams.isEmpty()) {
+            for (auto it = m_updateMap.begin(); it != m_updateMap.end(); ++it) {
+                q.bindValue(":" + it.key(), it.value());
+            }
             for (auto it = m_namedParams.begin(); it != m_namedParams.end(); ++it) {
                 q.bindValue(":" + it.key(), it.value());
             }
         } else {
+            for (auto it = m_updateMap.begin(); it != m_updateMap.end(); ++it) {
+                q.addBindValue(it.value());
+            }
             for (auto it = m_params.begin(); it != m_params.end(); ++it) {
                 q.addBindValue(*it);
             }
