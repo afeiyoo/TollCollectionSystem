@@ -161,6 +161,7 @@ QString BizHandler::doDealCmd16(const QVariantMap &aMap)
     if (stationID.isEmpty())
         throw BaseException(1, "响应失败: 站代码为空");
 
+    QString dealtData;
     if (tradeType == 7) {
         // 补费票段设置
         if (startNum.isEmpty())
@@ -187,8 +188,7 @@ QString BizHandler::doDealCmd16(const QVariantMap &aMap)
         QVariantMap map;
         map["status"] = "0";
         map["desc"] = "成功设置补费票段";
-        QString dealtData = GM_INSTANCE->m_jsonSerializer->serialize(map);
-        return dealtData;
+        dealtData = GM_INSTANCE->m_jsonSerializer->serialize(map);
     } else if (tradeType == 8) {
         // 稽核打票
         if (tradeId.isEmpty())
@@ -204,7 +204,7 @@ QString BizHandler::doDealCmd16(const QVariantMap &aMap)
         GM_INSTANCE->createSqlServerConnection(stationIP);
         // 获取票据信息
         QString id = QString("sqlserver_%1").arg(stationIP);
-        QVariantMap resMap = m_ds.getTicketUseInfo(laneID, shiftDate, id);
+        QVariantMap resMap = m_ds.getTicketUseInfo(laneID, id);
         if (resMap.isEmpty())
             throw BaseException(1, "响应失败: 未查询到相关票据信息");
 
@@ -244,15 +244,16 @@ QString BizHandler::doDealCmd16(const QVariantMap &aMap)
             throw BaseException(1, "响应失败: 站级数据传输异常");
 
         // 更新LastNum
-        m_ds.updateTicketUseInfo(laneID, shiftDate, ticketNum.toInt(), id);
+        m_ds.updateTicketUseInfo(laneID, ticketNum.toInt(), id);
 
         QVariantMap map;
         map["status"] = "0";
         map["desc"] = "成功录入票据信息";
-        QString dealtData = GM_INSTANCE->m_jsonSerializer->serialize(map);
-        return dealtData;
+        dealtData = GM_INSTANCE->m_jsonSerializer->serialize(map);
+    } else if (tradeType == 9) {
+        // 补打票
     }
-    return "";
+    return dealtData;
 }
 
 QString BizHandler::doDealCmd18(const QVariantMap &aMap)
@@ -1348,10 +1349,8 @@ QString BizHandler::doDealCmd31(QVariantMap aMap)
         QString remark = aMap.take("remark").toString();
         QString vehicleId = aMap["vehicleId"].toString();
 
-// TODO 测试完成后取消注释
-#if 0
         sendData = GM_INSTANCE->m_jsonSerializer->serialize(aMap);
-        LOG_INFO().noquote() << "请求稽核补费结果上传: " << QString::fromUtf8(sendData;
+        LOG_INFO().noquote() << "请求稽核补费结果上传: " << QString::fromUtf8(sendData);
 
         QUrl url(GM_INSTANCE->m_config->m_baseConfig.payBackUrl + "/" + vehicleId);
         auto reply = Http().instance().post(url, sendData, "application/json");
@@ -1361,9 +1360,7 @@ QString BizHandler::doDealCmd31(QVariantMap aMap)
 
         QVariantMap tempMap = GM_INSTANCE->m_jsonParser->parse(result.toUtf8()).toMap();
         bool ok = tempMap["success"].toBool();
-#endif
 
-        bool ok = false;
         if (ok) {
             // 支付结果上传稽核补费接口成功，DTP下发站级的T_AuditPayBack表
             T_AuditPayBack auditPayBack;

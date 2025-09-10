@@ -14,9 +14,7 @@ bool DataService::getLatestOutTrade(const QString &vehPlate, QObject *obj, int t
 {
     QSqlDatabase sdb = GM_INSTANCE->m_dbFactory->getDatabase("oracle");
     QString sql(
-        R"(SELECT * FROM %1 WHERE exvehplate = ? AND extime = (SELECT max(extime) FROM
-        (SELECT max(extime) AS extime FROM t_etc_out WHERE exvehplate = ? UNION
-        SELECT max(extime) AS extime FROM t_mtc_out WHERE exvehplate =?) t))");
+        R"(SELECT * FROM %1 WHERE exvehplate = ? AND extime = (SELECT max(extime) FROM (SELECT max(extime) AS extime FROM t_etc_out WHERE exvehplate = ? UNION SELECT max(extime) AS extime FROM t_mtc_out WHERE exvehplate =?) t))");
 
     if (type == 0) {
         sql = sql.arg("t_etc_out");
@@ -28,8 +26,8 @@ bool DataService::getLatestOutTrade(const QString &vehPlate, QObject *obj, int t
     try {
         EasyQtSql::PreparedQuery query = t.prepare(sql);
         EasyQtSql::QueryResult res = query.exec(vehPlate, vehPlate, vehPlate);
+
         LOG_INFO().noquote() << "执行SQL语句: " << res.executedQuery();
-        t.commit();
 
         if (!res.next())
             return false;
@@ -37,8 +35,7 @@ bool DataService::getLatestOutTrade(const QString &vehPlate, QObject *obj, int t
         res.fetchObject(*obj);
         return true;
     } catch (EasyQtSql::DBException &e) {
-        t.rollback();
-        LOG_ERROR().noquote() << e.lastError.text() << '\n' << e.lastQuery;
+        LOG_ERROR().noquote() << e.lastError.text() << '\t' << e.lastQuery;
         return false;
     }
 }
@@ -47,13 +44,7 @@ QVariantMap DataService::getEnInfo(const QString &passID)
 {
     QSqlDatabase sdb = GM_INSTANCE->m_dbFactory->getDatabase("oracle");
     QString sql(
-        R"(SELECT tradeid, TO_CHAR(entime, 'yyyy-mm-dd HH24:mi:ss') AS entime, cnlaneid, enstation, stationname
-       FROM t_mtc_in
-       WHERE passid = ?
-       UNION ALL
-       SELECT tradeid, TO_CHAR(entime, 'yyyy-mm-dd HH24:mi:ss') AS entime, cnlaneid, enstation, stationname
-       FROM t_etc_in
-       WHERE passid = ?)");
+        R"(SELECT tradeid, TO_CHAR(entime, 'yyyy-mm-dd HH24:mi:ss') AS entime, cnlaneid, enstation, stationname FROM t_mtc_in WHERE passid = ? UNION ALL SELECT tradeid, TO_CHAR(entime, 'yyyy-mm-dd HH24:mi:ss') AS entime, cnlaneid, enstation, stationname FROM t_etc_in WHERE passid = ?)");
 
     EasyQtSql::Transaction t(sdb);
     try {
@@ -61,7 +52,6 @@ QVariantMap DataService::getEnInfo(const QString &passID)
         EasyQtSql::QueryResult res = query.exec(passID, passID);
 
         LOG_INFO().noquote() << "执行SQL语句: " << res.executedQuery();
-        t.commit();
 
         if (!res.next())
             return {};
@@ -69,8 +59,7 @@ QVariantMap DataService::getEnInfo(const QString &passID)
         QVariantMap resMap = res.toMap();
         return resMap;
     } catch (EasyQtSql::DBException &e) {
-        t.rollback();
-        LOG_ERROR().noquote() << e.lastError.text() << '\n' << e.lastQuery;
+        LOG_ERROR().noquote() << e.lastError.text() << '\t' << e.lastQuery;
         return {};
     }
 }
@@ -79,11 +68,7 @@ QList<QVariantMap> DataService::getGantryInfos(const QString &passId)
 {
     QSqlDatabase sdb = GM_INSTANCE->m_dbFactory->getDatabase("oracle");
     QString sql(
-        R"(SELECT g.gantryid AS gantryid, e.tradetime AS tradetime, e.flagid AS flagid, g.flagname AS flagname, e.errcode
-        FROM t_ff_etcTrade e, t_etcflag g WHERE e.passid = ? AND e.flagid = g.flagid
-        UNION ALL
-        SELECT g.gantryid AS gantryid, e.tradetime AS tradetime, e.flagid AS flagid, g.flagname AS flagname, e.errcode
-        FROM t_ff_cpcrecord e, t_etcflag g WHERE e.passid = ? AND e.flagid = g.flagid ORDER BY tradetime)");
+        R"(SELECT g.gantryid AS gantryid, e.tradetime AS tradetime, e.flagid AS flagid, g.flagname AS flagname, e.errcode FROM t_ff_etcTrade e, t_etcflag g WHERE e.passid = ? AND e.flagid = g.flagid UNION ALL SELECT g.gantryid AS gantryid, e.tradetime AS tradetime, e.flagid AS flagid, g.flagname AS flagname, e.errcode FROM t_ff_cpcrecord e, t_etcflag g WHERE e.passid = ? AND e.flagid = g.flagid ORDER BY tradetime)");
 
     EasyQtSql::Transaction t(sdb);
     try {
@@ -91,7 +76,6 @@ QList<QVariantMap> DataService::getGantryInfos(const QString &passId)
         EasyQtSql::QueryResult res = query.exec(passId, passId);
 
         LOG_INFO().noquote() << "执行SQL语句: " << res.executedQuery();
-        t.commit();
 
         QList<QVariantMap> records;
         while (res.next()) {
@@ -101,8 +85,7 @@ QList<QVariantMap> DataService::getGantryInfos(const QString &passId)
 
         return records;
     } catch (EasyQtSql::DBException &e) {
-        t.rollback();
-        LOG_ERROR().noquote() << e.lastError.text() << '\n' << e.lastQuery;
+        LOG_ERROR().noquote() << e.lastError.text() << '\t' << e.lastQuery;
         return {};
     }
 }
@@ -118,7 +101,6 @@ QString DataService::getGantryNodeID(const QString &nodeHex)
         EasyQtSql::QueryResult res = query.exec(nodeHex);
 
         LOG_INFO().noquote() << "执行SQL语句: " << res.executedQuery();
-        t.commit();
 
         if (!res.next())
             return "";
@@ -126,8 +108,7 @@ QString DataService::getGantryNodeID(const QString &nodeHex)
         QString data = res.value("nodeid").toString();
         return data;
     } catch (EasyQtSql::DBException &e) {
-        t.rollback();
-        LOG_ERROR().noquote() << e.lastError.text() << '\n' << e.lastQuery;
+        LOG_ERROR().noquote() << e.lastError.text() << '\t' << e.lastQuery;
         return "";
     }
 }
@@ -143,7 +124,6 @@ QString DataService::getGantryNodeName(const QString &nodeId)
         EasyQtSql::QueryResult res = query.exec(nodeId);
 
         LOG_INFO().noquote() << "执行SQL语句: " << res.executedQuery();
-        t.commit();
 
         if (!res.next())
             return "";
@@ -151,8 +131,7 @@ QString DataService::getGantryNodeName(const QString &nodeId)
         QString data = res.value("nodename").toString();
         return data;
     } catch (EasyQtSql::DBException &e) {
-        t.rollback();
-        LOG_ERROR().noquote() << e.lastError.text() << '\n' << e.lastQuery;
+        LOG_ERROR().noquote() << e.lastError.text() << '\t' << e.lastQuery;
         return "";
     }
 }
@@ -168,7 +147,6 @@ QString DataService::getGantryHexNode(const QString &nodeId)
         EasyQtSql::QueryResult res = query.exec(nodeId);
 
         LOG_INFO().noquote() << "执行SQL语句: " << res.executedQuery();
-        t.commit();
 
         if (!res.next())
             return "";
@@ -176,8 +154,7 @@ QString DataService::getGantryHexNode(const QString &nodeId)
         QString data = res.value("hexnode").toString();
         return data;
     } catch (EasyQtSql::DBException &e) {
-        t.rollback();
-        LOG_ERROR().noquote() << e.lastError.text() << '\n' << e.lastQuery;
+        LOG_ERROR().noquote() << e.lastError.text() << '\t' << e.lastQuery;
         return "";
     }
 }
@@ -193,7 +170,6 @@ bool DataService::getSplitOut(const QString &tradeId, QObject *obj)
         EasyQtSql::QueryResult res = query.exec(tradeId);
 
         LOG_INFO().noquote() << "执行SQL语句: " << res.executedQuery();
-        t.commit();
 
         if (!res.next())
             return false;
@@ -201,8 +177,7 @@ bool DataService::getSplitOut(const QString &tradeId, QObject *obj)
         res.fetchObject(*obj);
         return true;
     } catch (EasyQtSql::DBException &e) {
-        t.rollback();
-        LOG_ERROR().noquote() << e.lastError.text() << '\n' << e.lastQuery;
+        LOG_ERROR().noquote() << e.lastError.text() << '\t' << e.lastQuery;
         return false;
     }
 }
@@ -218,7 +193,6 @@ QString DataService::getUserID(const QString &cardId)
         EasyQtSql::QueryResult res = query.exec(cardId);
 
         LOG_INFO().noquote() << "执行SQL语句: " << res.executedQuery();
-        t.commit();
 
         if (!res.next())
             return "";
@@ -226,8 +200,7 @@ QString DataService::getUserID(const QString &cardId)
         QString data = res.value("userid").toString();
         return data;
     } catch (EasyQtSql::DBException &e) {
-        t.rollback();
-        LOG_ERROR().noquote() << e.lastError.text() << '\n' << e.lastQuery;
+        LOG_ERROR().noquote() << e.lastError.text() << '\t' << e.lastQuery;
         return "";
     }
 }
@@ -249,7 +222,6 @@ QString DataService::getUserName(const QString &param, int type)
         EasyQtSql::QueryResult res = query.exec(param);
 
         LOG_INFO().noquote() << "执行SQL语句: " << res.executedQuery();
-        t.commit();
 
         if (!res.next())
             return "";
@@ -257,8 +229,7 @@ QString DataService::getUserName(const QString &param, int type)
         QString data = res.value("username").toString();
         return data;
     } catch (EasyQtSql::DBException &e) {
-        t.rollback();
-        LOG_ERROR().noquote() << e.lastError.text() << '\n' << e.lastQuery;
+        LOG_ERROR().noquote() << e.lastError.text() << '\t' << e.lastQuery;
         return "";
     }
 }
@@ -274,7 +245,6 @@ QString DataService::getStationIP(const QString &stationId)
         EasyQtSql::QueryResult res = query.exec(stationId);
 
         LOG_INFO().noquote() << "执行SQL语句: " << res.executedQuery();
-        t.commit();
 
         if (!res.next())
             return "";
@@ -282,8 +252,7 @@ QString DataService::getStationIP(const QString &stationId)
         QString data = res.value("ipaddr").toString();
         return data;
     } catch (EasyQtSql::DBException &e) {
-        t.rollback();
-        LOG_ERROR().noquote() << e.lastError.text() << '\n' << e.lastQuery;
+        LOG_ERROR().noquote() << e.lastError.text() << '\t' << e.lastQuery;
         return "";
     }
 }
@@ -299,7 +268,6 @@ QString DataService::getStationName(const QString &nodeId)
         EasyQtSql::QueryResult res = query.exec(nodeId);
 
         LOG_INFO().noquote() << "执行SQL语句: " << res.executedQuery();
-        t.commit();
 
         if (!res.next())
             return "";
@@ -307,8 +275,7 @@ QString DataService::getStationName(const QString &nodeId)
         QString data = res.value("nodename").toString();
         return data;
     } catch (EasyQtSql::DBException &e) {
-        t.rollback();
-        LOG_ERROR().noquote() << e.lastError.text() << '\n' << e.lastQuery;
+        LOG_ERROR().noquote() << e.lastError.text() << '\t' << e.lastQuery;
         return "";
     }
 }
@@ -324,7 +291,6 @@ QString DataService::getGrayCardRemark(const QString &cardId)
         EasyQtSql::QueryResult res = query.exec(cardId);
 
         LOG_INFO().noquote() << "执行SQL语句: " << res.executedQuery();
-        t.commit();
 
         if (!res.next())
             return "";
@@ -332,8 +298,7 @@ QString DataService::getGrayCardRemark(const QString &cardId)
         QString data = res.value("remark").toString();
         return data;
     } catch (EasyQtSql::DBException &e) {
-        t.rollback();
-        LOG_ERROR().noquote() << e.lastError.text() << '\n' << e.lastQuery;
+        LOG_ERROR().noquote() << e.lastError.text() << '\t' << e.lastQuery;
         return "";
     }
 }
@@ -349,7 +314,6 @@ QString DataService::getGrayVehicleRemark(const QString &plate)
         EasyQtSql::QueryResult res = query.exec(plate);
 
         LOG_INFO().noquote() << "执行SQL语句: " << res.executedQuery();
-        t.commit();
 
         if (!res.next())
             return "";
@@ -357,8 +321,7 @@ QString DataService::getGrayVehicleRemark(const QString &plate)
         QString data = res.value("remark").toString();
         return data;
     } catch (EasyQtSql::DBException &e) {
-        t.rollback();
-        LOG_ERROR().noquote() << e.lastError.text() << '\n' << e.lastQuery;
+        LOG_ERROR().noquote() << e.lastError.text() << '\t' << e.lastQuery;
         return "";
     }
 }
@@ -366,8 +329,8 @@ QString DataService::getGrayVehicleRemark(const QString &plate)
 int DataService::getGreenPassBanType(const QString &plate)
 {
     QSqlDatabase sdb = GM_INSTANCE->m_dbFactory->getDatabase("oracle");
-    QString sql(R"(SELECT bantype FROM t_greenpassban WHERE vehplate = ? AND isvalid = 1 AND
-                CURRENT_TIMESTAMP BETWEEN starttime AND endtime)");
+    QString sql(
+        R"(SELECT bantype FROM t_greenpassban WHERE vehplate = ? AND isvalid = 1 AND CURRENT_TIMESTAMP BETWEEN starttime AND endtime)");
 
     EasyQtSql::Transaction t(sdb);
     try {
@@ -375,7 +338,6 @@ int DataService::getGreenPassBanType(const QString &plate)
         EasyQtSql::QueryResult res = query.exec(plate);
 
         LOG_INFO().noquote() << "执行SQL语句: " << res.executedQuery();
-        t.commit();
 
         if (!res.next())
             return -1;
@@ -383,8 +345,7 @@ int DataService::getGreenPassBanType(const QString &plate)
         int data = res.value("bantype").toInt();
         return data;
     } catch (EasyQtSql::DBException &e) {
-        t.rollback();
-        LOG_ERROR().noquote() << e.lastError.text() << '\n' << e.lastQuery;
+        LOG_ERROR().noquote() << e.lastError.text() << '\t' << e.lastQuery;
         return -1;
     }
 }
@@ -400,7 +361,6 @@ bool DataService::getGreenPassAppointment(const QString &plate)
         EasyQtSql::QueryResult res = query.exec(plate);
 
         LOG_INFO().noquote() << "执行SQL语句: " << res.executedQuery();
-        t.commit();
 
         if (!res.next())
             return false;
@@ -408,8 +368,7 @@ bool DataService::getGreenPassAppointment(const QString &plate)
         int data = res.value("count").toInt();
         return data > 0;
     } catch (EasyQtSql::DBException &e) {
-        t.rollback();
-        LOG_ERROR().noquote() << e.lastError.text() << '\n' << e.lastQuery;
+        LOG_ERROR().noquote() << e.lastError.text() << '\t' << e.lastQuery;
         return false;
     }
 }
@@ -425,7 +384,6 @@ QVariantList DataService::getFreeTempVehicles(const QString &plate)
         EasyQtSql::QueryResult res = query.exec(plate);
 
         LOG_INFO().noquote() << "执行SQL语句: " << res.executedQuery();
-        t.commit();
 
         QVariantList records;
         while (res.next()) {
@@ -434,8 +392,7 @@ QVariantList DataService::getFreeTempVehicles(const QString &plate)
         }
         return records;
     } catch (EasyQtSql::DBException &e) {
-        t.rollback();
-        LOG_ERROR().noquote() << e.lastError.text() << '\n' << e.lastQuery;
+        LOG_ERROR().noquote() << e.lastError.text() << '\t' << e.lastQuery;
         return {};
     }
 }
@@ -451,7 +408,6 @@ QString DataService::getEmgcSeqNum(const QString &stationId)
         EasyQtSql::QueryResult res = query.exec(stationId);
 
         LOG_INFO().noquote() << "执行SQL语句: " << res.executedQuery();
-        t.commit();
 
         if (!res.next())
             return "0";
@@ -459,8 +415,7 @@ QString DataService::getEmgcSeqNum(const QString &stationId)
         QString data = res.value("kitem").toString();
         return data;
     } catch (EasyQtSql::DBException &e) {
-        t.rollback();
-        LOG_ERROR().noquote() << e.lastError.text() << '\n' << e.lastQuery;
+        LOG_ERROR().noquote() << e.lastError.text() << '\t' << e.lastQuery;
         return "";
     }
 }
@@ -480,7 +435,7 @@ bool DataService::updateEmgcSeqNum(const QString &stationId, const QString &newS
         return t.commit();
     } catch (EasyQtSql::DBException &e) {
         t.rollback();
-        LOG_ERROR().noquote() << e.lastError.text() << '\n' << e.lastQuery;
+        LOG_ERROR().noquote() << e.lastError.text() << '\t' << e.lastQuery;
         return false;
     }
 }
@@ -501,26 +456,24 @@ bool DataService::insertEmgcSeqNum(const QString &stationId)
         return t.commit();
     } catch (EasyQtSql::DBException &e) {
         t.rollback();
-        LOG_ERROR().noquote() << e.lastError.text() << '\n' << e.lastQuery;
+        LOG_ERROR().noquote() << e.lastError.text() << '\t' << e.lastQuery;
         return false;
     }
 }
 
-QVariantMap DataService::getTicketUseInfo(int laneId, const QString &shiftDate, const QString &id)
+QVariantMap DataService::getTicketUseInfo(int laneId, const QString &id)
 {
     QSqlDatabase sdb = GM_INSTANCE->m_dbFactory->getDatabase(id);
 
     QString sql(
-        R"(SELECT TOP 1 * FROM t_ticketusemanage WHERE laneid = ? AND shiftdate = ? AND isused = 1 AND lastnum != stopnum
-        AND remark LIKE '%SPT-POS:30%' ORDER BY operatetime)");
+        R"(SELECT TOP 1 * FROM t_ticketusemanage WHERE laneid = ? AND isused = 1 AND lastnum != stopnum AND remark LIKE '%SPT-POS:30%' ORDER BY operatetime)");
 
     EasyQtSql::Transaction t(sdb);
     try {
         EasyQtSql::PreparedQuery query = t.prepare(sql);
-        EasyQtSql::QueryResult res = query.exec(laneId, shiftDate);
+        EasyQtSql::QueryResult res = query.exec(laneId);
 
         LOG_INFO().noquote() << "执行SQL语句: " << res.executedQuery();
-        t.commit();
 
         if (!res.next())
             return {};
@@ -528,30 +481,28 @@ QVariantMap DataService::getTicketUseInfo(int laneId, const QString &shiftDate, 
         QVariantMap resMap = res.toMap();
         return resMap;
     } catch (EasyQtSql::DBException &e) {
-        t.rollback();
-        LOG_ERROR().noquote() << e.lastError.text() << '\n' << e.lastQuery;
+        LOG_ERROR().noquote() << e.lastError.text() << '\t' << e.lastQuery;
         return {};
     }
 }
 
-bool DataService::updateTicketUseInfo(int laneId, const QString &shiftDate, int newSeqNum, const QString &id)
+bool DataService::updateTicketUseInfo(int laneId, int newSeqNum, const QString &id)
 {
     QSqlDatabase sdb = GM_INSTANCE->m_dbFactory->getDatabase(id);
 
     EasyQtSql::Transaction t(sdb);
     try {
-        EasyQtSql::NonQueryResult res = t.update("t_ticketusemanage")
-                                            .set("lastnum", newSeqNum)
-                                            .where("laneid = ? AND shiftdate = ? AND isused = 1 AND lastnum != stopnum",
-                                                   laneId,
-                                                   shiftDate);
+        EasyQtSql::NonQueryResult res
+            = t.update("t_ticketusemanage")
+                  .set("lastnum", newSeqNum)
+                  .where("laneid = ? AND isused = 1 AND lastnum != stopnum AND remark LIKE '%SPT-POS:30%'", laneId);
 
         LOG_INFO().noquote() << "执行SQL语句: " << res.executedQuery();
 
         return t.commit();
     } catch (EasyQtSql::DBException &e) {
         t.rollback();
-        LOG_ERROR().noquote() << e.lastError.text() << '\n' << e.lastQuery;
+        LOG_ERROR().noquote() << e.lastError.text() << '\t' << e.lastQuery;
         return false;
     }
 }
