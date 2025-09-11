@@ -1381,7 +1381,7 @@ QString BizHandler::doDealCmd31(QVariantMap aMap)
             auditPayBack.ShiftID = shiftId;
             auditPayBack.VehPlate = Utils::BizUtils::getPlateNoColor(vehicleId);
             auditPayBack.VehPlateColor = Utils::BizUtils::getColorCodeFromPlate(vehicleId);
-            auditPayBack.PayFee = aMap["paybackFee"].toInt();
+            auditPayBack.PayFee = aMap["paybackFee"].toInt() / 100.0; // 以分为单位
             auditPayBack.VehClass = vehClass;
             auditPayBack.DataType = 2; // 手持机稽核
             auditPayBack.Remark = remark;
