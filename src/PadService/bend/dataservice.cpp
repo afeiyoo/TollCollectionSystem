@@ -27,7 +27,7 @@ bool DataService::getLatestOutTrade(const QString &vehPlate, QObject *obj, int t
         EasyQtSql::PreparedQuery query = t.prepare(sql);
         EasyQtSql::QueryResult res = query.exec(vehPlate, vehPlate, vehPlate);
 
-        LOG_INFO().noquote() << "执行SQL语句: " << res.executedQuery();
+        LOG_INFO().noquote() << "执行SQL语句: " << res.fullExecutedQuery();
 
         if (!res.next())
             return false;
@@ -51,7 +51,7 @@ QVariantMap DataService::getEnInfo(const QString &passID)
         EasyQtSql::PreparedQuery query = t.prepare(sql);
         EasyQtSql::QueryResult res = query.exec(passID, passID);
 
-        LOG_INFO().noquote() << "执行SQL语句: " << res.executedQuery();
+        LOG_INFO().noquote() << "执行SQL语句: " << res.fullExecutedQuery();
 
         if (!res.next())
             return {};
@@ -75,7 +75,7 @@ QList<QVariantMap> DataService::getGantryInfos(const QString &passId)
         EasyQtSql::PreparedQuery query = t.prepare(sql);
         EasyQtSql::QueryResult res = query.exec(passId, passId);
 
-        LOG_INFO().noquote() << "执行SQL语句: " << res.executedQuery();
+        LOG_INFO().noquote() << "执行SQL语句: " << res.fullExecutedQuery();
 
         QList<QVariantMap> records;
         while (res.next()) {
@@ -100,7 +100,7 @@ QString DataService::getGantryNodeID(const QString &nodeHex)
         EasyQtSql::PreparedQuery query = t.prepare(sql);
         EasyQtSql::QueryResult res = query.exec(nodeHex);
 
-        LOG_INFO().noquote() << "执行SQL语句: " << res.executedQuery();
+        LOG_INFO().noquote() << "执行SQL语句: " << res.fullExecutedQuery();
 
         if (!res.next())
             return "";
@@ -123,7 +123,7 @@ QString DataService::getGantryNodeName(const QString &nodeId)
         EasyQtSql::PreparedQuery query = t.prepare(sql);
         EasyQtSql::QueryResult res = query.exec(nodeId);
 
-        LOG_INFO().noquote() << "执行SQL语句: " << res.executedQuery();
+        LOG_INFO().noquote() << "执行SQL语句: " << res.fullExecutedQuery();
 
         if (!res.next())
             return "";
@@ -146,7 +146,7 @@ QString DataService::getGantryHexNode(const QString &nodeId)
         EasyQtSql::PreparedQuery query = t.prepare(sql);
         EasyQtSql::QueryResult res = query.exec(nodeId);
 
-        LOG_INFO().noquote() << "执行SQL语句: " << res.executedQuery();
+        LOG_INFO().noquote() << "执行SQL语句: " << res.fullExecutedQuery();
 
         if (!res.next())
             return "";
@@ -169,7 +169,7 @@ bool DataService::getSplitOut(const QString &tradeId, QObject *obj)
         EasyQtSql::PreparedQuery query = t.prepare(sql);
         EasyQtSql::QueryResult res = query.exec(tradeId);
 
-        LOG_INFO().noquote() << "执行SQL语句: " << res.executedQuery();
+        LOG_INFO().noquote() << "执行SQL语句: " << res.fullExecutedQuery();
 
         if (!res.next())
             return false;
@@ -192,7 +192,7 @@ QString DataService::getUserID(const QString &cardId)
         EasyQtSql::PreparedQuery query = t.prepare(sql);
         EasyQtSql::QueryResult res = query.exec(cardId);
 
-        LOG_INFO().noquote() << "执行SQL语句: " << res.executedQuery();
+        LOG_INFO().noquote() << "执行SQL语句: " << res.fullExecutedQuery();
 
         if (!res.next())
             return "";
@@ -221,7 +221,7 @@ QString DataService::getUserName(const QString &param, int type)
         EasyQtSql::PreparedQuery query = t.prepare(sql);
         EasyQtSql::QueryResult res = query.exec(param);
 
-        LOG_INFO().noquote() << "执行SQL语句: " << res.executedQuery();
+        LOG_INFO().noquote() << "执行SQL语句: " << res.fullExecutedQuery();
 
         if (!res.next())
             return "";
@@ -244,7 +244,7 @@ QString DataService::getStationIP(const QString &stationId)
         EasyQtSql::PreparedQuery query = t.prepare(sql);
         EasyQtSql::QueryResult res = query.exec(stationId);
 
-        LOG_INFO().noquote() << "执行SQL语句: " << res.executedQuery();
+        LOG_INFO().noquote() << "执行SQL语句: " << res.fullExecutedQuery();
 
         if (!res.next())
             return "";
@@ -267,7 +267,7 @@ QString DataService::getStationName(const QString &nodeId)
         EasyQtSql::PreparedQuery query = t.prepare(sql);
         EasyQtSql::QueryResult res = query.exec(nodeId);
 
-        LOG_INFO().noquote() << "执行SQL语句: " << res.executedQuery();
+        LOG_INFO().noquote() << "执行SQL语句: " << res.fullExecutedQuery();
 
         if (!res.next())
             return "";
@@ -290,7 +290,7 @@ QString DataService::getGrayCardRemark(const QString &cardId)
         EasyQtSql::PreparedQuery query = t.prepare(sql);
         EasyQtSql::QueryResult res = query.exec(cardId);
 
-        LOG_INFO().noquote() << "执行SQL语句: " << res.executedQuery();
+        LOG_INFO().noquote() << "执行SQL语句: " << res.fullExecutedQuery();
 
         if (!res.next())
             return "";
@@ -313,7 +313,7 @@ QString DataService::getGrayVehicleRemark(const QString &plate)
         EasyQtSql::PreparedQuery query = t.prepare(sql);
         EasyQtSql::QueryResult res = query.exec(plate);
 
-        LOG_INFO().noquote() << "执行SQL语句: " << res.executedQuery();
+        LOG_INFO().noquote() << "执行SQL语句: " << res.fullExecutedQuery();
 
         if (!res.next())
             return "";
@@ -337,7 +337,7 @@ int DataService::getGreenPassBanType(const QString &plate)
         EasyQtSql::PreparedQuery query = t.prepare(sql);
         EasyQtSql::QueryResult res = query.exec(plate);
 
-        LOG_INFO().noquote() << "执行SQL语句: " << res.executedQuery();
+        LOG_INFO().noquote() << "执行SQL语句: " << res.fullExecutedQuery();
 
         if (!res.next())
             return -1;
@@ -360,7 +360,7 @@ bool DataService::getGreenPassAppointment(const QString &plate)
         EasyQtSql::PreparedQuery query = t.prepare(sql);
         EasyQtSql::QueryResult res = query.exec(plate);
 
-        LOG_INFO().noquote() << "执行SQL语句: " << res.executedQuery();
+        LOG_INFO().noquote() << "执行SQL语句: " << res.fullExecutedQuery();
 
         if (!res.next())
             return false;
@@ -383,7 +383,7 @@ QVariantList DataService::getFreeTempVehicles(const QString &plate)
         EasyQtSql::PreparedQuery query = t.prepare(sql);
         EasyQtSql::QueryResult res = query.exec(plate);
 
-        LOG_INFO().noquote() << "执行SQL语句: " << res.executedQuery();
+        LOG_INFO().noquote() << "执行SQL语句: " << res.fullExecutedQuery();
 
         QVariantList records;
         while (res.next()) {
@@ -407,7 +407,7 @@ QString DataService::getEmgcSeqNum(const QString &stationId)
         EasyQtSql::PreparedQuery query = t.prepare(sql);
         EasyQtSql::QueryResult res = query.exec(stationId);
 
-        LOG_INFO().noquote() << "执行SQL语句: " << res.executedQuery();
+        LOG_INFO().noquote() << "执行SQL语句: " << res.fullExecutedQuery();
 
         if (!res.next())
             return "0";
@@ -473,7 +473,7 @@ QVariantMap DataService::getTicketUseInfo(int laneId, const QString &id)
         EasyQtSql::PreparedQuery query = t.prepare(sql);
         EasyQtSql::QueryResult res = query.exec(laneId);
 
-        LOG_INFO().noquote() << "执行SQL语句: " << res.executedQuery();
+        LOG_INFO().noquote() << "执行SQL语句: " << res.fullExecutedQuery();
 
         if (!res.next())
             return {};
