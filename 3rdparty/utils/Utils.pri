@@ -1,4 +1,4 @@
-QT *= xml
+QT *= xml sql
 
 HEADERS += \
     $$PWD/algorithm.h \

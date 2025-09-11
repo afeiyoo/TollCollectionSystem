@@ -5,6 +5,7 @@
 #if QT_VERSION >= QT_VERSION_CHECK(5, 10, 0)
     #include <QRandomGenerator>
 #endif
+#include <QDebug>
 #include <QMetaProperty>
 #include <QVariant>
 
@@ -962,4 +963,57 @@ QString DataDealUtils::getUpdateSql(QObject *obj)
     QString sql = QString("UPDATE %1 SET %2 WHERE %3")
                       .arg(tableName.toLower(), setClauses.join(","), whereClauses.join(" AND "));
     return sql;
+}
+
+QString DataDealUtils::fullExecutedQuery(const QSqlQuery &query)
+{
+    QString sql = query.lastQuery();
+    if (sql.isEmpty())
+        return sql;
+
+    auto bvals = query.boundValues();
+    if (bvals.isEmpty())
+        return sql;
+
+    QString result = sql;
+
+    // SQL 是否包含 ? 占位符
+    bool isPositional = result.contains('?');
+
+    if (isPositional) {
+        // 位置绑定，按顺序替换 ?
+        QList<QVariant> values = bvals.values(); // 忽略键名
+        for (const QVariant &val : values) {
+            QString v;
+            if (val.isNull()) {
+                v = "NULL";
+            } else if (val.type() == QVariant::String || val.type() == QVariant::DateTime
+                       || val.type() == QVariant::Date || val.type() == QVariant::Time) {
+                v = "'" + val.toString().replace("'", "''") + "'";
+            } else {
+                v = val.toString();
+            }
+
+            int pos = result.indexOf('?');
+            if (pos != -1)
+                result.replace(pos, 1, v);
+        }
+    } else {
+        // 命名绑定
+        for (auto it = bvals.begin(); it != bvals.end(); ++it) {
+            QString v;
+            if (it.value().isNull()) {
+                v = "NULL";
+            } else if (it.value().type() == QVariant::String || it.value().type() == QVariant::DateTime
+                       || it.value().type() == QVariant::Date || it.value().type() == QVariant::Time) {
+                v = "'" + it.value().toString().replace("'", "''") + "'";
+            } else {
+                v = it.value().toString();
+            }
+
+            result.replace(it.key(), v);
+        }
+    }
+
+    return result;
 }

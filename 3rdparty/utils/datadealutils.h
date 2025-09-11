@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QObject>
+#include <QSqlQuery>
 
 namespace Utils {
 
@@ -143,6 +144,9 @@ public:
 
     // 解析obj对象，获取对应的更新Sql
     static QString getUpdateSql(QObject *obj);
+
+    // 输出完整的SQL语句（不含占位符）
+    static QString fullExecutedQuery(const QSqlQuery &query);
 };
 
 } // namespace Utils
