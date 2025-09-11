@@ -65,6 +65,5 @@ bin/
 src/Common/
 src/Devices/
 src/DTPV2/
-src/LaneSystem/
 lib/
 bin/
