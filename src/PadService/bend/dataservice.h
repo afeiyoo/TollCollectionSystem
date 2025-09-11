@@ -67,8 +67,20 @@ public:
     bool insertEmgcSeqNum(const QString &stationId);
 
     // 获取票据段信息
-    QVariantMap getTicketUseInfo(int laneId,  const QString &id);
+    QVariantMap getTicketUseInfo(int laneId, const QString &id);
 
     // 更新票据段信息
     bool updateTicketUseInfo(int laneId, int newSeqNum, const QString &id);
+
+    // 获取相关班次数据记录条数
+    int getOutShiftSettleCount(const QString &stationId, const QString &shiftDate, int shiftId, const QString &id);
+
+    // 插入相关班次数据
+    bool insertOutShiftSettle(const QString &dataId,
+                              const QString &shiftDate,
+                              int shiftId,
+                              const QString &stationId,
+                              const QString &operatorId,
+                              const QString &operatorName,
+                              const QString &id);
 };

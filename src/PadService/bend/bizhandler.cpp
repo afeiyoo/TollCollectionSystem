@@ -246,6 +246,17 @@ QString BizHandler::doDealCmd16(const QVariantMap &aMap)
         // 更新LastNum
         m_ds.updateTicketUseInfo(laneID, ticketNum.toInt(), id);
 
+        // 更新班次表
+        if (m_ds.getOutShiftSettleCount(stationID, shiftDate, shiftNum, id) == 0) {
+            LOG_INFO().noquote() << "班次数据表不存在相关记录, 插入新记录";
+            QString varShiftDate = QDateTime::fromString(shiftDate, "yyyy-MM-dd hh:mm:ss").toString("yyyyMMdd");
+            QString dataId = QString("%1XX%2").arg(varShiftDate).arg(Utils::DataDealUtils::padValue(shiftNum, 2));
+            QString varOperatorName = m_ds.getUserName(operatorId, 1);
+            QString operatorName = varOperatorName.isEmpty() ? "稽查班" : varOperatorName;
+
+            m_ds.insertOutShiftSettle(dataId, shiftDate, shiftNum, stationID, operatorId, operatorName, id);
+        }
+
         QVariantMap map;
         map["status"] = "0";
         map["desc"] = "成功录入票据信息";
