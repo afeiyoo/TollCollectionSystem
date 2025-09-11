@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sqls namespace="Read">
+    <sql id="findConfig">
+        SELECT * FROM t_laneconfig WHERE laneid = :laneid AND lanetype = :lanetype
+    </sql>
+</sqls>

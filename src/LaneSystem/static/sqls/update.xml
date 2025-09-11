@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sqls namespace="Update">
+    <sql id="updateConfig">
+        UPDATE t_laneconfig SET stationid = :stationid WHERE itemkey = :itemkey AND laneid = :laneid
+    </sql>
+</sqls>

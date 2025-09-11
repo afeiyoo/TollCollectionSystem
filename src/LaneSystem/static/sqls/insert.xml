@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sqls namespace="Insert">
+    <sql id="insertConfig">
+        INSERT INTO t_laneconfig (stationid, laneid, lanetype, itemkey, itemvalue, reserve, updatetime) VALUES (:stationid, :laneid, :lanetype, :itemkey, :itemvalue, :reserve, :updatetime)
+    </sql>
+</sqls>
