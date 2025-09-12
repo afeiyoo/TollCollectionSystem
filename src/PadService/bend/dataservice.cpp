@@ -493,10 +493,13 @@ bool DataService::updateTicketUseInfo(int laneId, int newSeqNum, const QString &
 
     EasyQtSql::Transaction t(sdb);
     try {
-        EasyQtSql::NonQueryResult res
-            = t.update("t_ticketusemanage")
-                  .set("lastnum", newSeqNum)
-                  .where("laneid = ? AND isused = 1 AND lastnum != stopnum AND remark LIKE '%SPT-POS:30%'", laneId);
+        EasyQtSql::NonQueryResult res = t.update("t_ticketusemanage")
+                                            .set("lastnum", newSeqNum)
+                                            .where("laneid = ? AND isused = 1 AND lastnum != stopnum AND startnum <= ? "
+                                                   "AND stopnum >= ? AND remark LIKE '%SPT-POS:30%'",
+                                                   laneId,
+                                                   newSeqNum,
+                                                   newSeqNum);
 
         LOG_INFO().noquote() << "执行SQL语句: " << Utils::DataDealUtils::fullExecutedQuery(res.unwrappedQuery());
 
