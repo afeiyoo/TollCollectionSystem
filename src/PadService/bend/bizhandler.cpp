@@ -79,6 +79,9 @@ QString BizHandler::doMainDeal(int cmdType, const QVariantMap &dataMap, const QB
     case 34:
         dealtData = doDealCmd34(dataMap); // 临时免征车列表查询
         break;
+    case 38:
+        dealtData = doDealCmd38(dataMap); // 查询出口流水是否可补打票信息
+        break;
     case 39:
         dealtData = doDealCmd39(dataMap); // 本站绿通流水查询
         break;
@@ -1820,6 +1823,215 @@ QString BizHandler::doDealCmd34(const QVariantMap &aMap)
     return dealtData;
 }
 
+QString BizHandler::doDealCmd38(const QVariantMap &aMap)
+{
+    QString vehPlate;
+    QString cardId;
+    QString startTime;
+    QString stopTime;
+    QString stationId;
+
+    if (aMap.contains("vehPlate"))
+        vehPlate = aMap["vehPlate"].toString();
+    if (aMap.contains("cardId"))
+        cardId = aMap["cardId"].toString();
+    if (aMap.contains("startTime"))
+        startTime = aMap["startTime"].toString();
+    if (aMap.contains("stopTime"))
+        stopTime = aMap["stopTime"].toString();
+    if (aMap.contains("stationId"))
+        stationId = aMap["stationId"].toString();
+
+    if (vehPlate.isEmpty())
+        throw BaseException(1, "响应失败: 站代码为空");
+    if (cardId.isEmpty())
+        throw BaseException(1, "响应失败: 卡号为空");
+    if (startTime.isEmpty() || stopTime.isEmpty())
+        throw BaseException(1, "响应失败：开始或结束时间为空");
+    if (stationId.isEmpty())
+        throw BaseException(1, "响应失败：站代码为空");
+
+    QString stationIP = m_ds.getStationIP(stationId);
+    QString stationServiceUrl = QString("http://%1:8082").arg(stationIP);
+
+    QVariantList tradeList;
+    QVariantList records = getDurationOutTrades(stationServiceUrl, vehPlate, cardId, startTime, stopTime);
+    for (const auto &record : records) {
+        QVariantMap recordMap = record.toMap();
+        QString tradeId = recordMap["tradeid"].toString();
+
+        QVariantMap tradeMap;
+        tradeMap["tradeId"] = tradeId;
+        tradeMap["passId"] = recordMap["passid"].toString();
+        tradeMap["vehPlate"] = recordMap["exvehplate"].toString();
+        tradeMap["cardId"] = recordMap["cardid"].toString();
+        tradeMap["enStation"] = recordMap["enstationname"].toString();
+        tradeMap["exStation"] = recordMap["exstationname"].toString();
+        tradeMap["factFee"] = recordMap["factpay"].toString();
+        tradeMap["tradeTime"] = recordMap["extime"].toString();
+        tradeMap["remark"] = "";
+
+        bool isUseTicket = getMTicketUseExist(stationServiceUrl, tradeId);
+        if (isUseTicket) {
+            // 查询废票表中是否有该票据作废数据
+            bool isScrapTicket = getScrapTicketExist(stationServiceUrl, tradeId);
+            tradeMap["isPrint"] = isScrapTicket ? 1 : 0;
+        } else {
+            // 查询弃票表中是否有该数据
+            bool isDiscardTicket = getDiscardTicket(stationServiceUrl, tradeId);
+            if (isDiscardTicket) {
+                tradeMap["isPrint"] = 1;
+            } else {
+                int ticketNum = recordMap["ticketNum"].toInt();
+                tradeMap["isPrint"] = ticketNum == 0 ? 1 : 0;
+            }
+        }
+
+        tradeList.append(tradeMap);
+    }
+
+    QVariantMap resMap;
+    resMap["status"] = 0;
+    resMap["desc"] = "";
+    resMap["tradeList"] = tradeList;
+
+    QString dealtData = GM_INSTANCE->m_jsonSerializer->serialize(resMap);
+    return dealtData;
+}
+
+QVariantList BizHandler::getDurationOutTrades(const QString &stationServiceUrl,
+                                              const QString &vehPlate,
+                                              const QString &cardId,
+                                              const QString &startTime,
+                                              const QString &stopTime)
+{
+    QVariantList records;
+
+    QVariantMap sendMap;
+    sendMap["queryType"] = "queryData";
+    sendMap["queryAuth"] = "1";
+    sendMap["querySql"]
+        = QString(
+              "SELECT tradeid, passid, exvehplate, cardid, enstationname, exstationname, factpay, extime, ticketnum "
+              "FROM t_mtc_out WHERE paytype = 0 AND isvalid = 1 AND (exvehplate = '%1' OR cardid = '%2') AND "
+              "exshiftdate > '%3' AND exshiftdate < '%4' UNION ALL SELECT tradeid, passid, exvehplate, "
+              "cardid, enstationname, exstationname, factpay, extime, ticketnum FROM "
+              "t_etc_out WHERE (paytype = 2 OR paytype = 0)  AND isvalid = 1 AND (exvehplate = '%5' OR cardid = '%6') "
+              "AND exshiftdate > '%7' AND exshiftdate < '%8'")
+              .arg(vehPlate, cardId, startTime, stopTime, vehPlate, cardId, startTime, stopTime);
+    sendMap["dataType"] = 4;
+
+    QString sendData = GM_INSTANCE->m_jsonSerializer->serialize(sendMap);
+    LOG_INFO().noquote() << QString("%1 在 %2~%3 内的第三方支付与现金支付流水查询请求: ")
+                                .arg(vehPlate, startTime, stopTime)
+                         << sendData;
+
+    QUrl url(stationServiceUrl);
+    auto reply = Http().instance().post(url, sendData.toUtf8(), "application/json");
+
+    QString result = blockUtilResponse(reply, Http().instance().getReadTimeout());
+    LOG_INFO().noquote() << "返回相关流水 TradeId 查询结果: " << result;
+
+    QVariantMap resMap = GM_INSTANCE->m_jsonParser->parse(result.toUtf8()).toMap();
+    if (resMap["errCode"].toInt() == 1) {
+        QString errorMessage = resMap["errorMessage"].toString();
+        throw BaseException(1, QString("响应失败: 站级服务返回查询失败 %1").arg(errorMessage));
+    } else {
+        records = resMap["data"].toList();
+    }
+    return records;
+}
+
+bool BizHandler::getMTicketUseExist(const QString &stationServiceUrl, const QString &tradeId)
+{
+    int data = 0;
+
+    QVariantMap sendMap;
+    sendMap["queryType"] = "queryData";
+    sendMap["queryAuth"] = "1";
+    sendMap["querySql"] = QString("SELECT COUNT(*) FROM t_mticketuse WHERE tradeid = '%1' AND isvalid = 1").arg(tradeId);
+    sendMap["dataType"] = 2;
+
+    QString sendData = GM_INSTANCE->m_jsonSerializer->serialize(sendMap);
+    LOG_INFO().noquote() << QString("Trade %1 相关票据使用情况查询请求: ").arg(tradeId) << sendData;
+
+    QUrl url(stationServiceUrl);
+    auto reply = Http().instance().post(url, sendData.toUtf8(), "application/json");
+
+    QString result = blockUtilResponse(reply, Http().instance().getReadTimeout());
+    LOG_INFO().noquote() << "返回相关票据使用情况查询结果: " << result;
+
+    QVariantMap resMap = GM_INSTANCE->m_jsonParser->parse(result.toUtf8()).toMap();
+    if (resMap["errCode"].toInt() == 1) {
+        QString errorMessage = resMap["errorMessage"].toString();
+        throw BaseException(1, QString("响应失败: 站级服务返回查询失败 %1").arg(errorMessage));
+    } else {
+        data = resMap["data"].toInt();
+    }
+
+    return data > 0;
+}
+
+bool BizHandler::getScrapTicketExist(const QString &stationServiceUrl, const QString &tradeId)
+{
+    int data = 0;
+
+    QVariantMap sendMap;
+    sendMap["queryType"] = "queryData";
+    sendMap["queryAuth"] = "1";
+    sendMap["querySql"] = QString("SELECT COUNT(*) FROM t_scrapticket WHERE tradeid = '%1'").arg(tradeId);
+    sendMap["dataType"] = 2;
+
+    QString sendData = GM_INSTANCE->m_jsonSerializer->serialize(sendMap);
+    LOG_INFO().noquote() << QString("Trade %1 相关废票信息查询请求: ").arg(tradeId) << sendData;
+
+    QUrl url(stationServiceUrl);
+    auto reply = Http().instance().post(url, sendData.toUtf8(), "application/json");
+
+    QString result = blockUtilResponse(reply, Http().instance().getReadTimeout());
+    LOG_INFO().noquote() << "返回相关废票信息查询结果: " << result;
+
+    QVariantMap resMap = GM_INSTANCE->m_jsonParser->parse(result.toUtf8()).toMap();
+    if (resMap["errCode"].toInt() == 1) {
+        QString errorMessage = resMap["errorMessage"].toString();
+        throw BaseException(1, QString("响应失败: 站级服务返回查询失败 %1").arg(errorMessage));
+    } else {
+        data = resMap["data"].toInt();
+    }
+
+    return data > 0;
+}
+
+bool BizHandler::getDiscardTicket(const QString &stationServiceUrl, const QString &tradeId)
+{
+    int data = 0;
+
+    QVariantMap sendMap;
+    sendMap["queryType"] = "queryData";
+    sendMap["queryAuth"] = "1";
+    sendMap["querySql"] = QString("SELECT COUNT(*) FROM t_discardticket WHERE tradeid = '%1'").arg(tradeId);
+    sendMap["dataType"] = 2;
+
+    QString sendData = GM_INSTANCE->m_jsonSerializer->serialize(sendMap);
+    LOG_INFO().noquote() << QString("Trade %1 相关弃票信息查询请求: ").arg(tradeId) << sendData;
+
+    QUrl url(stationServiceUrl);
+    auto reply = Http().instance().post(url, sendData.toUtf8(), "application/json");
+
+    QString result = blockUtilResponse(reply, Http().instance().getReadTimeout());
+    LOG_INFO().noquote() << "返回相关弃票信息查询结果: " << result;
+
+    QVariantMap resMap = GM_INSTANCE->m_jsonParser->parse(result.toUtf8()).toMap();
+    if (resMap["errCode"].toInt() == 1) {
+        QString errorMessage = resMap["errorMessage"].toString();
+        throw BaseException(1, QString("响应失败: 站级服务返回查询失败 %1").arg(errorMessage));
+    } else {
+        data = resMap["data"].toInt();
+    }
+
+    return data > 0;
+}
+
 QString BizHandler::doDealCmd39(const QVariantMap &aMap)
 {
     QString stationID;
@@ -1844,14 +2056,14 @@ QString BizHandler::doDealCmd39(const QVariantMap &aMap)
     sendMap["queryType"] = "queryData";
     sendMap["queryAuth"] = "1";
     sendMap["querySql"]
-        = QString("SELECT TradeID, PassID, ExVehPlate, EnNetID, EnStation, ExNetID, ExStation, ExTime, EnTotalWeight, "
-                  "TotalWeight, CardType, ShouldPay, FactPay, ProvinceNum, CardBizType, Reserve, UserType, OBUPlate "
-                  "FROM T_ETC_OUT WHERE "
-                  "(UserType = 21 OR UserType = 22) AND ExTime >= '%1' AND ExTime < '%2' UNION ALL "
-                  "SELECT TradeID, PassID, ExVehPlate, EnNetID, EnStation, ExNetID, ExStation, ExTime, EnTotalWeight, "
-                  "TotalWeight, CardType, ShouldPay, FactPay, NULL AS ProvinceNum, CardBizType, Reserve, UserType, "
-                  "NULL AS OBUPlate FROM T_MTC_OUT "
-                  "WHERE (UserType = 21 OR UserType = 22) AND ExTime >= '%3' AND ExTime < '%4'")
+        = QString("SELECT tradeid, passid, exvehplate, ennetid, enstation, exnetid, exstation, extime, entotalweight, "
+                  "totalweight, cardtype, shouldpay, factpay, provincenum, cardbiztype, reserve, usertype, obuplate "
+                  "FROM t_etc_out WHERE "
+                  "(usertype = 21 OR usertype = 22) AND extime >= '%1' AND extime < '%2' UNION ALL "
+                  "SELECT tradeid, passid, exvehplate, ennetid, enstation, exnetid, exstation, extime, entotalweight, "
+                  "totalweight, cardtype, shouldpay, factpay, NULL AS provincenum, cardbiztype, reserve, usertype, "
+                  "NULL AS obuplate FROM t_mtc_out "
+                  "WHERE (usertype = 21 OR usertype = 22) AND extime >= '%3' AND extime < '%4'")
               .arg(startTime, stopTime, startTime, stopTime);
     sendMap["dataType"] = 4;
 
@@ -1860,7 +2072,7 @@ QString BizHandler::doDealCmd39(const QVariantMap &aMap)
 
     QString stationIP = m_ds.getStationIP(stationID);
     QString stationServiceUrl = QString("http://%1:8082").arg(stationIP);
-    QString url(stationServiceUrl);
+    QUrl url(stationServiceUrl);
     auto reply = Http().instance().post(url, sendData.toUtf8(), "application/json");
 
     QString result = blockUtilResponse(reply, Http().instance().getReadTimeout());
@@ -1869,7 +2081,6 @@ QString BizHandler::doDealCmd39(const QVariantMap &aMap)
     QVariantMap resMap = GM_INSTANCE->m_jsonParser->parse(result.toUtf8()).toMap();
     if (resMap["errCode"].toInt() == 1) {
         QString errorMessage = resMap["errorMessage"].toString();
-        LOG_ERROR().noquote() << "站级服务返回查询失败: " << errorMessage;
         throw BaseException(1, QString("响应失败: 站级服务返回查询失败 %1").arg(errorMessage));
     }
 
@@ -1879,19 +2090,19 @@ QString BizHandler::doDealCmd39(const QVariantMap &aMap)
         QVariantMap recordMap = record.toMap();
 
         QVariantMap greenTrade;
-        greenTrade["tradeId"] = recordMap["TradeID"].toString();
-        greenTrade["passId"] = recordMap["PassID"].toString();
-        greenTrade["vehPlate"] = recordMap["ExVehPlate"].toString();
-        QString enHexNode = recordMap["EnNetID"].toString() + recordMap["EnStation"].toString();
+        greenTrade["tradeId"] = recordMap["tradeid"].toString();
+        greenTrade["passId"] = recordMap["passid"].toString();
+        greenTrade["vehPlate"] = recordMap["exvehplate"].toString();
+        QString enHexNode = recordMap["ennetid"].toString() + recordMap["enstation"].toString();
         greenTrade["enStation"] = m_ds.getGantryNodeID(enHexNode);
-        QString exHexNode = recordMap["ExNetID"].toString() + recordMap["ExStation"].toString();
+        QString exHexNode = recordMap["exnetid"].toString() + recordMap["exstation"].toString();
         greenTrade["exStation"] = m_ds.getGantryNodeID(exHexNode);
-        greenTrade["exTime"] = QDateTime::fromString(recordMap["ExTime"].toString(), "yyyy-MM-dd hh:mm:ss")
+        greenTrade["exTime"] = QDateTime::fromString(recordMap["extime"].toString(), "yyyy-MM-dd hh:mm:ss")
                                    .toString("yyyy-MM-ddThh:mm:ss");
-        greenTrade["enWeight"] = recordMap["EnTotalWeight"].toString();
-        greenTrade["exWeight"] = recordMap["TotalWeight"].toString();
+        greenTrade["enWeight"] = recordMap["entotalweight"].toString();
+        greenTrade["exWeight"] = recordMap["totalweight"].toString();
 
-        int cardType = recordMap["CardType"].toInt();
+        int cardType = recordMap["cardtype"].toInt();
         if (cardType == 22 || cardType == 23) {
             greenTrade["mediaType"] = 1;
         } else if (cardType == 15) {
@@ -1902,7 +2113,7 @@ QString BizHandler::doDealCmd39(const QVariantMap &aMap)
             greenTrade["mediaType"] = 9;
         }
 
-        int cardBizType = recordMap["CardBizType"].toInt();
+        int cardBizType = recordMap["cardbiztype"].toInt();
         if (cardBizType == 33 || cardBizType == 34 || cardBizType == 35) {
             greenTrade["transPayType"] = 2;
         } else if (cardType == 22 || cardType == 23) {
@@ -1910,11 +2121,11 @@ QString BizHandler::doDealCmd39(const QVariantMap &aMap)
         } else {
             greenTrade["transPayType"] = -1;
         }
-        greenTrade["fee"] = recordMap["FactPay"].toInt();
-        greenTrade["payFee"] = recordMap["ShouldPay"].toInt();
+        greenTrade["fee"] = recordMap["factpay"].toInt();
+        greenTrade["payFee"] = recordMap["shouldpay"].toInt();
 
-        int userType = recordMap["UserType"].toInt();
-        QString reserve = recordMap["Reserve"].toString();
+        int userType = recordMap["usertype"].toInt();
+        QString reserve = recordMap["reserve"].toString();
         if (reserve.contains("(Appointment:0)")) {
             greenTrade["vehicleSign"] = "0xFF";
         } else if (userType == 21) {
@@ -1923,7 +2134,7 @@ QString BizHandler::doDealCmd39(const QVariantMap &aMap)
             greenTrade["vehicleSign"] = "0x03";
         }
 
-        int provinceNum = recordMap["ProvinceNum"].toInt();
+        int provinceNum = recordMap["provincenum"].toInt();
         if (provinceNum == 0) {
             provinceNum = 1;
             QRegularExpression re(R"(\(ProvinceNum:(\d+)\))"); // 捕获数字
@@ -1933,7 +2144,7 @@ QString BizHandler::doDealCmd39(const QVariantMap &aMap)
         }
 
         greenTrade["proviceCount"] = provinceNum;
-        greenTrade["obuPlate"] = recordMap["OBUPlate"].toString();
+        greenTrade["obuPlate"] = recordMap["obuplate"].toString();
 
         greenTradeList.append(greenTrade);
     }
