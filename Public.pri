@@ -85,12 +85,12 @@ MGS_OUTPUT_PATH = $$PWD
     MGS_BIN_PATH = $$MGS_OUTPUT_PATH/bin
 }
 
-# 函数定义，拷贝指定的动态库到目标目录 DESTDIR（仅 Windows）
+# 函数定义，拷贝指定的动态库到目标目录 DESTDIR
 defineTest(copyLibsToDestdir) {
     win32 {
         LIB_EXT = dll
         FILE_NAME = $${1}.$${LIB_EXT}
-        src = $$MGS_LIBRARY_PATH/$$FILE_NAME
+        src = $$MGS_LIBRARY_PATH/win/$$FILE_NAME
         dst = $$DESTDIR/$$FILE_NAME
 
         exists($$src) {
@@ -115,8 +115,23 @@ defineTest(copyLibsToDestdir) {
 
         export(QMAKE_POST_LINK)
     }
-    else {
-        message("Note: copyLibsToDestdir skipped on non-Windows system. Use rpath or system library path.")
+    else:unix {
+        LIB_EXT = so
+        FILE_NAME = lib$${1}.$${LIB_EXT}   # Linux 下通常是 libxxx.so
+        SRC_DIR = $$MGS_LIBRARY_PATH/linux
+        DST_DIR = $$DESTDIR
+
+        exists($$SRC_DIR/$$FILE_NAME*) {
+            message("Will copy library set: $$SRC_DIR/$$FILE_NAME* -> $$DST_DIR/")
+
+            QMAKE_POST_LINK += mkdir -p $$shell_quote($$DST_DIR) $$escape_expand(\\n\\t)
+
+            # 使用 cp -a 保留软链接
+            QMAKE_POST_LINK += cp -a $$SRC_DIR/$${FILE_NAME}* $$DST_DIR/ $$escape_expand(\\n\\t)
+        } else {
+            message("Warning: library not found in $$SRC_DIR: $$FILE_NAME*")
+        }
+        export(QMAKE_POST_LINK)
     }
     return(true)
 }
@@ -125,7 +140,16 @@ defineTest(copyLibsToDestdir) {
 # 这个选项用于抑制 GCC 关于 noexcept 类型比较的警告
 gcc:!clang: QMAKE_CXXFLAGS += -Wno-noexcept-type
 
-!macx:exists($$MGS_LIBRARY_PATH): LIBS *= -L$$MGS_LIBRARY_PATH
+!macx {
+    exists($$MGS_LIBRARY_PATH) {
+        win32 {
+            LIBS *= -L$$MGS_LIBRARY_PATH/win
+        }
+        unix {
+            LIBS *= -L$$MGS_LIBRARY_PATH/linux
+        }
+    }
+}
 
 # Output directory，OUT_PWD表示构建输出目录
 CONFIG(debug, debug|release) {

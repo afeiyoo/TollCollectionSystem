@@ -4,11 +4,15 @@ QT -= gui
 
 TARGET = HttpServer
 
-DESTDIR = $$MGS_LIBRARY_PATH
-
 TEMPLATE = lib
 CONFIG += shared dll
 TARGET = $$qtLibraryTargetName($$TARGET)
+
+win32 {
+    DESTDIR = $$MGS_LIBRARY_PATH/win
+} else {
+    DESTDIR = $$MGS_LIBRARY_PATH/linux
+}
 
 win32 {
    DEFINES += QTWEBAPPLIB_EXPORT

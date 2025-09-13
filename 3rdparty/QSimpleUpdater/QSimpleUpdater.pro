@@ -24,11 +24,15 @@ include($$PWD/../../Public.pri)
 
 TARGET = QSimpleUpdater
 
-DESTDIR = $$MGS_LIBRARY_PATH
-
 TEMPLATE = lib
 CONFIG += shared dll
 TARGET = $$qtLibraryTargetName($$TARGET)
+
+win32 {
+    DESTDIR = $$MGS_LIBRARY_PATH/win
+} else {
+    DESTDIR = $$MGS_LIBRARY_PATH/linux
+}
 
 shared|dll {
     DEFINES += QSU_SHARED

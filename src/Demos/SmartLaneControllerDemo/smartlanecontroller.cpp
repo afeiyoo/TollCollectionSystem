@@ -27,12 +27,12 @@ SmartLaneController::SmartLaneController(QObject *parent)
     connect(m_tcpSocket, &QTcpSocket::connected, this, &SmartLaneController::doConnected);
     connect(m_tcpSocket, &QTcpSocket::disconnected, this, &SmartLaneController::doDisconnected);
     connect(m_tcpSocket, &QTcpSocket::readyRead, this, &SmartLaneController::doReadyRead);
-    connect(m_tcpSocket,
-            QOverload<QAbstractSocket::SocketError>::of(&QAbstractSocket::errorOccurred),
-            this,
-            [=](QAbstractSocket::SocketError socketError) {
-                LOG_INFO() << "[ERROR] Socket error:" << socketError << m_tcpSocket->errorString();
-            });
+//    connect(m_tcpSocket,
+//            QOverload<QAbstractSocket::SocketError>::of(&QAbstractSocket::errorOccurred),
+//            this,
+//            [=](QAbstractSocket::SocketError socketError) {
+//                LOG_INFO() << "[ERROR] Socket error:" << socketError << m_tcpSocket->errorString();
+//            });
 }
 
 void SmartLaneController::connectServer(const QString &ip, quint16 port)

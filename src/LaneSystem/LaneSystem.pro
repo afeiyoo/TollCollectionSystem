@@ -5,8 +5,11 @@ QT       *= core gui network
 TARGET = LaneSystem
 TEMPLATE = app
 
-# 编译得到的最终产物输出路径
-DESTDIR = $$MGS_BIN_PATH/$$TARGET
+win32 {
+    DESTDIR = $$MGS_BIN_PATH/win/$$TARGET
+} else {
+    DESTDIR = $$MGS_BIN_PATH/linux/$$TARGET
+}
 
 DEFINES += USE_ELAWIDGETTOOLS
 

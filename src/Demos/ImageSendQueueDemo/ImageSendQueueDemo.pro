@@ -5,7 +5,11 @@ QT *= core network
 TARGET = ImageSendQueueDemo
 TEMPLATE = app
 
-DESTDIR = $$MGS_BIN_PATH/$$TARGET
+win32 {
+    DESTDIR = $$MGS_BIN_PATH/win/$$TARGET
+} else {
+    DESTDIR = $$MGS_BIN_PATH/linux/$$TARGET
+}
 
 # You can make your code fail to compile if it uses deprecated APIs.
 # In order to do so, uncomment the following line.
