@@ -3,6 +3,9 @@
 #include "Logger.h"
 #include "config/config.h"
 #include "global/globalmanager.h"
+#include "utils/datadealutils.h"
+
+using namespace Utils;
 
 LaneService::LaneService(QObject *parent)
     : QObject(parent)
@@ -36,7 +39,7 @@ QString LaneService::dbCreate(const QString &reqJson)
             resMap = genResMapForDBOperate(1, -1, "SQL命名空间类型错误", {});
         } else {
             EasyQtSql::NonQueryResult res = t.execNonQuery(sql);
-            LOG_INFO().noquote() << "执行sql语句: " << res.executedQuery();
+            LOG_INFO().noquote() << "执行sql语句: " << DataDealUtils::fullExecutedQuery(res.unwrappedQuery());
             resMap = genResMapForDBOperate(0, res.numRowsAffected(), "成功执行建表语句", {});
 
             t.commit();
@@ -85,11 +88,11 @@ QString LaneService::dbUpdate(const QString &reqJson)
                 QString whereClause = match.captured(2);
                 if (whereClause.isEmpty()) {
                     EasyQtSql::NonQueryResult res = t.update(tableName).set(updateParams).exec();
-                    LOG_INFO().noquote() << "执行sql语句: " << res.executedQuery();
+                    LOG_INFO().noquote() << "执行sql语句: " << DataDealUtils::fullExecutedQuery(res.unwrappedQuery());
                     resMap = genResMapForDBOperate(0, res.numRowsAffected(), "成功执行更新语句", {});
                 } else {
                     EasyQtSql::NonQueryResult res = t.update(tableName).set(updateParams).where(whereClause, whereParams);
-                    LOG_INFO().noquote() << "执行sql语句: " << res.executedQuery();
+                    LOG_INFO().noquote() << "执行sql语句: " << DataDealUtils::fullExecutedQuery(res.unwrappedQuery());
                     resMap = genResMapForDBOperate(0, res.numRowsAffected(), "成功执行更新语句", {});
                 }
 
@@ -130,7 +133,7 @@ QString LaneService::dbRead(const QString &reqJson)
         } else {
             EasyQtSql::PreparedQuery query = t.prepare(sql);
             EasyQtSql::QueryResult res = query.exec(whereParams);
-            LOG_INFO().noquote() << "执行sql语句: " << res.executedQuery();
+            LOG_INFO().noquote() << "执行sql语句: " << DataDealUtils::fullExecutedQuery(res.unwrappedQuery());
 
             QVariantList records;
             while (res.next()) {
@@ -189,11 +192,11 @@ QString LaneService::dbDelete(const QString &reqJson)
 
                 if (whereClause.isEmpty()) {
                     EasyQtSql::NonQueryResult res = t.deleteFrom(tableName).exec();
-                    LOG_INFO().noquote() << "执行sql语句: " << res.executedQuery();
+                    LOG_INFO().noquote() << "执行sql语句: " << DataDealUtils::fullExecutedQuery(res.unwrappedQuery());
                     resMap = genResMapForDBOperate(0, res.numRowsAffected(), "成功执行删除语句", {});
                 } else {
                     EasyQtSql::NonQueryResult res = t.deleteFrom(tableName).where(whereClause, whereParams);
-                    LOG_INFO().noquote() << "执行sql语句: " << res.executedQuery();
+                    LOG_INFO().noquote() << "执行sql语句: " << DataDealUtils::fullExecutedQuery(res.unwrappedQuery());
                     resMap = genResMapForDBOperate(0, res.numRowsAffected(), "成功执行删除语句", {});
                 }
 
