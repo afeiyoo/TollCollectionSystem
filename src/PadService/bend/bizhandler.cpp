@@ -189,7 +189,7 @@ QString BizHandler::doDealCmd16(const QVariantMap &aMap)
         map["status"] = "0";
         map["desc"] = "成功设置补费票段";
         dealtData = GM_INSTANCE->m_jsonSerializer->serialize(map);
-    } else if (tradeType == 8) {
+    } else if (tradeType == 8 || tradeType == 9) {
         // 稽核打票
         if (tradeId.isEmpty())
             throw BaseException(1, "响应失败: 交易号为空");
@@ -204,7 +204,7 @@ QString BizHandler::doDealCmd16(const QVariantMap &aMap)
         GM_INSTANCE->createSqlServerConnection(stationIP);
         // 获取票据信息
         QString id = QString("sqlserver_%1").arg(stationIP);
-        QVariantMap resMap = m_ds.getTicketUseInfo(laneID, id);
+        QVariantMap resMap = m_ds.getTicketUseInfo(laneID, ticketNum, id);
         if (resMap.isEmpty())
             throw BaseException(1, "响应失败: 未查询到相关票据信息");
 
@@ -244,7 +244,8 @@ QString BizHandler::doDealCmd16(const QVariantMap &aMap)
             throw BaseException(1, "响应失败: 站级数据传输异常");
 
         // 更新LastNum
-        m_ds.updateTicketUseInfo(laneID, ticketNum.toInt(), id);
+        int dataId = resMap["DataID"].toInt();
+        m_ds.updateTicketUseInfo(dataId, laneID, ticketNum.toInt(), id);
 
         // 更新班次表
         if (m_ds.getOutShiftSettleCount(stationID, shiftDate, shiftNum, id) == 0) {
@@ -261,8 +262,6 @@ QString BizHandler::doDealCmd16(const QVariantMap &aMap)
         map["status"] = "0";
         map["desc"] = "成功录入票据信息";
         dealtData = GM_INSTANCE->m_jsonSerializer->serialize(map);
-    } else if (tradeType == 9) {
-        // 补打票
     }
     return dealtData;
 }
