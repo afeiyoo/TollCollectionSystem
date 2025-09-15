@@ -3,6 +3,8 @@
 #include <QString>
 #include <QtGlobal>
 
+#include "utils/stdafx.h"
+
 // 数据库配置
 struct ST_DatabaseConfig
 {
@@ -29,7 +31,13 @@ struct ST_LogConfig
 };
 
 // 数据库类型枚举
-enum DataBaseType { MySql = 1, Dameng };
+Q_BEGIN_ENUM_CREATE(EM_DataBaseType)
+enum DataBaseType { MYSQL = 1, DAMENG };
+Q_ENUM_CREATE(DataBaseType)
+Q_END_ENUM_CREATE(EM_DataBaseType)
 
 // 服务的socket类型
-enum SocketType { tcp = 1, websocket };
+Q_BEGIN_ENUM_CREATE(EM_SocketType)
+enum SocketType { TCP = 1, WEBSOCKET };
+Q_ENUM_CREATE(SocketType)
+Q_END_ENUM_CREATE(EM_SocketType)
