@@ -16,7 +16,7 @@ public:
 
     void loadConfig(const Utils::FileName &configPath);
 
-    void dumpConfig();
+    QString dumpConfig();
 
 public:
     ST_DatabaseConfig m_dbConfig;

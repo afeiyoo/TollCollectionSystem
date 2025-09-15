@@ -8,9 +8,30 @@
 #include "config/config.h"
 #include "global/defs.h"
 #include "utils/fileutils.h"
+#include "utils/stdafx.h"
+
+using namespace Utils;
 
 Q_GLOBAL_STATIC(GlobalManager, ins)
 
+//==============================================================================
+// Rpc 内部日志输出类
+//==============================================================================
+class JsonRpcCuteLogger : public jcon::JsonRpcLogger
+{
+public:
+    JsonRpcCuteLogger() {}
+    ~JsonRpcCuteLogger() override {}
+
+    void logDebug(const QString &message) override { LOG_CDEBUG("service").noquote() << message; }
+    void logInfo(const QString &message) override { LOG_CINFO("service").noquote() << message; }
+    void logWarning(const QString &message) override { LOG_CWARNING("service").noquote() << message; }
+    void logError(const QString &message) override { LOG_CERROR("service").noquote() << message; }
+};
+
+//==============================================================================
+// 全局管理类：进行日志初始化，配置加载，工具类初始化，数据库连接等
+//==============================================================================
 GlobalManager::GlobalManager(QObject *parent)
     : QObject{parent}
 {
@@ -19,13 +40,13 @@ GlobalManager::GlobalManager(QObject *parent)
     m_jsonParser = new QJson::Parser();
     m_jsonSerializer = new QJson::Serializer();
 
-    m_sqlDealer = new Utils::SqlUtils(this);
+    m_sqlDealer = new SqlUtils(this);
 }
 
 GlobalManager::~GlobalManager()
 {
-    delete m_jsonParser;
-    delete m_jsonSerializer;
+    SAFE_DELETE(m_jsonSerializer);
+    SAFE_DELETE(m_jsonParser);
 }
 
 GlobalManager *GlobalManager::instance()
@@ -40,55 +61,48 @@ void GlobalManager::init()
     consoleAppender->setFormat(m_config->m_logConfig.format);
     cuteLogger->registerAppender(consoleAppender);
 
-    //总日志，负责打接收到的报文信息
-    Utils::FileName logPath = Utils::FileName::fromString(Utils::FileUtils::curApplicationDirPath()
-                                                          + "/logs/LaneService.log");
-    Utils::FileUtils::makeSureDirExist(logPath.parentDir());
-    RollingFileAppender *serviceFileAppender = new RollingFileAppender(
-        Utils::FileUtils::canonicalPath(logPath).toString());
+    //总日志
+    FileName logPath = FileName::fromString(FileUtils::curApplicationDirPath() + "/logs/LaneService.log");
+    FileUtils::makeSureDirExist(logPath.parentDir());
+    RollingFileAppender *serviceFileAppender = new RollingFileAppender(FileUtils::canonicalPath(logPath).toString());
     serviceFileAppender->setFormat(m_config->m_logConfig.format);
     serviceFileAppender->setLogFilesLimit(m_config->m_logConfig.filesLimit);
     serviceFileAppender->setFlushOnWrite(true);
     serviceFileAppender->setDatePattern(RollingFileAppender::DatePattern::DailyRollover);
-    cuteLogger->registerCategoryAppender("service",serviceFileAppender);
-
-    //TODO 注册计费日志
-
-    //TODO 注册SQL日志
+    cuteLogger->registerCategoryAppender("service", serviceFileAppender);
 
     // 加载配置
-    Utils::FileName configPath = Utils::FileName::fromString(Utils::FileUtils::curApplicationDirPath()
-                                                             + "/config/service.ini");
+    FileName configPath = FileName::fromString(FileUtils::curApplicationDirPath() + "/config/service.ini");
     m_config->loadConfig(configPath);
-    m_config->dumpConfig();
+    LOG_CINFO("service").noquote() << m_config->dumpConfig();
 
     // json解析对象初始化
     m_jsonSerializer->setIndentMode(QJson::IndentCompact); // 序列化时不保留空格
 
     // sql语句解析对象初始化
-    Utils::FileName sqlsDir = Utils::FileName::fromString(Utils::FileUtils::curApplicationDirPath() + "/sqls");
-    Utils::FileNameList sqlFiles = Utils::FileUtils::getFilesWithSuffix(sqlsDir, "xml");
+    FileName sqlsDir = FileName::fromString(FileUtils::curApplicationDirPath() + "/sqls");
+    FileNameList sqlFiles = FileUtils::getFilesWithSuffix(sqlsDir, "xml");
     m_sqlDealer->loadSqlFiles(sqlFiles);
 
     // 服务初始化
-    if (m_config->m_serverConfig.socketType == SocketType::tcp) {
-        m_rpcServer = new jcon::JsonRpcTcpServer(this);
+    if (m_config->m_serverConfig.socketType == EM_SocketType::TCP) {
+        m_rpcServer = new jcon::JsonRpcTcpServer(this, std::make_shared<JsonRpcCuteLogger>());
     } else {
-        m_rpcServer = new jcon::JsonRpcWebSocketServer(this);
+        m_rpcServer = new jcon::JsonRpcWebSocketServer(this, std::make_shared<JsonRpcCuteLogger>());
     }
     m_rpcServer->enableSendNotification(true);
     m_rpcServer->listen(m_config->m_serverConfig.port);
 
     // 数据库连接池初始化
     EasyQtSql::SqlFactory::DBSetting dbSetting;
-    if (m_config->m_dbConfig.type == DataBaseType::MySql) {
+    if (m_config->m_dbConfig.type == EM_DataBaseType::MYSQL) {
         dbSetting = EasyQtSql::SqlFactory::DBSetting("QMYSQL",
                                                      m_config->m_dbConfig.host,
                                                      m_config->m_dbConfig.port,
                                                      m_config->m_dbConfig.user,
                                                      m_config->m_dbConfig.password,
                                                      m_config->m_dbConfig.dbName);
-    } else if (m_config->m_dbConfig.type == DataBaseType::Dameng) {
+    } else if (m_config->m_dbConfig.type == EM_DataBaseType::DAMENG) {
         // TODO 达梦数据库连接
     }
     m_sqlFactory = EasyQtSql::SqlFactory::getInstance()->config(dbSetting, "tolllanedb");

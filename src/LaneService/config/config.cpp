@@ -27,9 +27,9 @@ void Config::loadConfig(const Utils::FileName &configPath)
     m_serverConfig.port = m_ini->value("rpc_server", "port", "5927").toUInt();
 }
 
-void Config::dumpConfig()
+QString Config::dumpConfig()
 {
     if (!m_ini)
-        return;
-    m_ini->dumpInfo();
+        return "";
+    return m_ini->dumpInfo();
 }

@@ -5,7 +5,7 @@ QT += core network
 QT -= gui
 
 TARGET = LaneService
-TEMPLATE = app
+TEMPLATE = lib
 
 isEqual(TEMPLATE, app) {
     win32 {
