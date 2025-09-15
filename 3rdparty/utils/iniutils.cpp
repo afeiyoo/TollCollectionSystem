@@ -30,15 +30,13 @@ IniUtils::~IniUtils()
 
 void IniUtils::dumpInfo() const
 {
-    LOG_INFO().noquote() << "dump ini info";
-
     for (const auto &agroup : m_iniData.datas) {
         if (!agroup.isHead)
             LOG_INFO().noquote() << "【group】" << agroup.group;
 
         for (const auto &arow : agroup.rows) {
             if (arow.isValid) {
-                LOG_INFO().noquote() << "\t【key】" << arow.key << "【value】" << arow.value;
+                LOG_INFO().noquote() << "\t【key】" << arow.key << "【value】 " << arow.value.toString();
             }
         }
     }

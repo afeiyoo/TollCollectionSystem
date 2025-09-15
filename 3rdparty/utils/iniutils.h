@@ -22,9 +22,15 @@ public:
     // 分组内所有key
     QStringList keys(const QString &group) const;
     // 获取值
-    QVariant value(const QString &group, const QString &key, const QVariant &def = QVariant(), Qt::CaseSensitivity cs = Qt::CaseInsensitive) const;
+    QVariant value(const QString &group,
+                   const QString &key,
+                   const QVariant &def = QVariant(),
+                   Qt::CaseSensitivity cs = Qt::CaseInsensitive) const;
     // 设置值，group或key不存在则创建
-    void setValue(const QString &group, const QString &key, const QVariant &value, Qt::CaseSensitivity cs = Qt::CaseInsensitive);
+    void setValue(const QString &group,
+                  const QString &key,
+                  const QVariant &value,
+                  Qt::CaseSensitivity cs = Qt::CaseInsensitive);
     // 保存
     bool save();
     // 加载
