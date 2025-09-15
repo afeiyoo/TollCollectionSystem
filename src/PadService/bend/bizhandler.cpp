@@ -1848,8 +1848,8 @@ QString BizHandler::doDealCmd39(const QVariantMap &aMap)
                   "FROM T_ETC_OUT WHERE "
                   "(UserType = 21 OR UserType = 22) AND ExTime >= '%1' AND ExTime < '%2' UNION ALL "
                   "SELECT TradeID, PassID, ExVehPlate, EnNetID, EnStation, ExNetID, ExStation, ExTime, EnTotalWeight, "
-                  "TotalWeight, CardType, ShouldPay, FactPay, NULL AS ProvinceNum, CardBizType, Reserve, UserType, "
-                  "NULL AS OBUPlate FROM T_MTC_OUT "
+                  "TotalWeight, CardType, ShouldPay, FactPay, '' AS ProvinceNum, CardBizType, Reserve, UserType, "
+                  "'' AS OBUPlate FROM T_MTC_OUT "
                   "WHERE (UserType = 21 OR UserType = 22) AND ExTime >= '%3' AND ExTime < '%4'")
               .arg(startTime, stopTime, startTime, stopTime);
     sendMap["dataType"] = 4;
@@ -1865,8 +1865,12 @@ QString BizHandler::doDealCmd39(const QVariantMap &aMap)
     QString result = blockUtilResponse(reply, Http().instance().getReadTimeout());
     LOG_INFO().noquote() << "返回本站绿通流水查询结果: " << result;
 
-    QVariantMap resMap = GM_INSTANCE->m_jsonParser->parse(result.toUtf8()).toMap();
-    if (resMap["errCode"].toInt() == 1) {
+    bool ok = false;
+    QVariantMap resMap = GM_INSTANCE->m_jsonParser->parse(result.toUtf8(), &ok).toMap();
+    if (!ok)
+        throw BaseException(1, "响应失败: json内容解析失败");
+
+    if (resMap["errCode"].toInt() != 0) {
         QString errorMessage = resMap["errorMessage"].toString();
         LOG_ERROR().noquote() << "站级服务返回查询失败: " << errorMessage;
         throw BaseException(1, QString("响应失败: 站级服务返回查询失败 %1").arg(errorMessage));
