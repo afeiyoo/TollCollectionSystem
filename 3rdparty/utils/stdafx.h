@@ -97,3 +97,19 @@ protected: \
 \
 private: \
     Q_DECLARE_PUBLIC(CLASS);
+
+// 安全内存释放
+#define SAFE_DELETE(p) \
+    { \
+        if (p) { \
+            delete (p); \
+            (p) = nullptr; \
+        } \
+    }
+#define SAFE_DELETE_ARRAY(p) \
+    { \
+        if (p) { \
+            delete[] (p); \
+            (p) = nullptr; \
+        } \
+    }
