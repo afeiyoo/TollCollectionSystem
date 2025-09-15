@@ -28,18 +28,31 @@ IniUtils::~IniUtils()
     save();
 }
 
-void IniUtils::dumpInfo() const
+QString IniUtils::dumpInfo() const
 {
+    QString helpInfo;
+    QTextStream stream(&helpInfo);
+
+    stream << "start loading " << m_iniPath << " ==> ";
+
     for (const auto &agroup : m_iniData.datas) {
         if (!agroup.isHead)
-            LOG_INFO().noquote() << "【group】" << agroup.group;
+            stream << agroup.group << " {";
 
+        bool first = true;
         for (const auto &arow : agroup.rows) {
             if (arow.isValid) {
-                LOG_INFO().noquote() << "\t【key】" << arow.key << "【value】 " << arow.value.toString();
+                if (!first)
+                    stream << ", ";
+                stream << arow.key << ":" << arow.value.toString();
+                first = false;
             }
         }
+        if (!agroup.isHead)
+            stream << "}; ";
     }
+
+    return helpInfo;
 }
 
 QStringList IniUtils::groups() const
@@ -153,8 +166,6 @@ void IniUtils::load(const QString &filepath)
     if ((QIODevice::WriteOnly == m_iniMode) || !file.exists() || !file.open(QIODevice::ReadOnly | QIODevice::Text)) {
         return;
     }
-
-    LOG_INFO().noquote() << "loading ini" << m_iniPath;
 
     IniData iniData;
     IniGroup iniGroup;

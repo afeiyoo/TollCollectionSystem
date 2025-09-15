@@ -16,7 +16,7 @@ public:
     ~IniUtils();
 
     // 打印ini信息
-    void dumpInfo() const;
+    QString dumpInfo() const;
     // 分组列表
     QStringList groups() const;
     // 分组内所有key
