@@ -113,3 +113,18 @@ private: \
             (p) = nullptr; \
         } \
     }
+
+//枚举类导出  兼容QT5低版本
+#define Q_BEGIN_ENUM_CREATE(CLASS) \
+    class CLASS : public QObject \
+    { \
+        Q_OBJECT \
+    public:
+
+#define Q_END_ENUM_CREATE(CLASS) \
+private: \
+    Q_DISABLE_COPY(CLASS) \
+    } \
+    ;
+
+#define Q_ENUM_CREATE(CLASS) Q_ENUM(CLASS)
