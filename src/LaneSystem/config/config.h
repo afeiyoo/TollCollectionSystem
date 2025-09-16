@@ -1,8 +1,6 @@
 #pragma once
 
 #include "global/defs.h"
-#include "utils/iniutils.h"
-
 #include <QObject>
 
 class Config : public QObject
@@ -10,13 +8,12 @@ class Config : public QObject
     Q_OBJECT
 public:
     explicit Config(QObject *parent = nullptr);
-
     ~Config() override;
 
     bool loadConfig();
 
 public:
-    ST_DatabaseConfig m_dbConfig;
-    ST_RpcServerConfig m_serverConfig;
-    ST_LogConfig m_logConfig;
+    ST_BusinessConfig m_businessConfig;
+    ST_SystemConfig m_systemConfig;
+    QVariantMap m_keyboard;
 };

@@ -19,6 +19,8 @@ include($$THIRD_PARTY_LIBRARY_PATH/EasyQtSql/EasyQtSql.pri)
 SOURCES += \
     # bend/mtcin/cardrobothandler.cpp \
     # bend/mtcin/mtcindeskhandler.cpp \
+    config/bizenv.cpp \
+    config/config.cpp \
     global/globalmanager.cpp \
     global/modemanager.cpp \
     global/signalmanager.cpp \
@@ -43,7 +45,7 @@ SOURCES += \
     gui/mgsplateeditdialog.cpp \
     main.cpp\
     # claneform.cpp \
-    cbizenv.cpp \
+    # cbizenv.cpp \
     # bend/mtcout/cmodeskprocess.cpp \
     # bend/mtcout/csptprocess.cpp \
     # bend/etc/cetcprocess.cpp \
@@ -53,12 +55,14 @@ HEADERS += \
     # bend/mtcin/cardrobothandler.h \
     # bend/mtcin/mtcindeskhandler.h \
     # claneform.h \
+    config/bizenv.h \
+    config/config.h \
     global/constant.h \
+    global/defs.h \
     global/globalmanager.h \
     global/modemanager.h \
     global/signalmanager.h \
     gui/component/mgscontentdialog.h \
-    global/tlaneconfig.h \
     gui/component/mgsdevicepanel.h \
     gui/component/mgsiconbutton.h \
     gui/component/mgsmenu.h \
@@ -78,7 +82,7 @@ HEADERS += \
     gui/mgsmtcoutpage.h \
     gui/mgsplateeditdialog.h \
     ibizservice.h \
-    cbizenv.h \
+    # cbizenv.h \
     # bend/mtcout/cmodeskprocess.h \
     # bend/mtcout/csptprocess.h \
     # bend/etc/cetcprocess.h \
@@ -91,7 +95,7 @@ FORMS += claneform.ui
 unix:!macx|win32: LIBS += \
     -l$$qtLibraryTargetName(ElaWidgetTools) -l$$qtLibraryTargetName(CuteLogger) \
     -l$$qtLibraryTargetName(LaneService) -l$$qtLibraryTargetName(Jcon) \
-    -l$$qtLibraryTargetName(QSimpleUpdater)
+    -l$$qtLibraryTargetName(QSimpleUpdater) -l$$qtLibraryTargetName(QJson) \
 
 INCLUDEPATH += \
     $$THIRD_PARTY_LIBRARY_PATH/ElaWidgetTools \
@@ -99,6 +103,7 @@ INCLUDEPATH += \
     $$THIRD_PARTY_LIBRARY_PATH/Jcon \
     $$PWD/../LaneService \
     $$THIRD_PARTY_LIBRARY_PATH/QSimpleUpdater/include
+    $$THIRD_PARTY_LIBRARY_PATH/QJson/include
 
 RESOURCES += \
     resource.qrc

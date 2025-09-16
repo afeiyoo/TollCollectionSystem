@@ -16,6 +16,8 @@ isEqual(TEMPLATE, app) {
 
     CONFIG += cmdline
     DEFINES += LANESERVICE_STATIC
+    # 在线式
+    DEFINES += LANESERVICE_NETWORK
 
     SOURCES += main.cpp
 } else {
@@ -33,6 +35,8 @@ isEqual(TEMPLATE, app) {
     }else{
         DEFINES += LANESERVICE_STATIC
     }
+    # 网络版
+    DEFINES += LANESERVICE_LOCAL
 }
 
 include($$THIRD_PARTY_LIBRARY_PATH/utils/Utils.pri)
@@ -75,3 +79,6 @@ isEqual(TEMPLATE, app) {
     copyLibsToDestdir($$qtLibraryTargetName(Jcon))
     copyLibsToDestdir($$qtLibraryTargetName(QJson))
 }
+
+RESOURCES += \
+    resource.qrc

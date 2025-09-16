@@ -12,7 +12,10 @@
 #include "jcon/json_rpc_tcp_client.h"
 #include "laneservice.h"
 
+#include "LaneService.h"
 #include "utils/uiutils.h"
+
+#include "global/globalmanager.h"
 
 int main(int argc, char *argv[])
 {
@@ -29,16 +32,16 @@ int main(int argc, char *argv[])
 #endif
     QApplication a(argc, argv);
 
-    //ENV初始化
-    GENV->RegistLogs(); //注册日志文件
-    LOG_CINFO("sys") << "LaneSystem start Init";
-    GENV->InitLaneEnv();
+    // //ENV初始化
+    // GENV->RegistLogs(); //注册日志文件
+    // LOG_CINFO("sys") << "LaneSystem start Init";
+    // GENV->InitLaneEnv();
 
-    eApp->init(); // 界面库初始化
-    //TODO 初始化界面
-    MgsMainWindow m;
-    m.initMtcIn();
-    m.show();
+    // eApp->init(); // 界面库初始化
+    // //TODO 初始化界面
+    // MgsMainWindow m;
+    // m.initMtcIn();
+    // m.show();
 
     // MgsPlateEditDialog w;
     // w.show();
@@ -47,10 +50,31 @@ int main(int argc, char *argv[])
     // server->init();
 
     // auto rpc_client = new jcon::JsonRpcTcpClient(nullptr);
-    // rpc_client->connectToServer("127.0.0.1", 9588);
+    // rpc_client->connectToServer("127.0.0.1", 5927);
 
-    // QString title2 = QString("请注意搭街坊卡拉介绍了快点放假啊势力扩大解放法撒旦看见了");
-    // Utils::UiUtils::showMessageBoxInfo(title2, "好的合", QMessageBox::Yes);
+    // QVariantMap whereParam;
+    // whereParam["laneid"] = 19;
+    // whereParam["lanetype"] = 1;
+
+    // QVariantMap reqMap;
+    // reqMap["sqlNamespace"] = "Read";
+    // reqMap["sqlID"] = "findConfig";
+    // reqMap["whereParam"] = whereParam;
+
+    // QString reqJson = GM_INSTANCE->m_jsonSerializer->serialize(reqMap);
+    // // auto result = rpc_client->call("dbRead", reqJson);
+    // auto result2 = server->dbRead(reqJson);
+    // qDebug().noquote() << result2;
+
+    // if (result->isSuccess()) {
+    //     QVariant res = result->result();
+    //     qDebug().noquote() << res.toString();
+    // } else {
+    //     QString err_str = result->toString();
+    //     qDebug().noquote() << err_str;
+    // }
+
+    GM_INSTANCE->init();
 
     return a.exec();
 }

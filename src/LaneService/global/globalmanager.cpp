@@ -23,10 +23,10 @@ public:
     JsonRpcCuteLogger() {}
     ~JsonRpcCuteLogger() override {}
 
-    void logDebug(const QString &message) override { LOG_CDEBUG("service").noquote() << message; }
-    void logInfo(const QString &message) override { LOG_CINFO("service").noquote() << message; }
-    void logWarning(const QString &message) override { LOG_CWARNING("service").noquote() << message; }
-    void logError(const QString &message) override { LOG_CERROR("service").noquote() << message; }
+    void logDebug(const QString &message) override { LOG_DEBUG().noquote() << message; }
+    void logInfo(const QString &message) override { LOG_INFO().noquote() << message; }
+    void logWarning(const QString &message) override { LOG_WARNING().noquote() << message; }
+    void logError(const QString &message) override { LOG_ERROR().noquote() << message; }
 };
 
 //==============================================================================
@@ -56,25 +56,36 @@ GlobalManager *GlobalManager::instance()
 
 void GlobalManager::init()
 {
+    FileName logDir = FileName::fromString(FileUtils::curApplicationDirPath() + "/logs");
+    FileUtils::makeSureDirExist(logDir);
+#ifdef LANESERVICE_NETWORK
     // 日志初始化
     ConsoleAppender *consoleAppender = new ConsoleAppender;
     consoleAppender->setFormat(m_config->m_logConfig.format);
     cuteLogger->registerAppender(consoleAppender);
 
-    //总日志
-    FileName logPath = FileName::fromString(FileUtils::curApplicationDirPath() + "/logs/LaneService.log");
-    FileUtils::makeSureDirExist(logPath.parentDir());
-    RollingFileAppender *serviceFileAppender = new RollingFileAppender(FileUtils::canonicalPath(logPath).toString());
+    // 总日志
+    FileName serviceLogPath = logDir + QString("/service.log");
+    RollingFileAppender *serviceFileAppender = new RollingFileAppender(
+        FileUtils::canonicalPath(serviceLogPath).toString());
     serviceFileAppender->setFormat(m_config->m_logConfig.format);
     serviceFileAppender->setLogFilesLimit(m_config->m_logConfig.filesLimit);
     serviceFileAppender->setFlushOnWrite(true);
     serviceFileAppender->setDatePattern(RollingFileAppender::DatePattern::DailyRollover);
-    cuteLogger->registerCategoryAppender("service", serviceFileAppender);
+    cuteLogger->registerAppender(serviceFileAppender);
+#endif
+    // 计费日志
+    FileName calFeeLogPath = logDir + QString("/fee.log");
+    RollingFileAppender *calFeeFileAppender = new RollingFileAppender(
+        FileUtils::canonicalPath(calFeeLogPath).toString());
+    calFeeFileAppender->setFormat(m_config->m_logConfig.format);
+    calFeeFileAppender->setLogFilesLimit(m_config->m_logConfig.filesLimit);
+    calFeeFileAppender->setFlushOnWrite(true);
+    calFeeFileAppender->setDatePattern(RollingFileAppender::DatePattern::DailyRollover);
+    cuteLogger->registerCategoryAppender("fee", calFeeFileAppender);
 
     // 加载配置
-    FileName configPath = FileName::fromString(FileUtils::curApplicationDirPath() + "/config/service.ini");
-    m_config->loadConfig(configPath);
-    LOG_CINFO("service").noquote() << m_config->dumpConfig();
+    LOG_ASSERT_X(m_config->loadConfig(), "后端服务初始化失败");
 
     // json解析对象初始化
     m_jsonSerializer->setIndentMode(QJson::IndentCompact); // 序列化时不保留空格
