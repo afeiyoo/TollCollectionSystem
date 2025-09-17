@@ -213,24 +213,24 @@ struct ST_RsuCfg
 // 收费节点
 struct ST_TollNode
 {
-    int NodeID;
-    ST_PaymentRobotCfg PaymentRobot;
-    ST_CardRobotCfg CardRobot;
-    ST_FeeScrCfg FeeScr;
-    ST_CardReaderCfg DeskReader;
-    ST_PrinterCfg PrinterCfg;
-    ST_CapCfg CapCfg;
+    int nodeID;
+    ST_PaymentRobotCfg paymentRobotCfg;
+    ST_CardRobotCfg cardRobotCfg;
+    ST_FeeScrCfg feeScrCfg;
+    ST_CardReaderCfg deskReaderCfg;
+    ST_PrinterCfg printerCfg;
+    ST_CapCfg capCfg;
 };
-struct ST_DevConfig
+struct ST_DevCfg
 {
-    QMap<int, ST_TollNode> TollNodeCfgMap;
-    QMap<int, ST_RsuCfg> RsuCfgMap;             //天线配置 index为天线编号，其中0为近天线 1为远天线
-    QMap<int, ST_InfoBoardCfg> InfoBoardCfgMap; //情报板 index为情报板编号
+    QMap<int, ST_TollNode> tollNodeCfgMap;
+    QMap<int, ST_RsuCfg> rsuCfgMap;             //天线配置 index为天线编号，其中0为近天线 1为远天线
+    QMap<int, ST_InfoBoardCfg> infoBoardCfgMap; //情报板 index为情报板编号
 
-    ST_WeightCfg WeightCfg;                           //称重
-    ST_OverLapCfg OverLapCfg;                         //字符叠加
-    ST_SmartLaneControllerCfg SmartLaneControllerCfg; //车道智能网关
-    ST_LaneCtrlCfg LaneCtrlCfg;                       //车控器
+    ST_WeightCfg weightCfg;                           //称重
+    ST_OverLapCfg overLapCfg;                         //字符叠加
+    ST_SmartLaneControllerCfg smartLaneControllerCfg; //车道智能网关
+    ST_LaneCtrlCfg laneCtrlCfg;                       //车控器
 };
 
 //==============================================================================
