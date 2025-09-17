@@ -80,7 +80,6 @@ HEADERS += \
     gui/mgsmtcinpage.h \
     gui/mgsmtcoutpage.h \
     gui/mgsplateeditdialog.h \
-    ibizservice.h \
     # cbizenv.h \
     # bend/mtcout/cmodeskprocess.h \
     # bend/mtcout/csptprocess.h \
