@@ -1774,7 +1774,7 @@ void BizHandler::saveAndReplaceContainerPic(const QString &base64Data, QVariantM
 #else
     QString picUUID = QUuid::createUuid().toString(QUuid::WithoutBraces);
 #endif
-    QString picName = QString("%1.jpg").arg(picUUID);
+    QString picName = QString("/%1.jpg").arg(picUUID);
     QString targetPath = (GM_INSTANCE->m_pictureDir + picName).toString();
 
     Utils::FileSaver saver(targetPath);
@@ -1863,7 +1863,7 @@ QString BizHandler::doDealCmd39(const QVariantMap &aMap)
     auto reply = Http().instance().post(url, sendData.toUtf8(), "application/json");
 
     QString result = blockUtilResponse(reply, Http().instance().getReadTimeout());
-    LOG_INFO().noquote() << "返回本站绿通流水查询结果: " << result;
+    LOG_INFO().noquote() << "返回本站绿通流水查询结果: " << result.left(1024);
 
     bool ok = false;
     QVariantMap resMap = GM_INSTANCE->m_jsonParser->parse(result.toUtf8(), &ok).toMap();
