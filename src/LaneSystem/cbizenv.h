@@ -29,8 +29,8 @@ public:
     static CBizEnv *GetInstance();
     void InitLaneEnv(); //运行环境初始化
     void InitBizEnv();  //业务环境初始化
-    TLaneEnv GetLaneEnv() const;
-    TDevConfig GetDevConfig() const;
+    // TLaneEnv GetLaneEnv() const;
+    // TDevConfig GetDevConfig() const;
     QString GetKeyName(int keyCode) const;
     int GetKeyCode(QString keyName) const;
 
@@ -51,8 +51,8 @@ private:
 private:
     QList<TCapVehInfo> m_cap_list;           //车牌识别队列
     QList<TVehicleWeightInfo> m_weight_list; //称重数据队列
-    TLaneEnv m_lane_env;
-    TDevConfig m_dev_cfg;
+    // TLaneEnv m_lane_env;
+    // TDevConfig m_dev_cfg;
     QMap<QString, QString> m_keyboardMap;
 signals:
 

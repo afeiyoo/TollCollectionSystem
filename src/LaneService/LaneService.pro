@@ -7,6 +7,9 @@ QT -= gui
 TARGET = LaneService
 TEMPLATE = lib
 
+MGS_LANE_GANTRY = $$PWD/MgsLaneGantry
+
+
 isEqual(TEMPLATE, app) {
     win32 {
         DESTDIR = $$MGS_BIN_PATH/win/$$TARGET
@@ -50,7 +53,6 @@ SOURCES += \
 HEADERS += \
     config/config.h \
     global/constant.h \
-    global/defs.h \
     global/globalmanager.h \
     laneservice.h \
     laneservice_global.h
@@ -70,8 +72,7 @@ unix:!macx|win32: LIBS += \
 INCLUDEPATH += \
     $$THIRD_PARTY_LIBRARY_PATH/CuteLogger/include \
     $$THIRD_PARTY_LIBRARY_PATH/Jcon \
-    $$THIRD_PARTY_LIBRARY_PATH/QJson/include
-
+    $$MGS_LANE_GANTRY
 
 # 拷贝第三方库
 isEqual(TEMPLATE, app) {

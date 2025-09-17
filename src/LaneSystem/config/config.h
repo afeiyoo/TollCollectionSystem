@@ -1,6 +1,6 @@
 #pragma once
 
-#include "global/defs.h"
+#include "utils/defs.h"
 #include <QObject>
 
 class Config : public QObject
@@ -13,7 +13,7 @@ public:
     bool loadConfig();
 
 public:
-    ST_BusinessConfig m_businessConfig;
-    ST_SystemConfig m_systemConfig;
+    ST_BusinessCfg m_businessConfig;
+    ST_SystemCfg m_systemConfig;
     QVariantMap m_keyboard;
 };

@@ -1,8 +1,8 @@
 #include "config.h"
-
+#include "Logger.h"
 #include "global/constant.h"
 #include "utils/fileutils.h"
-#include "Logger.h"
+#include "utils/iniutils.h"
 
 using namespace Utils;
 
@@ -22,32 +22,34 @@ bool Config::loadConfig()
 
     // 车道服务配置加载
     FileName configPath = configDir + QString("/Service.ini");
-    LOG_INFO().noquote() << "开始加载车道服务配置";
-    if(!configPath.exists()){
-        LOG_WARNING().noquote() << "车道服务配置文件 " << configPath.fileName(0) << "不存在，开始创建默认车道服务配置";
+    LOG_INFO().noquote() << "加载后端服务配置";
+    if (!configPath.exists()) {
+        LOG_WARNING().noquote() << "后端服务配置文件 " << configPath.fileName(0) << "不存在，开始创建默认后端服务配置";
         // 创建默认服务配置
         QByteArray configData = FileReader::fetchQrc(Constant::Path::SERVICE_CONFIG_PATH);
         FileSaver saver(configPath.toString());
         saver.write(configData);
         if (!saver.finalize()) {
-            LOG_ERROR().noquote() << "创建默认车道服务配置失败 " << saver.errorString();
+            LOG_ERROR().noquote() << "创建默认后端服务配置失败 " << saver.errorString();
             return false;
         }
-        LOG_INFO().noquote() << "创建默认车道服务配置成功";
+        LOG_INFO().noquote() << "创建默认后端服务配置成功";
     }
 
     IniUtils ini(configPath.toString());
     m_dbConfig.type = ini.value("database", "type", 1).toUInt();
-    m_dbConfig.host = ini.value("database", "host").toString();
-    m_dbConfig.port = ini.value("database", "port").toUInt();
+    m_dbConfig.ip = ini.value("database", "ip", "127.0.0.1").toString();
+    m_dbConfig.port = ini.value("database", "port", 3306).toUInt();
     m_dbConfig.dbName = ini.value("database", "dbName", "tolllanedb").toString();
     m_dbConfig.user = ini.value("database", "user", "tlman").toString();
     m_dbConfig.password = ini.value("database", "password", "ds18fjeit").toString();
 
-    m_serverConfig.socketType = ini.value("rpc_server", "socketType", "1").toUInt();
-    m_serverConfig.port = ini.value("rpc_server", "port", "5927").toUInt();
+    m_serverConfig.socketType = ini.value("service", "socketType", 1).toUInt();
+    m_serverConfig.port = ini.value("service", "port", 5927).toUInt();
+    m_serverConfig.mode = ini.value("service", "mode", 0).toUInt();
 
     LOG_INFO().noquote() << ini.dumpInfo();
+    LOG_INFO().noquote() << "后端服务配置加载完成";
 
     return true;
 }

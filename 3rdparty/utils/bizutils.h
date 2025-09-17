@@ -20,10 +20,10 @@ public:
     static QString getPlateNoColor(const QString &fullPlate);
 
     // 从车牌中获取并返回颜色编码
-    static PlateColorType::PlateColor getColorCodeFromPlate(const QString &fullPlate);
+    static EM_PlateColor::PlateColor getColorCodeFromPlate(const QString &fullPlate);
 
     // 根据颜色编码获取车牌颜色 0-蓝 1-黄 2-黑 3-白 4-绿 5-拼 6-渐 7-临 9-未知
-    static QString getColorFormColorCode(PlateColorType::PlateColor colorCode);
+    static QString getColorFormColorCode(EM_PlateColor::PlateColor colorCode);
 
     /*******************************************************/
     /****                   DTP传输相关                  ****/

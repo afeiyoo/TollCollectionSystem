@@ -40,39 +40,39 @@ QString BizUtils::getPlateNoColor(const QString &fullPlate)
     return fullPlate.mid(pos + 1, fullPlate.length() - pos - 1);
 }
 
-PlateColorType::PlateColor BizUtils::getColorCodeFromPlate(const QString &fullPlate)
+EM_PlateColor::PlateColor BizUtils::getColorCodeFromPlate(const QString &fullPlate)
 {
     if (fullPlate.length() < 5)
-        return PlateColorType::Unknown;
+        return EM_PlateColor::Unknown;
     if (DataDealUtils::getChineseCountFromString(fullPlate, 4) <= 1) {
         QString prefix = fullPlate.left(2);
         if (prefix.contains(QStringLiteral("白")))
-            return PlateColorType::White;
+            return EM_PlateColor::White;
         else
-            return PlateColorType::Unknown;
+            return EM_PlateColor::Unknown;
     }
     QString checkData = fullPlate.mid(0, 1);
     if (checkData.contains(QStringLiteral("蓝")))
-        return PlateColorType::Blue;
+        return EM_PlateColor::Blue;
     else if (checkData.contains(QStringLiteral("黄")))
-        return PlateColorType::Yellow;
+        return EM_PlateColor::Yellow;
     else if (checkData.contains(QStringLiteral("黑")))
-        return PlateColorType::Black;
+        return EM_PlateColor::Black;
     else if (checkData.contains(QStringLiteral("白")))
-        return PlateColorType::White;
+        return EM_PlateColor::White;
     else if (checkData.contains(QStringLiteral("绿")))
-        return PlateColorType::Green;
+        return EM_PlateColor::Green;
     else if (checkData.contains(QStringLiteral("拼")))
-        return PlateColorType::Plain;
+        return EM_PlateColor::Plain;
     else if (checkData.contains(QStringLiteral("渐")))
-        return PlateColorType::Gradient;
+        return EM_PlateColor::Gradient;
     else if (checkData.contains(QStringLiteral("临")))
-        return PlateColorType::Temporty;
+        return EM_PlateColor::Temporty;
     else
-        return PlateColorType::Unknown;
+        return EM_PlateColor::Unknown;
 }
 
-QString BizUtils::getColorFormColorCode(PlateColorType::PlateColor colorCode)
+QString BizUtils::getColorFormColorCode(EM_PlateColor::PlateColor colorCode)
 {
     QStringList colors;
     colors << QStringLiteral("蓝") << QStringLiteral("黄") << QStringLiteral("黑") << QStringLiteral("白")

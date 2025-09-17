@@ -58,7 +58,6 @@ HEADERS += \
     config/bizenv.h \
     config/config.h \
     global/constant.h \
-    global/defs.h \
     global/globalmanager.h \
     global/modemanager.h \
     global/signalmanager.h \

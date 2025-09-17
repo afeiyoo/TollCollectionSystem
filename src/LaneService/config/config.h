@@ -1,7 +1,6 @@
 #pragma once
 
-#include "global/defs.h"
-#include "utils/iniutils.h"
+#include "utils/defs.h"
 
 #include <QObject>
 
@@ -16,7 +15,7 @@ public:
     bool loadConfig();
 
 public:
-    ST_DatabaseConfig m_dbConfig;
-    ST_RpcServerConfig m_serverConfig;
-    ST_LogConfig m_logConfig;
+    ST_DatabaseCfg m_dbConfig;
+    ST_RpcServerCfg m_serverConfig;
+    ST_LogCfg m_logConfig;
 };

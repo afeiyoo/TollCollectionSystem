@@ -15,10 +15,15 @@ LaneService::~LaneService() {}
 
 bool LaneService::init()
 {
-    GM_INSTANCE->init();
-    GM_INSTANCE->m_rpcServer->registerServices({this});
+    if (!GM_INSTANCE->init())
+        return false;
 
-    LOG_INFO().noquote() << "LaneService 已注册, 监听端口 " << GM_INSTANCE->m_config->m_serverConfig.port;
+    if (GM_INSTANCE->m_config->m_serverConfig.mode == EM_ServiceMode::ONLINE) {
+        GM_INSTANCE->m_rpcServer->registerServices({this});
+        LOG_INFO().noquote() << "后端服务成功初始化, 监听端口 " << GM_INSTANCE->m_config->m_serverConfig.port;
+    } else {
+        LOG_INFO().noquote() << "后端服务成功初始化";
+    }
     return true;
 }
 

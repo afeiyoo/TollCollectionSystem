@@ -19,7 +19,7 @@ public:
 
     static GlobalManager *instance();
 
-    void init();
+    bool init();
 
 public:
     // 全局配置信息

@@ -1,14 +1,17 @@
 #include "globalmanager.h"
 
-#include "ConsoleAppender.h"
 #include "Jcon/json_rpc_tcp_server.h"
 #include "Jcon/json_rpc_websocket_server.h"
 #include "Logger.h"
 #include "RollingFileAppender.h"
 #include "config/config.h"
-#include "global/defs.h"
+#include "utils/defs.h"
 #include "utils/fileutils.h"
 #include "utils/stdafx.h"
+
+#ifdef LANESERVICE_NETWORK
+    #include "ConsoleAppender.h"
+#endif
 
 using namespace Utils;
 
@@ -54,7 +57,7 @@ GlobalManager *GlobalManager::instance()
     return ins();
 }
 
-void GlobalManager::init()
+bool GlobalManager::init()
 {
     FileName logDir = FileName::fromString(FileUtils::curApplicationDirPath() + "/logs");
     FileUtils::makeSureDirExist(logDir);
@@ -85,30 +88,43 @@ void GlobalManager::init()
     cuteLogger->registerCategoryAppender("fee", calFeeFileAppender);
 
     // 加载配置
-    LOG_ASSERT_X(m_config->loadConfig(), "后端服务初始化失败");
+    if (!m_config->loadConfig())
+        return false;
 
     // json解析对象初始化
     m_jsonSerializer->setIndentMode(QJson::IndentCompact); // 序列化时不保留空格
 
     // sql语句解析对象初始化
     FileName sqlsDir = FileName::fromString(FileUtils::curApplicationDirPath() + "/sqls");
+    FileUtils::makeSureDirExist(sqlsDir);
+    LOG_INFO().noquote() << "加载后端服务SQL文件";
     FileNameList sqlFiles = FileUtils::getFilesWithSuffix(sqlsDir, "xml");
-    m_sqlDealer->loadSqlFiles(sqlFiles);
+    if (sqlFiles.isEmpty()) {
+        LOG_ERROR().noquote() << "后端服务SQL文件不存在";
+        return false;
+    }
+    m_sqlDealer->loadSqlFiles(sqlFiles); // TODO 文件解析错误返回失败
+    LOG_INFO().noquote() << "后端服务SQL文件加载完成";
 
     // 服务初始化
-    if (m_config->m_serverConfig.socketType == EM_SocketType::TCP) {
-        m_rpcServer = new jcon::JsonRpcTcpServer(this, std::make_shared<JsonRpcCuteLogger>());
+    if (m_config->m_serverConfig.mode == EM_ServiceMode::ONLINE) {
+        if (m_config->m_serverConfig.socketType == EM_SocketType::TCP) {
+            m_rpcServer = new jcon::JsonRpcTcpServer(this, std::make_shared<JsonRpcCuteLogger>());
+        } else {
+            m_rpcServer = new jcon::JsonRpcWebSocketServer(this, std::make_shared<JsonRpcCuteLogger>());
+        }
+        m_rpcServer->enableSendNotification(true);
+        if (!m_rpcServer->listen(m_config->m_serverConfig.port))
+            return false;
     } else {
-        m_rpcServer = new jcon::JsonRpcWebSocketServer(this, std::make_shared<JsonRpcCuteLogger>());
+        m_rpcServer = nullptr; // 单机版
     }
-    m_rpcServer->enableSendNotification(true);
-    m_rpcServer->listen(m_config->m_serverConfig.port);
 
     // 数据库连接池初始化
     EasyQtSql::SqlFactory::DBSetting dbSetting;
     if (m_config->m_dbConfig.type == EM_DataBaseType::MYSQL) {
         dbSetting = EasyQtSql::SqlFactory::DBSetting("QMYSQL",
-                                                     m_config->m_dbConfig.host,
+                                                     m_config->m_dbConfig.ip,
                                                      m_config->m_dbConfig.port,
                                                      m_config->m_dbConfig.user,
                                                      m_config->m_dbConfig.password,
@@ -117,4 +133,5 @@ void GlobalManager::init()
         // TODO 达梦数据库连接
     }
     m_sqlFactory = EasyQtSql::SqlFactory::getInstance()->config(dbSetting, "tolllanedb");
+    return true;
 }

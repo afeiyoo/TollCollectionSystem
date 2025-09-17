@@ -12,7 +12,6 @@
 #include "jcon/json_rpc_tcp_client.h"
 #include "laneservice.h"
 
-#include "LaneService.h"
 #include "utils/uiutils.h"
 
 #include "global/globalmanager.h"
