@@ -59,7 +59,7 @@ struct ST_BusinessCfg
     int laneID;
     QString virEnstation; //虚拟入口站
     QString laneIP;       //车道IP
-    QString gantryID;     //门架编号
+    QString flagID;     //门架编号
     QString CNLaneID;     //注册车道编号
     int heartBeatTime;    //心跳上传时间间隔
     bool doubleLane;      //复式票亭
@@ -939,8 +939,15 @@ Q_END_ENUM_CREATE(EM_SocketType)
 
 // 后端服务调用方式
 Q_BEGIN_ENUM_CREATE(EM_ServiceMode)
-enum SocketType { LOCAL = 0, ONLINE };
+enum ServiceMode { LOCAL = 0, ONLINE };
+Q_ENUM_CREATE(ServiceMode)
 Q_END_ENUM_CREATE(EM_ServiceMode)
+
+// 车道系统类型
+Q_BEGIN_ENUM_CREATE(EM_LaneMode)
+enum LaneMode { ETC_IN = 1, ETC_OUT, MTC_IN, MTC_OUT, ETC_AUTO_IN, ETC_AUTO_OUT, PRE_TRADE_IN, PRE_TRADE_OUT, PAD };
+Q_ENUM_CREATE(LaneMode)
+Q_END_ENUM_CREATE(EM_LaneMode)
 
 // 卡类型
 Q_BEGIN_ENUM_CREATE(EM_CardType)
