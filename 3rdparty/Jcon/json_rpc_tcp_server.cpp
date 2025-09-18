@@ -1,6 +1,7 @@
 #include "json_rpc_tcp_server.h"
 #include "json_rpc_tcp_socket.h"
 #include "jcon_assert.h"
+#include <QThread>
 
 namespace jcon {
 
