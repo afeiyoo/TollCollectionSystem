@@ -22,6 +22,7 @@ SOURCES += \
     bend/mtcin/mideskprocess.cpp \
     config/bizenv.cpp \
     config/config.cpp \
+    config/laneenv.cpp \
     global/globalmanager.cpp \
     global/modemanager.cpp \
     global/signalmanager.cpp \
@@ -58,6 +59,7 @@ HEADERS += \
     # claneform.h \
     config/bizenv.h \
     config/config.h \
+    config/laneenv.h \
     global/constant.h \
     global/globalmanager.h \
     global/modemanager.h \

@@ -14,6 +14,8 @@
 #include "global/signalmanager.h"
 #include "utils/uiutils.h"
 
+using namespace Utils;
+
 MgsMenu::MgsMenu(QWidget *parent)
     : QWidget(parent)
 {
@@ -25,9 +27,9 @@ MgsMenu::MgsMenu(QWidget *parent)
     setWindowFlags(Qt::Window | Qt::WindowTitleHint);
 
     initUi();
-    Utils::UiUtils::disableMouseEvents(this);
+    UiUtils::disableMouseEvents(this);
 
-    Utils::UiUtils::moveToCenter(this);
+    UiUtils::moveToCenter(this);
 }
 
 MgsMenu::~MgsMenu() {}
@@ -37,7 +39,7 @@ void MgsMenu::initUi()
     m_pivot = new ElaPivot(this);
 
     m_tabLayout = new QStackedLayout();
-    QHBoxLayout *tipLayout = Utils::UiUtils::createTipWidget(
+    QHBoxLayout *tipLayout = UiUtils::createTipWidget(
         "按左右方向键选择分类，按上下方向键选择功能并按【确定】键确认选择");
 
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
@@ -114,7 +116,6 @@ void MgsMenu::reset()
 void MgsMenu::keyPressEvent(QKeyEvent *event)
 {
     int key = event->key();
-    LOG_INFO().noquote() << "KeyName:" << QKeySequence(key).toString();
 
     int tabIndex = m_tabLayout->currentIndex();
     int count = m_tabLayout->count();

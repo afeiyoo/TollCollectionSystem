@@ -114,5 +114,9 @@
     "Key_X": {
         "Name": "KeyEsc",
         "Desc": "返回"
+    },
+    "Key_Right": {
+        "Name": "KeyModify",
+        "Desc": "车牌修改"
     }
 }

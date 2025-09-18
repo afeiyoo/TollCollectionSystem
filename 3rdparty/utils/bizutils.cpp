@@ -2,6 +2,7 @@
 #include "utils/datadealutils.h"
 
 #include <QDate>
+#include <QDebug>
 #include <QMetaProperty>
 
 using namespace Utils;
@@ -24,14 +25,10 @@ QString BizUtils::getPlateNoColor(const QString &fullPlate)
             return fullPlate;
     }
 
-    if ((pos = checkData.indexOf("蓝")) < 0
-        && (pos = checkData.indexOf("黄")) < 0
-        && (pos = checkData.indexOf("白")) < 0
-        && (pos = checkData.indexOf("绿")) < 0
-        && (pos = checkData.indexOf("拼")) < 0
-        && (pos = checkData.indexOf("渐")) < 0
-        && (pos = checkData.indexOf("黑")) < 0
-        && (pos = checkData.indexOf("临")) < 0) {
+    if ((pos = checkData.indexOf("蓝")) < 0 && (pos = checkData.indexOf("黄")) < 0
+        && (pos = checkData.indexOf("白")) < 0 && (pos = checkData.indexOf("绿")) < 0
+        && (pos = checkData.indexOf("拼")) < 0 && (pos = checkData.indexOf("渐")) < 0
+        && (pos = checkData.indexOf("黑")) < 0 && (pos = checkData.indexOf("临")) < 0) {
         // 所有都没匹配到
         return fullPlate;
     }
@@ -82,6 +79,37 @@ QString BizUtils::getColorFormColorCode(EM_PlateColor::PlateColor colorCode)
         return "";
 
     return colors.at(colorCode);
+}
+
+QString BizUtils::getKeyName(const QVariantMap &keyboard, uint keyCode)
+{
+    if (keyboard.isEmpty())
+        return "";
+    QMetaEnum metaEnum = QMetaEnum::fromType<Qt::Key>();
+    QString keyStr = metaEnum.valueToKey(keyCode);
+    QVariantMap keyInfo = keyboard[keyStr].toMap();
+    return keyInfo.value("Name", "").toString();
+}
+
+QString BizUtils::getKeyDesc(const QVariantMap &keyboard, uint keyCode)
+{
+    if (keyboard.isEmpty())
+        return "";
+    QMetaEnum metaEnum = QMetaEnum::fromType<Qt::Key>();
+    QString keyStr = metaEnum.valueToKey(keyCode);
+    QVariantMap keyInfo = keyboard[keyStr].toMap();
+    return keyInfo.value("Desc", "无效按键").toString();
+}
+
+int BizUtils::getKeyCode(const QVariantMap &keyboard, const QString &keyName)
+{
+    if (keyboard.isEmpty())
+        return -1;
+    QString enumName = keyboard.key(keyName);
+    if (enumName.isEmpty())
+        return -1;
+    QMetaEnum metaEnum = QMetaEnum::fromType<Qt::Key>();
+    return metaEnum.keyToValue(enumName.toLocal8Bit().data());
 }
 
 QString BizUtils::makeDtpContentFromObj(const QObject &obj)

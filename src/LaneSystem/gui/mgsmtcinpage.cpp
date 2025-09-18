@@ -3,6 +3,7 @@
 #include "ElaWidgetTools/ElaTableView.h"
 #include "ElaWidgetTools/ElaText.h"
 #include "Logger.h"
+#include "config/config.h"
 #include "global/constant.h"
 #include "global/globalmanager.h"
 #include "global/modemanager.h"
@@ -11,6 +12,7 @@
 #include "gui/component/mgsrecenttradepanel.h"
 #include "gui/component/mgsscrolltext.h"
 #include "gui/mgsauthdialog.h"
+#include "utils/bizutils.h"
 #include "utils/fileutils.h"
 #include "utils/uiutils.h"
 
@@ -22,6 +24,8 @@
 #include <QKeyEvent>
 #include <QLabel>
 #include <QSplitter>
+
+using namespace Utils;
 
 MgsMtcInPage::MgsMtcInPage(QWidget *parent)
     : MgsBasePage(parent)
@@ -319,7 +323,8 @@ void MgsMtcInPage::setTradeHint(const QString &tradeHint, const QString &color)
 void MgsMtcInPage::keyPressEvent(QKeyEvent *event)
 {
     int key = event->key();
-    LOG_INFO().noquote() << "KeyName: " << QKeySequence(key).toString();
+    LOG_INFO().noquote() << "按键: " << BizUtils::getKeyName(GM_INSTANCE->m_config->m_keyboard, key)
+                         << QString("【%1】").arg(BizUtils::getKeyDesc(GM_INSTANCE->m_config->m_keyboard, key));
 
     if (key == Qt::Key_S) {
         Utils::FileName saveDir = Utils::FileName::fromString(qApp->applicationDirPath() + "/captures");
@@ -342,7 +347,7 @@ void MgsMtcInPage::keyPressEvent(QKeyEvent *event)
         setWeightLow(isLow ? false : true);
         event->accept();
     } else {
-        qDebug() << "无效按键";
+        qDebug() << "按键功能未实现";
         MgsBasePage::keyPressEvent(event); // 默认处理其他键
     }
 }
