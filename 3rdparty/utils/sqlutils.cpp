@@ -38,7 +38,7 @@ protected:
     bool fatalError(const QXmlParseException &exception);
 
 private:
-    void loadSqlFiles(const FileNameList &sqlFiles);
+    bool loadSqlFiles(const FileNameList &sqlFiles);
 
 private:
     QString m_sqlNamespace;
@@ -130,7 +130,7 @@ bool SqlUtilsPrivate::fatalError(const QXmlParseException &exception)
     return false;
 }
 
-void SqlUtilsPrivate::loadSqlFiles(const FileNameList &sqlFiles)
+bool SqlUtilsPrivate::loadSqlFiles(const FileNameList &sqlFiles)
 {
     for (const auto &fileName : sqlFiles) {
         LOG_INFO().noquote() << QString("加载 SQL 文件: %1").arg(fileName.fileName(1));
@@ -140,10 +140,12 @@ void SqlUtilsPrivate::loadSqlFiles(const FileNameList &sqlFiles)
         QXmlSimpleReader reader;
         reader.setContentHandler(this);
         reader.setErrorHandler(this);
-        reader.parse(inputSource);
+        if (!reader.parse(inputSource))
+            return false;
 
         m_defines.clear();
     }
+    return true;
 }
 
 SqlUtils::SqlUtils(QObject *parent)
@@ -168,9 +170,9 @@ QString SqlUtils::getSql(const QString &sqlNamespace, const QString &sqlId)
     return sql;
 }
 
-void SqlUtils::loadSqlFiles(const FileNameList &sqlFiles)
+bool SqlUtils::loadSqlFiles(const FileNameList &sqlFiles)
 {
     Q_D(SqlUtils);
-    d->loadSqlFiles(sqlFiles);
+    return d->loadSqlFiles(sqlFiles);
 }
 } // namespace Utils
