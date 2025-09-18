@@ -14,4 +14,6 @@ signals:
     void sigPlateChanged(const QString &plate);
     // 功能不可用
     void sigFuncUnavaliable(const QString &func);
+    // 按键功能
+    void sigFuncDeal(uint funcIndex);
 };

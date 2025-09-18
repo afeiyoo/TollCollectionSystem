@@ -44,6 +44,7 @@ isEqual(TEMPLATE, app) {
 
 include($$THIRD_PARTY_LIBRARY_PATH/utils/Utils.pri)
 include($$THIRD_PARTY_LIBRARY_PATH/EasyQtSql/EasyQtSql.pri)
+include($$THIRD_PARTY_LIBRARY_PATH/HttpClient/HttpClient.pri)
 
 SOURCES += \
     config/config.cpp \

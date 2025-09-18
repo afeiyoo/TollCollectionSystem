@@ -36,24 +36,6 @@ MgsBasePage::MgsBasePage(QWidget *parent)
 
     m_mainWidget = new QWidget(this);
     addCentralWidget(m_mainWidget);
-
-    QTimer *logTimer = new QTimer(this);
-    connect(logTimer, &QTimer::timeout, [=]() {
-        static int counter = 1;
-        static const int maxLogs = 51;
-
-        if (counter > maxLogs) {
-            // 找到 sender()，并关闭这个 QTimer
-            if (QTimer *timer = qobject_cast<QTimer *>(sender())) {
-                timer->stop();
-            }
-            return;
-        }
-
-        QString log = QString("定时日志[ERROR] #%1").arg(counter++);
-        onLogAppend(log);
-    });
-    logTimer->start(1000);
 }
 
 MgsBasePage::~MgsBasePage() {}

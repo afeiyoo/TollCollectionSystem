@@ -15,10 +15,11 @@ DEFINES += USE_ELAWIDGETTOOLS
 
 include($$THIRD_PARTY_LIBRARY_PATH/utils/Utils.pri)
 include($$THIRD_PARTY_LIBRARY_PATH/EasyQtSql/EasyQtSql.pri)
+include($$THIRD_PARTY_LIBRARY_PATH/HttpClient/HttpClient.pri)
 
 SOURCES += \
-    # bend/mtcin/cardrobothandler.cpp \
-    # bend/mtcin/mtcindeskhandler.cpp \
+    bend/mtcin/autocardprocess.cpp \
+    bend/mtcin/mideskprocess.cpp \
     config/bizenv.cpp \
     config/config.cpp \
     global/globalmanager.cpp \
@@ -52,8 +53,8 @@ SOURCES += \
     # bend/etc/cetcdeskprocess.cpp
 
 HEADERS += \
-    # bend/mtcin/cardrobothandler.h \
-    # bend/mtcin/mtcindeskhandler.h \
+    bend/mtcin/autocardprocess.h \
+    bend/mtcin/mideskprocess.h \
     # claneform.h \
     config/bizenv.h \
     config/config.h \

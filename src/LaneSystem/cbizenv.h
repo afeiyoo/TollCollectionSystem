@@ -15,7 +15,6 @@
 #include "Logger.h"
 #include "RollingFileAppender.h"
 #include "global/defs.h"
-#include "ibizservice.h"
 
 #define GENV CBizEnv::GetInstance()
 
@@ -36,7 +35,6 @@ public:
 
 public:
     QMutex m_mutex;         //更改或读取数据共享锁
-    IBizService *m_service; //车道后端业务服务对象
 
 private:
     CBizEnv(const CBizEnv &) = delete;

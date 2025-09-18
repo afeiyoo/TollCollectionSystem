@@ -1,6 +1,7 @@
 #pragma once
 
 #include "gui/mgsbasepage.h"
+#include "gui/mgsplateeditdialog.h"
 
 class MgsMenu;
 class MgsAuthDialog;

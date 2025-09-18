@@ -1,6 +1,5 @@
 #include "mgsmenu.h"
 
-#include <QDebug>
 #include <QGuiApplication>
 #include <QScreen>
 #include <QStackedLayout>
@@ -9,6 +8,7 @@
 
 #include "ElaWidgetTools/ElaListView.h"
 #include "ElaWidgetTools/ElaPivot.h"
+#include "Logger.h"
 #include "global/constant.h"
 #include "global/globalmanager.h"
 #include "global/signalmanager.h"
@@ -114,7 +114,7 @@ void MgsMenu::reset()
 void MgsMenu::keyPressEvent(QKeyEvent *event)
 {
     int key = event->key();
-    qDebug() << "KeyName:" << QKeySequence(key).toString();
+    LOG_INFO().noquote() << "KeyName:" << QKeySequence(key).toString();
 
     int tabIndex = m_tabLayout->currentIndex();
     int count = m_tabLayout->count();
@@ -141,9 +141,11 @@ void MgsMenu::keyPressEvent(QKeyEvent *event)
             int row = current.isValid() ? current.row() : 0;
 
             if (key == Qt::Key_Up) {
-                row = (row - 1 + view->model()->rowCount()) % view->model()->rowCount();
-            } else {
-                row = (row + 1) % view->model()->rowCount();
+                if (row > 0)
+                    row -= 1;
+            } else { // Key_Down
+                if (row < view->model()->rowCount() - 1)
+                    row += 1;
             }
 
             QModelIndex newIndex = view->model()->index(row, 0);
@@ -161,7 +163,8 @@ void MgsMenu::keyPressEvent(QKeyEvent *event)
                 emit GM_INSTANCE->m_signalMan->sigFuncUnavaliable(
                     view->model()->data(current, Qt::DisplayRole).toString());
             } else {
-                qDebug() << "当前选中项内容:" << view->model()->data(current, Qt::DisplayRole).toString();
+                LOG_INFO().noquote() << "请求功能:" << view->model()->data(current, Qt::DisplayRole).toString();
+                emit GM_INSTANCE->m_signalMan->sigFuncDeal(current.row());
             }
         }
 
@@ -170,7 +173,7 @@ void MgsMenu::keyPressEvent(QKeyEvent *event)
         hide();
         event->accept();
     } else {
-        qDebug() << "无效按键";
+        LOG_WARNING().noquote() << "无效按键";
         QWidget::keyPressEvent(event); // 默认处理其他键
     }
 }

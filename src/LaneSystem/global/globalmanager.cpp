@@ -1,8 +1,6 @@
 #include "globalmanager.h"
 
 #include "ConsoleAppender.h"
-#include "Jcon/json_rpc_tcp_client.h"
-#include "Jcon/json_rpc_websocket_client.h"
 #include "QSimpleUpdater.h"
 #include "RollingFileAppender.h"
 #include "config/bizenv.h"
@@ -11,7 +9,6 @@
 #include "global/modemanager.h"
 #include "global/signalmanager.h"
 #include "laneservice.h"
-#include "utils/datadealutils.h"
 #include "utils/fileutils.h"
 #include "utils/stdafx.h"
 
@@ -88,23 +85,11 @@ void GlobalManager::init()
     // 软件配置加载
     LOG_ASSERT_X(m_config->loadConfig(), "系统初始化失败: 系统配置加载异常");
 
-    // 环境参数初始化
-
     // 后端服务初始化
-    LOG_INFO().noquote() << "车道后端服务初始化";
+    LOG_INFO().noquote() << "服务初始化";
     m_laneService = new LaneService(this);
-    LOG_ASSERT_X(m_laneService->init(), "系统初始化失败：后端服务加载异常");
+    LOG_ASSERT_X(m_laneService->init(), "系统初始化失败：服务加载异常");
 
-    if (m_config->m_systemConfig.serviceMode == 1) {
-        if (m_config->m_systemConfig.serviceSocketType == 0) {
-            m_jsonRpcClient = new jcon::JsonRpcTcpClient(this);
-        } else {
-            m_jsonRpcClient = new jcon::JsonRpcWebSocketClient(this);
-        }
-        m_jsonRpcClient->connectToServer(m_config->m_systemConfig.serviceIP, m_config->m_systemConfig.servicePort);
-    } else {
-        m_jsonRpcClient = nullptr; // 单机版直接调用动态库
-    }
-
-    LOG_INFO().noquote() << "系统正常启动，启动时间：" << Utils::DataDealUtils::curDateStr();
+    // 系统环境参数初始化
+    // TODO
 }

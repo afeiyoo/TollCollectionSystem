@@ -1,20 +1,11 @@
 #include <QApplication>
 
 #include "ElaWidgetTools/ElaApplication.h"
-// #include "claneform.h"
-#include "cbizenv.h"
-#include "fileutils.h"
-#include "gui/component/mgsmenu.h"
-#include "gui/mgsauthdialog.h"
-#include "gui/mgsmainwindow.h"
-#include "gui/mgsplateeditdialog.h"
-
-#include "jcon/json_rpc_tcp_client.h"
-#include "laneservice.h"
-
-#include "utils/uiutils.h"
-
+#include "Logger.h"
+#include "bend/mtcin/mideskprocess.h"
+#include "config/config.h"
 #include "global/globalmanager.h"
+#include "gui/mgsmainwindow.h"
 
 int main(int argc, char *argv[])
 {
@@ -31,49 +22,42 @@ int main(int argc, char *argv[])
 #endif
     QApplication a(argc, argv);
 
-    // //ENV初始化
-    // GENV->RegistLogs(); //注册日志文件
-    // LOG_CINFO("sys") << "LaneSystem start Init";
-    // GENV->InitLaneEnv();
-
-    // eApp->init(); // 界面库初始化
-    // //TODO 初始化界面
-    // MgsMainWindow m;
-    // m.initMtcIn();
-    // m.show();
-
-    // MgsPlateEditDialog w;
-    // w.show();
-
-    // LaneService *server = new LaneService(nullptr);
-    // server->init();
-
-    // auto rpc_client = new jcon::JsonRpcTcpClient(nullptr);
-    // rpc_client->connectToServer("127.0.0.1", 5927);
-
-    // QVariantMap whereParam;
-    // whereParam["laneid"] = 19;
-    // whereParam["lanetype"] = 1;
-
-    // QVariantMap reqMap;
-    // reqMap["sqlNamespace"] = "Read";
-    // reqMap["sqlID"] = "findConfig";
-    // reqMap["whereParam"] = whereParam;
-
-    // QString reqJson = GM_INSTANCE->m_jsonSerializer->serialize(reqMap);
-    // // auto result = rpc_client->call("dbRead", reqJson);
-    // auto result2 = server->dbRead(reqJson);
-    // qDebug().noquote() << result2;
-
-    // if (result->isSuccess()) {
-    //     QVariant res = result->result();
-    //     qDebug().noquote() << res.toString();
-    // } else {
-    //     QString err_str = result->toString();
-    //     qDebug().noquote() << err_str;
-    // }
-
+    eApp->init();
     GM_INSTANCE->init();
+
+    // 界面初始化
+    LOG_INFO().noquote() << "前端初始化";
+    MgsMainWindow mainWindow;
+    if (GM_INSTANCE->m_config->m_businessConfig.laneMode == EM_LaneMode::MTC_IN) {
+        LOG_INFO().noquote() << "加载混合入口前端";
+        mainWindow.initMtcIn();
+    } else if (GM_INSTANCE->m_config->m_businessConfig.laneMode == EM_LaneMode::MTC_OUT) {
+        LOG_INFO().noquote() << "加载混合出口前端";
+        mainWindow.initMtcOut();
+    } else if (GM_INSTANCE->m_config->m_businessConfig.laneMode == EM_LaneMode::ETC_IN
+               || GM_INSTANCE->m_config->m_businessConfig.laneMode == EM_LaneMode::ETC_OUT) {
+        LOG_INFO().noquote() << "加载ETC车道前端";
+        mainWindow.initEtc();
+    } else {
+        LOG_ASSERT_X(false, "系统初始化失败：前端初始化失败（无对应车道类型）");
+    }
+    mainWindow.showNormal();
+    LOG_INFO().noquote() << "前端初始化完成";
+
+    // 业务处理模块初始化
+    LOG_INFO().noquote() << "业务处理模块初始化";
+    if (GM_INSTANCE->m_config->m_businessConfig.laneMode == EM_LaneMode::MTC_IN) {
+        LOG_INFO().noquote() << "加载混合入口业务处理模块";
+        new MIDeskProcess(&mainWindow);
+    } else if (GM_INSTANCE->m_config->m_businessConfig.laneMode == EM_LaneMode::MTC_OUT) {
+        // TODO 混合出口业务处理模块
+    } else if (GM_INSTANCE->m_config->m_businessConfig.laneMode == EM_LaneMode::ETC_IN
+               || GM_INSTANCE->m_config->m_businessConfig.laneMode == EM_LaneMode::ETC_OUT) {
+        // TODO ETC业务处理模块
+    } else {
+        LOG_ASSERT_X(false, "系统初始化失败：业务处理模块初始化失败（无对应车道类型）");
+    }
+    LOG_INFO().noquote() << "业务处理模块初始化完成";
 
     return a.exec();
 }

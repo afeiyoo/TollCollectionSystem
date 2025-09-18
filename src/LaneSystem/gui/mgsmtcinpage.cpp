@@ -2,6 +2,7 @@
 
 #include "ElaWidgetTools/ElaTableView.h"
 #include "ElaWidgetTools/ElaText.h"
+#include "Logger.h"
 #include "global/constant.h"
 #include "global/globalmanager.h"
 #include "global/modemanager.h"
@@ -318,7 +319,7 @@ void MgsMtcInPage::setTradeHint(const QString &tradeHint, const QString &color)
 void MgsMtcInPage::keyPressEvent(QKeyEvent *event)
 {
     int key = event->key();
-    qDebug() << "KeyName:" << QKeySequence(key).toString();
+    LOG_INFO().noquote() << "KeyName: " << QKeySequence(key).toString();
 
     if (key == Qt::Key_S) {
         Utils::FileName saveDir = Utils::FileName::fromString(qApp->applicationDirPath() + "/captures");
@@ -335,8 +336,6 @@ void MgsMtcInPage::keyPressEvent(QKeyEvent *event)
         GM_INSTANCE->m_modeMan->showMenu();
         event->accept();
     } else if (key == Qt::Key_Y) {
-        GM_INSTANCE->m_modeMan->onModeChanged(new MtcInPaperMode());
-        GM_INSTANCE->m_modeMan->showMenu();
         event->accept();
     } else if (key == Qt::Key_J) {
         static bool isLow = false;

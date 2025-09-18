@@ -18,12 +18,9 @@ bool LaneService::init()
     if (!GM_INSTANCE->init())
         return false;
 
-    if (GM_INSTANCE->m_config->m_serverConfig.mode == EM_ServiceMode::ONLINE) {
+    if (GM_INSTANCE->m_config->m_serverConfig.mode == EM_ServiceMode::ONLINE)
         GM_INSTANCE->m_rpcServer->registerServices({this});
-        LOG_INFO().noquote() << "后端服务成功初始化, 监听端口 " << GM_INSTANCE->m_config->m_serverConfig.port;
-    } else {
-        LOG_INFO().noquote() << "后端服务成功初始化";
-    }
+    LOG_INFO().noquote() << "服务成功初始化";
     return true;
 }
 
@@ -263,6 +260,15 @@ QString LaneService::dbInsert(const QString &reqJson)
         QString resJson = QString::fromUtf8(GM_INSTANCE->m_jsonSerializer->serialize(resMap));
         return resJson;
     }
+}
+
+QString LaneService::testFunc(int time, QString threadName)
+{
+    // 模拟阻塞操作
+    QThread::sleep(time);
+    QString result = QString("done: %1").arg(threadName);
+
+    return result;
 }
 
 QVariantMap LaneService::genResMapForDBOperate(int status, int recordCount, QString desc, QVariantList records)

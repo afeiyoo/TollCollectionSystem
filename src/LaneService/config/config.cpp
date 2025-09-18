@@ -20,20 +20,19 @@ bool Config::loadConfig()
     FileName configDir = FileName::fromString(FileUtils::curApplicationDirPath() + "/config");
     FileUtils::makeSureDirExist(configDir);
 
-    // 车道服务配置加载
+    // 服务配置加载
     FileName configPath = configDir + QString("/Service.ini");
-    LOG_INFO().noquote() << "加载后端服务配置";
+    LOG_INFO().noquote() << "加载服务配置";
     if (!configPath.exists()) {
-        LOG_WARNING().noquote() << "后端服务配置文件 " << configPath.fileName(0) << "不存在，开始创建默认后端服务配置";
-        // 创建默认服务配置
+        LOG_WARNING().noquote() << "服务配置文件 " << configPath.fileName(0) << "不存在，开始创建默认服务配置";
         QByteArray configData = FileReader::fetchQrc(Constant::Path::SERVICE_CONFIG_PATH);
         FileSaver saver(configPath.toString());
         saver.write(configData);
         if (!saver.finalize()) {
-            LOG_ERROR().noquote() << "创建默认后端服务配置失败 " << saver.errorString();
+            LOG_ERROR().noquote() << "创建默认服务配置失败 " << saver.errorString();
             return false;
         }
-        LOG_INFO().noquote() << "创建默认后端服务配置成功";
+        LOG_INFO().noquote() << "创建默认服务配置成功";
     }
 
     IniUtils ini(configPath.toString());
@@ -49,7 +48,7 @@ bool Config::loadConfig()
     m_serverConfig.mode = ini.value("service", "mode", 0).toUInt();
 
     LOG_INFO().noquote() << ini.dumpInfo();
-    LOG_INFO().noquote() << "后端服务配置加载完成";
+    LOG_INFO().noquote() << "服务配置加载完成";
 
     return true;
 }

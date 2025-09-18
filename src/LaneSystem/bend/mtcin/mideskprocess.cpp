@@ -1,32 +1,25 @@
-#include "mtcindeskhandler.h"
+#include "mideskprocess.h"
+#include "Logger.h"
+#include "global/globalmanager.h"
+#include "global/signalmanager.h"
+#include "gui/mgsmainwindow.h"
+#include "utils/uiutils.h"
 
-MtcInDeskHandler::MtcInDeskHandler(
-    ILaneForm *aForm, CBizEnv *bizEnv, TLaneEnv *env, ILaneDeviceCtrl *pCtrl, QObject *parent)
+using namespace Utils;
+
+MIDeskProcess::MIDeskProcess(MgsMainWindow *mainWindow, QObject *parent)
     : QObject(parent)
+    , m_mainWindow(mainWindow)
 {
-    // m_form = aForm;
-    // m_biz_env = bizEnv;
-    // m_service = bizEnv->m_service;
-    // m_env = env;
-    // m_devices = pCtrl;
-
-    // connect(m_form, SIGNAL(sigKeyPress(uint)), this, SLOT(onKeyPress(uint)));
-
-    // //创建自动发卡机业务处理线程
-    // m_robot_proc = NULL;
-    // if (m_env->laneMode == 5)
-    //     m_robot_proc = new CardRobotHandler(aForm, bizEnv, env, pCtrl, this);
-
-    // //创建ETC业务处理线程
-    // m_etc_proc = new CETCProcess(aForm, bizEnv, env, pCtrl, this);
+    connect(GM_INSTANCE->m_signalMan, &SignalManager::sigFuncDeal, this, &MIDeskProcess::onDealFunc);
 }
 
-void MtcInDeskHandler::onVDChanged(unsigned int newVD) {}
+MIDeskProcess::~MIDeskProcess() {}
 
-bool MtcInDeskHandler::login(const QVariantMap &params)
+void MIDeskProcess::onVDChanged(unsigned int newVD) {}
+
+void MIDeskProcess::onDealFunc(uint funcIndex)
 {
-    QString userID = params["userID"].toString();
-    QString password = params["password"].toString();
-
-    // 调用远程服务，查询参数是否正确
+    LOG_INFO().noquote() << "测试成功进入" << funcIndex;
+    UiUtils::showMessageBoxInfo("测试", "弹窗测试", QMessageBox::Yes);
 }

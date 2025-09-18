@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Jcon/json_rpc_client.h"
 #include "QJson/include/parser.h"
 #include "QJson/include/serializer.h"
 #include <QObject>
@@ -13,6 +12,7 @@ class ModeManager;
 class LaneService;
 class Config;
 class BizEnv;
+class MgsMainWindow;
 class GlobalManager : public QObject
 {
     Q_OBJECT
@@ -31,8 +31,6 @@ public:
     // Json解析对象
     QJson::Parser *m_jsonParser = nullptr;
     QJson::Serializer *m_jsonSerializer = nullptr;
-    // rpc调用客户端
-    jcon::JsonRpcClient *m_jsonRpcClient = nullptr;
     // rpc服务端-车道后端服务
     LaneService *m_laneService = nullptr;
     // 软件配置对象

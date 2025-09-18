@@ -4,7 +4,6 @@
 #include <QVBoxLayout>
 
 #include "ElaWidgetTools/ElaLCDNumber.h"
-#include "ElaWidgetTools/ElaMessageBar.h"
 #include "ElaWidgetTools/ElaStatusBar.h"
 #include "ElaWidgetTools/ElaToolButton.h"
 
@@ -15,11 +14,16 @@
 #include "gui/mgsetcpage.h"
 #include "gui/mgsmtcinpage.h"
 #include "gui/mgsmtcoutpage.h"
+#include <QCoreApplication>
+#include <QTimer>
 
 MgsMainWindow::MgsMainWindow(QWidget *parent)
     : ElaWindow(parent)
 {
     initUi();
+
+    // 程序退出时，清理界面资源
+    connect(qApp, &QCoreApplication::aboutToQuit, this, [this]() { MgsMainWindow::deleteLater(); });
 }
 
 MgsMainWindow::~MgsMainWindow() {}
@@ -116,6 +120,9 @@ void MgsMainWindow::initMtcIn()
                                MgsDevicePanel::PassingLamp,
                                MgsDevicePanel::RailingMachine,
                                MgsDevicePanel::RSU});
+
+    m_mainPage->setFocusPolicy(Qt::StrongFocus);
+    m_mainPage->setFocus();
 }
 
 void MgsMainWindow::initMtcOut()
@@ -217,6 +224,9 @@ void MgsMainWindow::initMtcOut()
                                MgsDevicePanel::PassingLamp,
                                MgsDevicePanel::RailingMachine,
                                MgsDevicePanel::RSU});
+
+    m_mainPage->setFocusPolicy(Qt::StrongFocus);
+    m_mainPage->setFocus();
 }
 
 void MgsMainWindow::initEtc()
@@ -294,6 +304,9 @@ void MgsMainWindow::initEtc()
         MgsDevicePanel::PassingLamp,
         MgsDevicePanel::RailingMachine,
     });
+
+    m_mainPage->setFocusPolicy(Qt::StrongFocus);
+    m_mainPage->setFocus();
 }
 
 void MgsMainWindow::initUi()
@@ -304,7 +317,6 @@ void MgsMainWindow::initUi()
     setIsStayTop(true); // 窗口置顶
     setIsNavigationBarEnable(false);
     setWindowButtonFlags(ElaAppBarType::None);
-    showMaximized();
     setWindowIcon(QIcon(Constant::Path::APP_ICON));
 
     // 状态栏
