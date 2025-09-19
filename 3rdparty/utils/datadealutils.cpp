@@ -794,7 +794,7 @@ QByteArray DataDealUtils::asciiStrToByteArray(const QString &str)
     return buffer;
 }
 
-QString DataDealUtils::byteArrayToHexStr(const QByteArray &data)
+QString DataDealUtils::byteArrayToHexStr(const QByteArray &data, bool withBlack)
 {
     QString temp = "";
     QString hex = data.toHex();
@@ -802,6 +802,9 @@ QString DataDealUtils::byteArrayToHexStr(const QByteArray &data)
     for (int i = 0; i < hex.length(); i = i + 2) {
         temp += hex.mid(i, 2) + " ";
     }
+
+    if(!withBlack)
+        return temp.replace(" ", "").toUpper();
 
     return temp.trimmed().toUpper();
 }

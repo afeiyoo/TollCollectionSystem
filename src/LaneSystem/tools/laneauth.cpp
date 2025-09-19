@@ -121,5 +121,5 @@ QString LaneAuth::computeID2License(QString cID, QString orgID)
                   reinterpret_cast<unsigned char *>(inpad.data()),
                   reinterpret_cast<unsigned char *>(out.data()));
 
-    return QString(out.toHex()).toUpper();
+    return DataDealUtils::byteArrayToHexStr(out, false);
 }

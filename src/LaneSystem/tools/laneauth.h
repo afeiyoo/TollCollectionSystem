@@ -9,6 +9,10 @@ class LaneAuth : public QObject
 public:
     explicit LaneAuth(QObject *parent = nullptr);
 
+    // 授权检查
+    bool authCheck(QString stationID, int laneID, QString laneIP, QString cnLaneID);
+
+private:
     // 从授权文件中获取授权信息
     bool getAuthInfo(const QString &fileName,
                      QString &stationID,
@@ -16,10 +20,6 @@ public:
                      QString &laneIP,
                      QString &licenseCode,
                      QString &cnLaneID);
-
-private:
-    // 授权检查
-    bool authCheck(QString stationID, int laneID, QString laneIP, QString cnLaneID);
 
     // 计算授权码
     QString computeID2License(QString cID, QString orgID);
