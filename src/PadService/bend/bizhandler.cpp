@@ -1016,7 +1016,14 @@ QString BizHandler::doDealCmd25(const QVariantMap &aMap)
     QString result = blockUtilResponse(reply, Http().instance().getReadTimeout());
     LOG_INFO().noquote() << "返回状态名单信息查询结果: " << result;
 
-    return result;
+    QVariantMap resMap = GM_INSTANCE->m_jsonParser->parse(result.toUtf8()).toMap();
+    int subCode = resMap["subCode"].toInt();    // 返回码
+    QString info = resMap["info"].toString();   // 信息
+
+    resMap["status"] = subCode == 200 ? 0 : 1;
+    resMap["desc"] = info;
+    QString dealtData = GM_INSTANCE->m_jsonSerializer->serialize(resMap);
+    return dealtData;
 }
 
 QString BizHandler::doDealCmd26(const QVariantMap &aMap)
