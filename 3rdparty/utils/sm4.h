@@ -3,6 +3,7 @@
 #define SM4_ENCRYPT 1
 #define SM4_DECRYPT 0
 
+namespace Utils {
 /**
  * \brief          SM4 context structure
  */
@@ -11,10 +12,6 @@ typedef struct
     int mode;             /*!<  encrypt/decrypt   */
     unsigned long sk[32]; /*!<  SM4 subkeys       */
 } sm4_context;
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 /**
  * \brief          SM4 key schedule (128-bit, encryption)
@@ -53,7 +50,4 @@ void sm4_crypt_ecb(sm4_context *ctx, int mode, int length, unsigned char *input,
  */
 void sm4_crypt_cbc(
     sm4_context *ctx, int mode, int length, unsigned char iv[16], unsigned char *input, unsigned char *output);
-
-#ifdef __cplusplus
-}
-#endif
+} // namespace Utils
