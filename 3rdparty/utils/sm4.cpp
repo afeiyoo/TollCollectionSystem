@@ -84,7 +84,8 @@ namespace Utils {
 
 /*
  * Expanded SM4 S-boxes
- /* Sbox table: 8bits input convert to 8 bits output*/
+ * Sbox table: 8bits input convert to 8 bits output
+ */
 
 static const unsigned char SboxTable[16][16]
     = {{0xd6, 0x90, 0xe9, 0xfe, 0xcc, 0xe1, 0x3d, 0xb7, 0x16, 0xb6, 0x14, 0xc2, 0x28, 0xfb, 0x2c, 0x05},
