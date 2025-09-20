@@ -59,7 +59,7 @@ struct ST_BusinessCfg
     int laneID;
     QString virEnstation; //虚拟入口站
     QString laneIP;       //车道IP
-    QString flagID;     //门架编号
+    QString flagID;       //门架编号
     QString CNLaneID;     //注册车道编号
     int heartBeatTime;    //心跳上传时间间隔
     bool doubleLane;      //复式票亭

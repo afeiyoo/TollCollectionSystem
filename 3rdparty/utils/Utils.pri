@@ -7,6 +7,7 @@ HEADERS += \
     $$PWD/defs.h \
     $$PWD/fileutils.h \
     $$PWD/hostosinfo.h \
+    $$PWD/httplib.h \
     $$PWD/iniutils.h \
     $$PWD/networkutils.h \
     $$PWD/optional.h \
