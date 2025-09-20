@@ -11,8 +11,8 @@ class SignalManager;
 class ModeManager;
 class LaneService;
 class Config;
-class BizEnv;
 class MgsMainWindow;
+class LaneAuth;
 class GlobalManager : public QObject
 {
     Q_OBJECT
@@ -31,10 +31,10 @@ public:
     // Json解析对象
     QJson::Parser *m_jsonParser = nullptr;
     QJson::Serializer *m_jsonSerializer = nullptr;
-    // rpc服务端-车道后端服务
+    // rpc服务端-车道服务
     LaneService *m_laneService = nullptr;
     // 软件配置对象
     Config *m_config = nullptr;
-    // 业务环境对象
-    BizEnv *m_bizEnv = nullptr;
+    // 车道授权工具对象
+    LaneAuth *m_laneAuth = nullptr;
 };

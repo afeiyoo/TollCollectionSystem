@@ -14,6 +14,14 @@ signals:
     void sigPlateChanged(const QString &plate);
     // 功能不可用
     void sigFuncUnavaliable(const QString &func);
-    // 按键功能
-    void sigFuncDeal(uint funcIndex);
+    // 上班
+    void sigShiftIn();
+    // 下班
+    void sigShiftOut();
+    // 菜单功能请求
+    void sigMenuRequest(uint index);
+    // 闭道
+    void sigCloseLane();
+    // 开道
+    void sigOpenLane();
 };

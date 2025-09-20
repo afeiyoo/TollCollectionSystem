@@ -7,6 +7,7 @@
 #include "global/constant.h"
 #include "global/globalmanager.h"
 #include "global/modemanager.h"
+#include "global/signalmanager.h"
 #include "gui/component/mgsdevicepanel.h"
 #include "gui/component/mgspagearea.h"
 #include "gui/component/mgsrecenttradepanel.h"
@@ -334,9 +335,6 @@ void MgsMtcInPage::keyPressEvent(QKeyEvent *event)
             qDebug() << error;
         }
         event->accept();
-    } else if (key == Qt::Key_I) {
-        m_authDialog->show();
-        event->accept();
     } else if (key == Qt::Key_W) {
         GM_INSTANCE->m_modeMan->showMenu();
         event->accept();
@@ -345,6 +343,18 @@ void MgsMtcInPage::keyPressEvent(QKeyEvent *event)
     } else if (key == Qt::Key_J) {
         static bool isLow = false;
         setWeightLow(isLow ? false : true);
+        event->accept();
+    } else if (key == Qt::Key_G) {
+        emit GM_INSTANCE->m_signalMan->sigCloseLane();
+        event->accept();
+    } else if (key == Qt::Key_O) {
+        emit GM_INSTANCE->m_signalMan->sigOpenLane();
+        event->accept();
+    } else if (key == Qt::Key_I) {
+        emit GM_INSTANCE->m_signalMan->sigShiftIn();
+        event->accept();
+    } else if (key == Qt::Key_U) {
+        emit GM_INSTANCE->m_signalMan->sigShiftOut();
         event->accept();
     } else {
         qDebug() << "按键功能未实现";

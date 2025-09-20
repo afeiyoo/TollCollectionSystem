@@ -165,7 +165,7 @@ void MgsMenu::keyPressEvent(QKeyEvent *event)
                     view->model()->data(current, Qt::DisplayRole).toString());
             } else {
                 LOG_INFO().noquote() << "请求功能:" << view->model()->data(current, Qt::DisplayRole).toString();
-                emit GM_INSTANCE->m_signalMan->sigFuncDeal(current.row());
+                emit GM_INSTANCE->m_signalMan->sigMenuRequest(current.row());
             }
         }
 

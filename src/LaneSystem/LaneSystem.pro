@@ -19,10 +19,12 @@ include($$THIRD_PARTY_LIBRARY_PATH/HttpClient/HttpClient.pri)
 
 SOURCES += \
     bend/mtcin/autocardprocess.cpp \
+    bend/mtcin/mibizenv.cpp \
     bend/mtcin/mideskprocess.cpp \
-    config/bizenv.cpp \
     config/config.cpp \
     config/laneenv.cpp \
+    dao/dataservice.cpp \
+    dao/midataservice.cpp \
     global/globalmanager.cpp \
     global/modemanager.cpp \
     global/signalmanager.cpp \
@@ -51,15 +53,18 @@ SOURCES += \
     # bend/mtcout/cmodeskprocess.cpp \
     # bend/mtcout/csptprocess.cpp \
     # bend/etc/cetcprocess.cpp \
-    # bend/etc/cetcdeskprocess.cpp
+ \    # bend/etc/cetcdeskprocess.cpp
+    tools/laneauth.cpp
 
 HEADERS += \
     bend/mtcin/autocardprocess.h \
+    bend/mtcin/mibizenv.h \
     bend/mtcin/mideskprocess.h \
     # claneform.h \
-    config/bizenv.h \
     config/config.h \
     config/laneenv.h \
+    dao/dataservice.h \
+    dao/midataservice.h \
     global/constant.h \
     global/globalmanager.h \
     global/modemanager.h \
@@ -88,7 +93,8 @@ HEADERS += \
     # bend/mtcout/csptprocess.h \
     # bend/etc/cetcprocess.h \
     # bend/etc/cetcdeskprocess.h \
-    # ILaneDeviceCtrl.h
+ \    # ILaneDeviceCtrl.h
+    tools/laneauth.h
 
 FORMS += claneform.ui
 

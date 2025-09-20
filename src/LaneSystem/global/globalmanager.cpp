@@ -3,12 +3,12 @@
 #include "ConsoleAppender.h"
 #include "QSimpleUpdater.h"
 #include "RollingFileAppender.h"
-#include "config/bizenv.h"
 #include "config/config.h"
 #include "global/constant.h"
 #include "global/modemanager.h"
 #include "global/signalmanager.h"
 #include "laneservice.h"
+#include "tools/laneauth.h"
 #include "utils/fileutils.h"
 #include "utils/stdafx.h"
 
@@ -28,7 +28,7 @@ GlobalManager::GlobalManager(QObject *parent)
 
     m_config = new Config(this);
 
-    m_bizEnv = new BizEnv(this);
+    m_laneAuth = new LaneAuth(this);
 }
 
 GlobalManager::~GlobalManager()

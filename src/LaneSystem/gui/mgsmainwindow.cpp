@@ -1,6 +1,8 @@
 #include "mgsmainwindow.h"
 
+#include <QCoreApplication>
 #include <QStackedLayout>
+#include <QTimer>
 #include <QVBoxLayout>
 
 #include "ElaWidgetTools/ElaLCDNumber.h"
@@ -14,8 +16,9 @@
 #include "gui/mgsetcpage.h"
 #include "gui/mgsmtcinpage.h"
 #include "gui/mgsmtcoutpage.h"
-#include <QCoreApplication>
-#include <QTimer>
+#include "utils/uiutils.h"
+
+using namespace Utils;
 
 MgsMainWindow::MgsMainWindow(QWidget *parent)
     : ElaWindow(parent)
@@ -307,6 +310,24 @@ void MgsMainWindow::initEtc()
 
     m_mainPage->setFocusPolicy(Qt::StrongFocus);
     m_mainPage->setFocus();
+}
+
+void MgsMainWindow::showFormErrorHint(const QString &title, const QStringList &strs)
+{
+    QString message = strs.join("<br/>");
+    UiUtils::showMessageBoxError(title, message, QMessageBox::Yes | QMessageBox::Cancel);
+}
+
+void MgsMainWindow::showFormInfoHint(const QString &title, const QStringList &strs)
+{
+    QString message = strs.join("<br/>");
+    UiUtils::showMessageBoxInfo(title, message, QMessageBox::Yes | QMessageBox::Cancel);
+}
+
+void MgsMainWindow::showFormWarningHint(const QString &title, const QStringList &strs)
+{
+    QString message = strs.join("<br/>");
+    UiUtils::showMessageBoxQuestion(title, message, QMessageBox::Yes | QMessageBox::Cancel);
 }
 
 void MgsMainWindow::initUi()
