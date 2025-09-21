@@ -436,9 +436,9 @@ void Updater::setUpdateAvailable(const bool available)
 
     // 2025-08-23 第三方库修改 对话框样式规范
     if (updateAvailable() && (notifyOnUpdate() || notifyOnFinish())) {
-        QString text = tr("是否现在下载更新包？");
+        QString text = tr("是否立即更新？");
         if (m_mandatoryUpdate) {
-            text = tr("是否现在下载更新包？<br /><strong>本次为强制更新，取消将退出应用程序!</strong>");
+            text = tr("是否立即更新？<br /><strong>本次为强制更新，若取消将无法上班!</strong>");
         }
         text += "<br/><br/>";
         if (!m_changelog.isEmpty())

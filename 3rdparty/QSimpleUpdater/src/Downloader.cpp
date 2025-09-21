@@ -224,7 +224,7 @@ void Downloader::installUpdate()
     QString title = "<h3>" + tr("为了安装更新，您可能需要退出应用程序！") + "</h3>";
     QString text = tr("是否开始安装更新包？");
     if (m_mandatoryUpdate)
-        text = tr("是否开始安装更新包？<br/><br/><strong>本次为强制更新，取消将退出应用程序！</strong>");
+        text = tr("是否开始安装更新包？<br/><br/><strong>本次为强制更新，若取消将无法上班！</strong>");
 
     QMessageBox::StandardButton clickBtn = UiHelper::showMessageBoxQuestion(title,
                                                                             text,
