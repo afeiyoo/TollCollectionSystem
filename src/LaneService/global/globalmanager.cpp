@@ -10,7 +10,7 @@
 #include "utils/fileutils.h"
 #include "utils/stdafx.h"
 
-#ifdef LANESERVICE_NETWORK
+#ifdef LANESERVICE_ONLINE
     #include "ConsoleAppender.h"
 #endif
 
@@ -58,26 +58,10 @@ GlobalManager *GlobalManager::instance()
     return ins();
 }
 
-bool GlobalManager::init()
+bool GlobalManager::initForLocal()
 {
     FileName logDir = FileName::fromString(FileUtils::curApplicationDirPath() + "/logs");
     FileUtils::makeSureDirExist(logDir);
-#ifdef LANESERVICE_NETWORK
-    // 日志初始化
-    ConsoleAppender *consoleAppender = new ConsoleAppender();
-    consoleAppender->setFormat(Constant::Log::FORMAT);
-    cuteLogger->registerAppender(consoleAppender);
-
-    // 总日志
-    FileName serviceLogPath = logDir + QString("/service.log");
-    RollingFileAppender *serviceFileAppender = new RollingFileAppender(
-        FileUtils::canonicalPath(serviceLogPath).toString());
-    serviceFileAppender->setFormat(Constant::Log::FORMAT);
-    serviceFileAppender->setLogFilesLimit(Constant::Log::MAX_SAVE_DAY);
-    serviceFileAppender->setFlushOnWrite(true);
-    serviceFileAppender->setDatePattern(RollingFileAppender::DatePattern::DailyRollover);
-    cuteLogger->registerAppender(serviceFileAppender);
-#endif
     // 计费日志
     FileName calFeeLogPath = logDir + QString("/fee.log");
     RollingFileAppender *calFeeFileAppender = new RollingFileAppender(
@@ -92,17 +76,10 @@ bool GlobalManager::init()
     if (!m_config->loadConfig())
         return false;
 
-#ifdef LANESERVICE_NETWORK
-    if (m_config->m_serverConfig.mode != EM_ServiceMode::ONLINE) {
-        LOG_ERROR().noquote() << "车道服务类型配置错误";
-        return false;
-    }
-#else
     if (m_config->m_serverConfig.mode != EM_ServiceMode::LOCAL) {
         LOG_ERROR().noquote() << "车道服务类型配置错误";
         return false;
     }
-#endif
 
     // json解析对象初始化
     m_jsonSerializer->setIndentMode(QJson::IndentCompact); // 序列化时不保留空格
@@ -139,18 +116,90 @@ bool GlobalManager::init()
     LOG_INFO().noquote() << "车道服务数据库连接初始化完成";
 
     // 服务初始化
-    if (m_config->m_serverConfig.mode == EM_ServiceMode::ONLINE) {
-        if (m_config->m_serverConfig.socketType == EM_SocketType::TCP) {
-            m_rpcServer = new jcon::JsonRpcTcpServer(this, std::make_shared<JsonRpcCuteLogger>());
-        } else {
-            m_rpcServer = new jcon::JsonRpcWebSocketServer(this, std::make_shared<JsonRpcCuteLogger>());
-        }
-        m_rpcServer->enableSendNotification(true);
-        if (!m_rpcServer->listen(m_config->m_serverConfig.port))
-            return false;
-    } else {
-        m_rpcServer = nullptr; // 单机版
+    m_rpcServer = nullptr;
+
+    return true;
+}
+
+bool GlobalManager::initForOnline()
+{
+    FileName logDir = FileName::fromString(FileUtils::curApplicationDirPath() + "/logs");
+    FileUtils::makeSureDirExist(logDir);
+    // 日志初始化
+    ConsoleAppender *consoleAppender = new ConsoleAppender();
+    consoleAppender->setFormat(Constant::Log::FORMAT);
+    cuteLogger->registerAppender(consoleAppender);
+    // 总日志
+    FileName serviceLogPath = logDir + QString("/service.log");
+    RollingFileAppender *serviceFileAppender = new RollingFileAppender(
+        FileUtils::canonicalPath(serviceLogPath).toString());
+    serviceFileAppender->setFormat(Constant::Log::FORMAT);
+    serviceFileAppender->setLogFilesLimit(Constant::Log::MAX_SAVE_DAY);
+    serviceFileAppender->setFlushOnWrite(true);
+    serviceFileAppender->setDatePattern(RollingFileAppender::DatePattern::DailyRollover);
+    cuteLogger->registerAppender(serviceFileAppender);
+    // 计费日志
+    FileName calFeeLogPath = logDir + QString("/fee.log");
+    RollingFileAppender *calFeeFileAppender = new RollingFileAppender(
+        FileUtils::canonicalPath(calFeeLogPath).toString());
+    calFeeFileAppender->setFormat(Constant::Log::FORMAT);
+    calFeeFileAppender->setLogFilesLimit(Constant::Log::MAX_SAVE_DAY);
+    calFeeFileAppender->setFlushOnWrite(true);
+    calFeeFileAppender->setDatePattern(RollingFileAppender::DatePattern::DailyRollover);
+    cuteLogger->registerCategoryAppender("fee", calFeeFileAppender);
+
+    // 加载配置
+    if (!m_config->loadConfig())
+        return false;
+
+    if (m_config->m_serverConfig.mode != EM_ServiceMode::ONLINE) {
+        LOG_ERROR().noquote() << "车道服务类型配置错误";
+        return false;
     }
+
+    // json解析对象初始化
+    m_jsonSerializer->setIndentMode(QJson::IndentCompact); // 序列化时不保留空格
+
+    // sql语句解析对象初始化
+    FileName sqlsDir = FileName::fromString(FileUtils::curApplicationDirPath() + "/sqls");
+    FileUtils::makeSureDirExist(sqlsDir);
+    LOG_INFO().noquote() << "加载车道服务SQL文件";
+    FileNameList sqlFiles = FileUtils::getFilesWithSuffix(sqlsDir, "xml");
+    if (sqlFiles.isEmpty()) {
+        LOG_ERROR().noquote() << "车道服务SQL文件不存在";
+        return false;
+    }
+    if (!m_sqlDealer->loadSqlFiles(sqlFiles))
+        return false;
+
+    LOG_INFO().noquote() << "车道服务SQL文件加载完成";
+
+    // 数据库连接池初始化
+    LOG_INFO().noquote() << "初始化车道服务数据库连接";
+    EasyQtSql::SqlFactory::DBSetting dbSetting;
+    if (m_config->m_dbConfig.type == EM_DataBaseType::MYSQL) {
+        dbSetting = EasyQtSql::SqlFactory::DBSetting("QMYSQL",
+                                                     m_config->m_dbConfig.ip,
+                                                     m_config->m_dbConfig.port,
+                                                     m_config->m_dbConfig.user,
+                                                     m_config->m_dbConfig.password,
+                                                     m_config->m_dbConfig.dbName);
+    } else if (m_config->m_dbConfig.type == EM_DataBaseType::DAMENG) {
+        // TODO 达梦数据库连接
+    }
+    m_sqlFactory = EasyQtSql::SqlFactory::getInstance()->config(dbSetting, "tolllanedb");
+    // TODO 测试数据库连通性
+    LOG_INFO().noquote() << "车道服务数据库连接初始化完成";
+
+    // 服务初始化
+    if (m_config->m_serverConfig.socketType == EM_SocketType::TCP) {
+        m_rpcServer = new jcon::JsonRpcTcpServer(this, std::make_shared<JsonRpcCuteLogger>());
+    } else {
+        m_rpcServer = new jcon::JsonRpcWebSocketServer(this, std::make_shared<JsonRpcCuteLogger>());
+    }
+    m_rpcServer->enableSendNotification(true);
+    if (!m_rpcServer->listen(m_config->m_serverConfig.port))
+        return false;
 
     return true;
 }

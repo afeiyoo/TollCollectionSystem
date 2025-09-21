@@ -1,6 +1,7 @@
 #include "mideskprocess.h"
 
 #include "Logger.h"
+#include "QSimpleUpdater.h"
 #include "bend/mtcin/mibizenv.h"
 #include "config/config.h"
 #include "global/globalmanager.h"
@@ -8,6 +9,8 @@
 #include "gui/mgsmainwindow.h"
 #include "tools/laneauth.h"
 #include "utils/uiutils.h"
+
+#include <QThread>
 
 using namespace Utils;
 
@@ -46,18 +49,18 @@ void MIDeskProcess::onShiftIn()
         return;
     }
 
-    // 1. 重新加载参数
-
-    // 2. 车道授权
+    // 1. 车道授权
     bool authOk = GM_INSTANCE->m_laneAuth->authCheck(GM_INSTANCE->m_config->m_businessConfig.stationID,
                                                      GM_INSTANCE->m_config->m_businessConfig.laneID,
                                                      GM_INSTANCE->m_config->m_businessConfig.laneIP,
                                                      GM_INSTANCE->m_config->m_businessConfig.CNLaneID);
-    m_mainWindow->showFormErrorHint("车道授权失败",
-                                    {"请通过省中心配置平台注册",
-                                     "请联系运维人员处理",
-                                     "情况大家激发大家",
-                                     "的骄傲法律角度是发的开机卡了"});
+    if (!authOk) {
+        m_mainWindow->showFormErrorHint("车道授权失败", {"该车道未在省中心平台注册", "请及时联系运维人员处理!"});
+        return;
+    }
+    // 2. 检查程序更新，必须是最新程序才可以登班
+
+    // 3. 上班后，重新加载参数
 }
 
 void MIDeskProcess::onShiftOut() {}

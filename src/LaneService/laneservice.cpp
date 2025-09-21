@@ -15,17 +15,18 @@ LaneService::~LaneService() {}
 
 bool LaneService::init()
 {
-    if (!GM_INSTANCE->init())
+#ifdef LANESERVICE_ONLINE
+    if (!GM_INSTANCE->initForOnline())
         return false;
-
-    if (GM_INSTANCE->m_config->m_serverConfig.mode == EM_ServiceMode::ONLINE) {
-        GM_INSTANCE->m_rpcServer->registerServices({this});
-        LOG_INFO().noquote() << "服务成功初始化 （网络版服务）";
-    } else {
-        LOG_INFO().noquote() << "服务成功初始化（单机版服务）";
-    }
-
+    GM_INSTANCE->m_rpcServer->registerServices({this});
+    LOG_INFO().noquote() << "服务成功初始化 （网络版服务）";
     return true;
+#else
+    if (!GM_INSTANCE->initForLocal())
+        return false;
+    LOG_INFO().noquote() << "服务成功初始化（单机版服务）";
+    return true;
+#endif
 }
 
 QString LaneService::dbCreate(const QString &reqJson)

@@ -55,7 +55,7 @@ bool Config::loadConfig()
     m_businessConfig.heartBeatTime = ini.value("business", "heartBeatTime", 600).toInt();
 
     LOG_INFO().noquote() << ini.dumpInfo();
-    LOG_INFO().noquote() << "车道基础配置加载完成";
+    LOG_INFO().noquote() << "系统基础配置加载完成";
 
     // 系统键盘参数加载
     LOG_INFO().noquote() << "加载系统键盘参数 键盘类型" << m_systemConfig.keyboardType;

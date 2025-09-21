@@ -20,7 +20,7 @@ isEqual(TEMPLATE, app) {
     CONFIG += cmdline
     DEFINES += LANESERVICE_STATIC
     # 在线式
-    DEFINES += LANESERVICE_NETWORK
+    DEFINES += LANESERVICE_ONLINE
 
     SOURCES += main.cpp
 } else {

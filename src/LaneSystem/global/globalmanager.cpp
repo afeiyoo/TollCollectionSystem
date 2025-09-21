@@ -86,9 +86,12 @@ void GlobalManager::init()
     LOG_ASSERT_X(m_config->loadConfig(), "系统初始化失败: 系统配置加载异常");
 
     // 后端服务初始化
-    LOG_INFO().noquote() << "服务初始化";
     m_laneService = new LaneService(this);
-    LOG_ASSERT_X(m_laneService->init(), "系统初始化失败：服务加载异常");
+    if (m_config->m_systemConfig.serviceMode == EM_ServiceMode::LOCAL) {
+        // 单机版需要进行车道服务初始化
+        LOG_INFO().noquote() << "服务初始化";
+        LOG_ASSERT_X(m_laneService->init(), "系统初始化失败：服务加载异常");
+    }
 
     // 系统环境参数初始化
     // TODO

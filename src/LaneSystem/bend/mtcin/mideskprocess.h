@@ -27,4 +27,5 @@ public slots:
 private:
     MgsMainWindow *m_mainWindow = nullptr;
     MIBizEnv *m_bizEnv = nullptr;
+    QThread *m_thread = nullptr;
 };
