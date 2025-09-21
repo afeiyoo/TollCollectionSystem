@@ -92,6 +92,13 @@ bool GlobalManager::init()
     if (!m_config->loadConfig())
         return false;
 
+#ifdef LANESERVICE_NETWORK
+    if (m_config->m_serverConfig.mode != EM_ServiceMode::ONLINE) {
+        LOG_ERROR().noquote() << "车道服务类型配置错误";
+        return false;
+    }
+#endif
+
     // json解析对象初始化
     m_jsonSerializer->setIndentMode(QJson::IndentCompact); // 序列化时不保留空格
 
