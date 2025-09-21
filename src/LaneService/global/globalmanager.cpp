@@ -5,6 +5,7 @@
 #include "Logger.h"
 #include "RollingFileAppender.h"
 #include "config/config.h"
+#include "global/constant.h"
 #include "utils/defs.h"
 #include "utils/fileutils.h"
 #include "utils/stdafx.h"
@@ -63,16 +64,16 @@ bool GlobalManager::init()
     FileUtils::makeSureDirExist(logDir);
 #ifdef LANESERVICE_NETWORK
     // 日志初始化
-    ConsoleAppender *consoleAppender = new ConsoleAppender;
-    consoleAppender->setFormat(m_config->m_logConfig.format);
+    ConsoleAppender *consoleAppender = new ConsoleAppender();
+    consoleAppender->setFormat(Constant::Log::FORMAT);
     cuteLogger->registerAppender(consoleAppender);
 
     // 总日志
     FileName serviceLogPath = logDir + QString("/service.log");
     RollingFileAppender *serviceFileAppender = new RollingFileAppender(
         FileUtils::canonicalPath(serviceLogPath).toString());
-    serviceFileAppender->setFormat(m_config->m_logConfig.format);
-    serviceFileAppender->setLogFilesLimit(m_config->m_logConfig.filesLimit);
+    serviceFileAppender->setFormat(Constant::Log::FORMAT);
+    serviceFileAppender->setLogFilesLimit(Constant::Log::MAX_SAVE_DAY);
     serviceFileAppender->setFlushOnWrite(true);
     serviceFileAppender->setDatePattern(RollingFileAppender::DatePattern::DailyRollover);
     cuteLogger->registerAppender(serviceFileAppender);
@@ -81,8 +82,8 @@ bool GlobalManager::init()
     FileName calFeeLogPath = logDir + QString("/fee.log");
     RollingFileAppender *calFeeFileAppender = new RollingFileAppender(
         FileUtils::canonicalPath(calFeeLogPath).toString());
-    calFeeFileAppender->setFormat(m_config->m_logConfig.format);
-    calFeeFileAppender->setLogFilesLimit(m_config->m_logConfig.filesLimit);
+    calFeeFileAppender->setFormat(Constant::Log::FORMAT);
+    calFeeFileAppender->setLogFilesLimit(Constant::Log::MAX_SAVE_DAY);
     calFeeFileAppender->setFlushOnWrite(true);
     calFeeFileAppender->setDatePattern(RollingFileAppender::DatePattern::DailyRollover);
     cuteLogger->registerCategoryAppender("fee", calFeeFileAppender);

@@ -17,5 +17,4 @@ public:
 public:
     ST_DatabaseCfg m_dbConfig;
     ST_RpcServerCfg m_serverConfig;
-    ST_LogCfg m_logConfig;
 };

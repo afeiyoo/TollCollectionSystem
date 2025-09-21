@@ -5,7 +5,7 @@ QT += core network
 QT -= gui
 
 TARGET = LaneService
-TEMPLATE = lib
+TEMPLATE = app
 
 MGS_LANE_GANTRY = $$PWD/MgsLaneGantry
 
@@ -48,6 +48,7 @@ include($$THIRD_PARTY_LIBRARY_PATH/HttpClient/HttpClient.pri)
 
 SOURCES += \
     config/config.cpp \
+    global/constant.cpp \
     global/globalmanager.cpp \
     laneservice.cpp \
 

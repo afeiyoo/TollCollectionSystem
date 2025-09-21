@@ -3,13 +3,12 @@
 namespace Constant {
 
 namespace Log {
-const char FORMAT[] = "[%{time}{yyyy-MM-dd HH:mm:ss.zzz}] [%{type}] [%{threadid}] [%{file}:%{line}] | %{message}\n\n";
-int LIMIT_FILES = 90;
+extern int MAX_SAVE_DAY;
+extern const char FORMAT[];
 } // namespace Log
 
-// 路径常量
 namespace Path {
-const char SERVICE_CONFIG_PATH[] = ":/static/config/Service.ini";
+extern const char SERVICE_CONFIG_PATH[]; // 声明路径常量
 } // namespace Path
 
 } // namespace Constant

@@ -8,10 +8,7 @@ using namespace Utils;
 
 Config::Config(QObject *parent)
     : QObject(parent)
-{
-    m_logConfig.filesLimit = Constant::Log::LIMIT_FILES;
-    m_logConfig.format = Constant::Log::FORMAT;
-}
+{}
 
 Config::~Config() {}
 
