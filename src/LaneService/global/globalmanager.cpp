@@ -97,6 +97,11 @@ bool GlobalManager::init()
         LOG_ERROR().noquote() << "车道服务类型配置错误";
         return false;
     }
+#else
+    if (m_config->m_serverConfig.mode != EM_ServiceMode::LOCAL) {
+        LOG_ERROR().noquote() << "车道服务类型配置错误";
+        return false;
+    }
 #endif
 
     // json解析对象初始化
