@@ -109,7 +109,7 @@ INCLUDEPATH += \
     $$THIRD_PARTY_LIBRARY_PATH/CuteLogger/include \
     $$THIRD_PARTY_LIBRARY_PATH/Jcon \
     $$PWD/../LaneService \
-    $$THIRD_PARTY_LIBRARY_PATH/QSimpleUpdater/include
+    $$THIRD_PARTY_LIBRARY_PATH/QSimpleUpdater/include \
     $$THIRD_PARTY_LIBRARY_PATH/QJson/include
 
 RESOURCES += \
