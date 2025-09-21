@@ -444,7 +444,7 @@ void Updater::setUpdateAvailable(const bool available)
         if (!m_changelog.isEmpty())
             text += tr("<strong>更新内容:</strong><br/>%1").arg(m_changelog);
 
-        QString title = "<h3>" + tr("%2 的新版本 %1 已发布！").arg(latestVersion()).arg(moduleName()) + "</h3>";
+        QString title = "<h2>" + tr("%2 的新版本 %1 已发布！").arg(latestVersion()).arg(moduleName()) + "</h2>";
 
         QMessageBox::StandardButton clickBtn = UiHelper::showMessageBoxInfo(title,
                                                                             text,

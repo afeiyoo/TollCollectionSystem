@@ -221,7 +221,7 @@ void Downloader::installUpdate()
     m_ui->timeLabel->setText(tr("完成后将打开安装程序") + "...");
 
     /* Ask the user to install the download */
-    QString title = "<h3>" + tr("为了安装更新，您可能需要退出应用程序！") + "</h3>";
+    QString title = "<h2>" + tr("为了安装更新，您可能需要退出应用程序！") + "</h2>";
     QString text = tr("是否开始安装更新包？");
     if (m_mandatoryUpdate)
         text = tr("是否开始安装更新包？<br/><br/><strong>本次为强制更新，若取消将无法上班！</strong>");

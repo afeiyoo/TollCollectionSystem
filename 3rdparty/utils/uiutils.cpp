@@ -168,11 +168,11 @@ QMessageBox::StandardButton UiUtils::showMessageBoxInfo(const QString &title,
 {
     QMessageBox box;
     box.setWindowTitle(QObject::tr("提示"));
-    box.setWindowFlags(Qt::Dialog | Qt::WindowTitleHint | Qt::CustomizeWindowHint);
+    box.setWindowFlags(Qt::Dialog | Qt::WindowTitleHint | Qt::WindowSystemMenuHint);
     box.setTextFormat(Qt::RichText);
     box.setIcon(QMessageBox::Information);
 
-    box.setText(QString("<h1>%1</h1>").arg(title));
+    box.setText(QString("<h2>%1</h2>").arg(title));
     box.setInformativeText(QString("<span style='font-size:11pt;'>%1</span>").arg(informativeText));
 
     box.setStandardButtons(buttons);
@@ -211,11 +211,11 @@ QMessageBox::StandardButton UiUtils::showMessageBoxQuestion(const QString &title
 {
     QMessageBox box;
     box.setWindowTitle(QObject::tr("选择"));
-    box.setWindowFlags(Qt::Dialog | Qt::WindowTitleHint | Qt::CustomizeWindowHint);
+    box.setWindowFlags(Qt::Dialog | Qt::WindowTitleHint | Qt::WindowSystemMenuHint);
     box.setTextFormat(Qt::RichText);
     box.setIcon(QMessageBox::Question);
 
-    box.setText(QString("<h1>%1</h1>").arg(title));
+    box.setText(QString("<h2>%1</h2>").arg(title));
     box.setInformativeText(QString("<span style='font-size:11pt;'>%1</span>").arg(informativeText));
 
     box.setStandardButtons(buttons);
@@ -254,11 +254,11 @@ QMessageBox::StandardButton UiUtils::showMessageBoxError(const QString &title,
 {
     QMessageBox box;
     box.setWindowTitle(QObject::tr("错误"));
-    box.setWindowFlags(Qt::Dialog | Qt::WindowTitleHint | Qt::CustomizeWindowHint);
+    box.setWindowFlags(Qt::Dialog | Qt::WindowTitleHint | Qt::WindowSystemMenuHint);
     box.setTextFormat(Qt::RichText);
     box.setIcon(QMessageBox::Critical);
 
-    box.setText(QString("<h1>%1</h1>").arg(title));
+    box.setText(QString("<h2>%1</h2>").arg(title));
     box.setInformativeText(QString("<span style='font-size:11pt;'>%1</span>").arg(informativeText));
 
     box.setStandardButtons(buttons);

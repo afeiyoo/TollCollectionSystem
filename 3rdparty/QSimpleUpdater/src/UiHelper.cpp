@@ -17,7 +17,7 @@ QMessageBox::StandardButton UiHelper::showMessageBoxInfo(const QString &title,
     box.setTextFormat(Qt::RichText);
     box.setIcon(QMessageBox::Information);
     box.setText(title);
-    box.setInformativeText(informativeText);
+    box.setInformativeText(QString("<span style='fon-size:11pt;'>%1</span>").arg(informativeText));
 
     box.setStandardButtons(buttons);
 
@@ -60,7 +60,7 @@ QMessageBox::StandardButton UiHelper::showMessageBoxQuestion(const QString &titl
     box.setTextFormat(Qt::RichText);
     box.setIcon(QMessageBox::Question);
     box.setText(title);
-    box.setInformativeText(informativeText);
+    box.setInformativeText(QString("<span style='fon-size:11pt;'>%1</span>").arg(informativeText));
 
     box.setStandardButtons(buttons);
 
