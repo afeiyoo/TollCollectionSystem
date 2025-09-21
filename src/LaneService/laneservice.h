@@ -21,8 +21,6 @@ public:
     Q_INVOKABLE QString dbDelete(const QString &reqJson);
     Q_INVOKABLE QString dbInsert(const QString &reqJson);
 
-    Q_INVOKABLE QString testFunc(int time, QString threadName);
-
 private:
     QVariantMap genResMapForDBOperate(int status, int recordCount, QString desc, QVariantList records);
 };

@@ -267,15 +267,6 @@ QString LaneService::dbInsert(const QString &reqJson)
     }
 }
 
-QString LaneService::testFunc(int time, QString threadName)
-{
-    // 模拟阻塞操作
-    QThread::sleep(time);
-    QString result = QString("done: %1").arg(threadName);
-
-    return result;
-}
-
 QVariantMap LaneService::genResMapForDBOperate(int status, int recordCount, QString desc, QVariantList records)
 {
     QVariantMap resMap;
