@@ -115,6 +115,8 @@ INCLUDEPATH += \
 RESOURCES += \
     resource.qrc
 
+RC_ICONS += mgskj.ico
+
 copyLibsToDestdir($$qtLibraryTargetName(CuteLogger))
 copyLibsToDestdir($$qtLibraryTargetName(ElaWidgetTools))
 copyLibsToDestdir($$qtLibraryTargetName(LaneService))
