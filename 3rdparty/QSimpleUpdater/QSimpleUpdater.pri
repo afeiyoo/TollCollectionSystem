@@ -28,6 +28,12 @@ QT += widgets
 DEFINES += QSU_INCLUDE_MOC=1
 INCLUDEPATH += $$PWD/include
 
+shared|dll {
+    DEFINES += QSU_SHARED
+}else {
+    DEFINES += QSU_IMPORT
+}
+
 SOURCES += \
     $$PWD/src/UiHelper.cpp \
     $$PWD/src/Updater.cpp \

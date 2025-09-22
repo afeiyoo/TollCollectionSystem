@@ -27,12 +27,16 @@
 #include <QList>
 #include <QObject>
 
-#if defined(QSU_SHARED)
-#   define QSU_DECL Q_DECL_EXPORT
-#elif defined(QSU_IMPORT)
-#   define QSU_DECL Q_DECL_IMPORT
+#if defined(Q_OS_WIN)
+    #if defined(QSU_SHARED)
+        #define QSU_DECL Q_DECL_EXPORT
+    #elif defined(QSU_IMPORT)
+        #define QSU_DECL
+    #else
+        #define QSU_DECL Q_DECL_IMPORT
+    #endif
 #else
-#   define QSU_DECL
+    #define QSU_DECL
 #endif
 
 class Updater;
@@ -108,4 +112,4 @@ private:
    Updater *getUpdater(const QString &url) const;
 };
 
-#endif
+    #endif

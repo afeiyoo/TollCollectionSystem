@@ -34,9 +34,5 @@ win32 {
     DESTDIR = $$MGS_LIBRARY_PATH/linux
 }
 
-shared|dll {
-    DEFINES += QSU_SHARED
-}
-
 include ($$PWD/QSimpleUpdater.pri)
 
