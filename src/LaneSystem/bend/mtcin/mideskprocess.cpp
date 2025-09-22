@@ -27,7 +27,7 @@ MIDeskProcess::MIDeskProcess(MgsMainWindow *mainWindow, QObject *parent)
     connect(GM_INSTANCE->m_signalMan, &SignalManager::sigShiftIn, this, &MIDeskProcess::onShiftIn);
     connect(GM_INSTANCE->m_signalMan, &SignalManager::sigShiftOut, this, &MIDeskProcess::onShiftOut);
 
-    connect(GM_INSTANCE->m_updater, SIGNAL(checkingFinished(QString)), this, SLOT(onUpdateCheckingFinished(QString)));
+    connect(GM_INSTANCE->m_updater, &QSimpleUpdater::checkingFinished, this, &MIDeskProcess::onUpdateCheckingFinished);
 }
 
 MIDeskProcess::~MIDeskProcess() {}
