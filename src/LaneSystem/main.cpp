@@ -12,9 +12,6 @@
 #include <QNetworkReply>
 #include <QObject>
 
-#include "jcon/json_rpc_client.h"
-#include "jcon/json_rpc_tcp_client.h"
-
 int main(int argc, char *argv[])
 {
 #if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))

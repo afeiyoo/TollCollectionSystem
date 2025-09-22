@@ -65,6 +65,8 @@ public:
    bool updateAvailable() const;
    bool downloaderEnabled() const;
    bool useCustomInstallProcedures() const;
+   // 2025-09-22 第三方库修改 网络异常状态获取
+   bool networkErrorOccured() const;
 
 public slots:
    void checkForUpdates();
@@ -82,6 +84,8 @@ public slots:
    void setMandatoryUpdate(const bool mandatory_update);
    void setDownloadUserName(const QString &user_name);
    void setDownloadPassword(const QString &password);
+   // 2025-09-22 第三方库修改 网络异常状态获取
+   void setNetworkErrorOccured(const bool status);
 
 private slots:
    void onReply(QNetworkReply *reply);
@@ -100,6 +104,8 @@ private:
    bool m_updateAvailable;
    bool m_downloaderEnabled;
    bool m_mandatoryUpdate;
+   // 2025-09-22 第三方库修改 网络异常状态获取
+   bool m_networkErrorOccured;
 
    QString m_openUrl;
    QString m_platform;

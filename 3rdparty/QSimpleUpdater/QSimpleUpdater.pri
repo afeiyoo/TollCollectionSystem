@@ -26,13 +26,13 @@ QT += network
 QT += widgets
 
 DEFINES += QSU_INCLUDE_MOC=1
-INCLUDEPATH += $$PWD/include
-
 shared|dll {
     DEFINES += QSU_SHARED
-}else {
+} else {
     DEFINES += QSU_IMPORT
 }
+
+INCLUDEPATH += $$PWD/include
 
 SOURCES += \
     $$PWD/src/UiHelper.cpp \

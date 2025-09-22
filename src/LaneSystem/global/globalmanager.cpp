@@ -1,7 +1,6 @@
 #include "globalmanager.h"
 
 #include "ConsoleAppender.h"
-#include "QSimpleUpdater.h"
 #include "RollingFileAppender.h"
 #include "config/config.h"
 #include "global/constant.h"
@@ -84,6 +83,15 @@ void GlobalManager::init()
 
     // 软件配置加载
     LOG_ASSERT_X(m_config->loadConfig(), "系统初始化失败: 系统配置加载异常");
+
+    // 更新对象初始化
+    FileName downloadDir = FileName::fromString(FileUtils::curApplicationDirPath() + "/download");
+    FileUtils::makeSureDirExist(downloadDir);
+
+    m_updater->setDownloadDir(m_config->m_systemConfig.updateUrl, downloadDir.toString() + "/update");
+    m_updater->setNotifyOnUpdate(m_config->m_systemConfig.updateUrl, true);
+    m_updater->setMandatoryUpdate(m_config->m_systemConfig.updateUrl, true);
+    m_updater->setModuleVersion(m_config->m_systemConfig.updateUrl, "0.1");
 
     // 后端服务初始化
     m_laneService = new LaneService(this);

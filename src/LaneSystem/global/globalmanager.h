@@ -2,11 +2,11 @@
 
 #include "QJson/include/parser.h"
 #include "QJson/include/serializer.h"
+#include "QSimpleUpdater.h"
 #include <QObject>
 
 #define GM_INSTANCE GlobalManager::instance()
 
-class QSimpleUpdater;
 class SignalManager;
 class ModeManager;
 class LaneService;

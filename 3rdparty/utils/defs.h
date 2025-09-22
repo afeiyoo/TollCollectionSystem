@@ -46,6 +46,7 @@ struct ST_SystemCfg
     int servicePort;
     int versionCheckTime;
     int keyboardType;
+    QString updateUrl;
 };
 
 // 车道系统业务配置

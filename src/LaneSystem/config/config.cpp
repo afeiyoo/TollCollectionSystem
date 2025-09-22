@@ -41,6 +41,7 @@ bool Config::loadConfig()
     m_systemConfig.servicePort = ini.value("system", "servicePort", 5927).toInt();
     m_systemConfig.versionCheckTime = ini.value("system", "versionCheckTime", 600).toInt();
     m_systemConfig.keyboardType = ini.value("system", "keyboardType", 0).toInt();
+    m_systemConfig.updateUrl = ini.value("system", "updateUrl", "").toString();
 
     m_businessConfig.laneMode = ini.value("business", "laneMode", 1).toInt();
     m_businessConfig.netID = ini.value("business", "netID", "3501").toString();

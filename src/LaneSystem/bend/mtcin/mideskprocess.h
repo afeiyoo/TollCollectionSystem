@@ -24,6 +24,8 @@ public slots:
     // 下班
     void onShiftOut();
 
+    void onUpdateCheckingFinished(const QString &url);
+
 private:
     MgsMainWindow *m_mainWindow = nullptr;
     MIBizEnv *m_bizEnv = nullptr;
