@@ -10,12 +10,15 @@
 #include "ElaWidgetTools/ElaToolButton.h"
 
 #include "global/constant.h"
+#include "global/globalmanager.h"
+#include "global/signalmanager.h"
 #include "gui/component/mgsdevicepanel.h"
 #include "gui/component/mgsweightinfopanel.h"
 #include "gui/mgsbasepage.h"
 #include "gui/mgsetcpage.h"
 #include "gui/mgsmtcinpage.h"
 #include "gui/mgsmtcoutpage.h"
+#include "utils/datadealutils.h"
 #include "utils/uiutils.h"
 
 using namespace Utils;
@@ -314,20 +317,34 @@ void MgsMainWindow::initEtc()
 
 void MgsMainWindow::showFormErrorHint(const QString &title, const QStringList &strs)
 {
+    QString logInfo = DataDealUtils::curDateTimeStr() + " [ERROR] " + title;
+    emit GM_INSTANCE->m_signalMan->sigLogAppend(logInfo);
     QString message = strs.join("<br/>");
     UiUtils::showMessageBoxError(title, message, QMessageBox::Yes | QMessageBox::Cancel);
 }
 
 void MgsMainWindow::showFormInfoHint(const QString &title, const QStringList &strs)
 {
+    QString logInfo = DataDealUtils::curDateTimeStr() + " [INFO] " + title;
+    emit GM_INSTANCE->m_signalMan->sigLogAppend(logInfo);
     QString message = strs.join("<br/>");
     UiUtils::showMessageBoxInfo(title, message, QMessageBox::Yes | QMessageBox::Cancel);
 }
 
-void MgsMainWindow::showFormWarningHint(const QString &title, const QStringList &strs)
+void MgsMainWindow::showFormQuestionHint(const QString &title, const QStringList &strs)
 {
+    QString logInfo = DataDealUtils::curDateTimeStr() + " [INFO] " + title;
+    emit GM_INSTANCE->m_signalMan->sigLogAppend(logInfo);
     QString message = strs.join("<br/>");
     UiUtils::showMessageBoxQuestion(title, message, QMessageBox::Yes | QMessageBox::Cancel);
+}
+
+void MgsMainWindow::showFormWarningHint(const QString &title, const QStringList &strs)
+{
+    QString logInfo = DataDealUtils::curDateTimeStr() + " [WARN] " + title;
+    emit GM_INSTANCE->m_signalMan->sigLogAppend(logInfo);
+    QString message = strs.join("<br/>");
+    UiUtils::showMessageBoxWarning(title, message, QMessageBox::Yes | QMessageBox::Cancel);
 }
 
 void MgsMainWindow::initUi()

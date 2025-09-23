@@ -20,7 +20,9 @@ public:
     void showFormErrorHint(const QString &title, const QStringList &strs);
     // 提示弹窗提示
     void showFormInfoHint(const QString &title, const QStringList &strs);
-    // 警告弹窗提示
+    // 选择弹窗提示
+    void showFormQuestionHint(const QString &title, const QStringList &strs);
+    // 报警弹窗提示
     void showFormWarningHint(const QString &title, const QStringList &strs);
 
 private:

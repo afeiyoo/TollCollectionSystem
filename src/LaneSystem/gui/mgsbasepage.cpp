@@ -8,6 +8,8 @@
 #include "ElaWidgetTools/ElaToolBar.h"
 #include "ElaWidgetTools/ElaToolButton.h"
 #include "global/constant.h"
+#include "global/globalmanager.h"
+#include "global/signalmanager.h"
 #include "gui/component/mgsdevicepanel.h"
 #include "gui/component/mgsiconbutton.h"
 #include "gui/component/mgspagearea.h"
@@ -36,6 +38,8 @@ MgsBasePage::MgsBasePage(QWidget *parent)
 
     m_mainWidget = new QWidget(this);
     addCentralWidget(m_mainWidget);
+
+    connect(GM_INSTANCE->m_signalMan, &SignalManager::sigLogAppend, this, &MgsBasePage::onLogAppend);
 }
 
 MgsBasePage::~MgsBasePage() {}
@@ -447,10 +451,8 @@ void MgsBasePage::onLogAppend(const QString &log)
     for (int i = 0; i < m_logBuffer.size(); ++i) {
         const QString &line = m_logBuffer[i];
         QColor textColor = Qt::black;
-        if (line.contains("[ERROR]"))
+        if (line.contains("[ERROR]") || line.contains("[WARN]"))
             textColor = Qt::red;
-        else if (line.contains("[WARN]"))
-            textColor = QColor(255, 165, 0); // 橙黄
 
         QTextCursor cursor = m_logBrowser->textCursor();
         cursor.movePosition(QTextCursor::End);
