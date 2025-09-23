@@ -1,10 +1,10 @@
 #include "config.h"
-
 #include "Logger.h"
 #include "global/constant.h"
 #include "global/globalmanager.h"
 #include "utils/fileutils.h"
 #include "utils/iniutils.h"
+#include <QMetaEnum>
 
 using namespace Utils;
 

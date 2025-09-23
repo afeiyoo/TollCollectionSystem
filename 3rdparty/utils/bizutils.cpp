@@ -91,7 +91,18 @@ QString BizUtils::getKeyName(const QVariantMap &keyboard, uint keyCode)
     return keyInfo.value("Name", "").toString();
 }
 
-QString BizUtils::getKeyDesc(const QVariantMap &keyboard, uint keyCode)
+QString BizUtils::getKeyDescByName(const QVariantMap &keyboard, const QString &keyName)
+{
+    if (keyboard.isEmpty())
+        return "";
+    for (auto itor = keyboard.constBegin(); itor != keyboard.constEnd(); itor++) {
+        if (itor->toMap().value("Name") == keyName)
+            return itor->toMap().value("Desc").toString();
+    }
+    return "";
+}
+
+QString BizUtils::getKeyDescByCode(const QVariantMap &keyboard, uint keyCode)
 {
     if (keyboard.isEmpty())
         return "";

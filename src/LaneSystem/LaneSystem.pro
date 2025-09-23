@@ -50,7 +50,7 @@ SOURCES += \
     main.cpp\
     # claneform.cpp \
     # cbizenv.cpp \
-    # bend/mtcout/cmodeskprocess.cpp \
+    bend/mtcout/cmodeskprocess.cpp \
     # bend/mtcout/csptprocess.cpp \
     # bend/etc/cetcprocess.cpp \
  \    # bend/etc/cetcdeskprocess.cpp
@@ -89,7 +89,7 @@ HEADERS += \
     gui/mgsmtcoutpage.h \
     gui/mgsplateeditdialog.h \
     # cbizenv.h \
-    # bend/mtcout/cmodeskprocess.h \
+    bend/mtcout/cmodeskprocess.h \
     # bend/mtcout/csptprocess.h \
     # bend/etc/cetcprocess.h \
     # bend/etc/cetcdeskprocess.h \

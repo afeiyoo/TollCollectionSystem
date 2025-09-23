@@ -13,7 +13,7 @@ public:
     bool loadConfig();
 
 public:
-    ST_BusinessCfg m_businessConfig;
-    ST_SystemCfg m_systemConfig;
+    ConfigDef::ST_BusinessCfg m_businessConfig;
+    ConfigDef::ST_SystemCfg m_systemConfig;
     QVariantMap m_keyboard;
 };

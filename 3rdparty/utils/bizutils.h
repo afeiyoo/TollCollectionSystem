@@ -28,8 +28,11 @@ public:
     // 获取按键对应的车道键盘按键名称
     static QString getKeyName(const QVariantMap &keyboard, uint keyCode);
 
-    // 获取按键对应的车道键盘按键描述
-    static QString getKeyDesc(const QVariantMap &keyboard, uint keyCode);
+    // 获取按键值对应的车道键盘按键描述
+    static QString getKeyDescByCode(const QVariantMap &keyboard, uint keyCode);
+
+    // 获取按键名称对应的车道键盘按键描述
+    static QString getKeyDescByName(const QVariantMap &keyboard, const QString &keyName);
 
     // 获取车道键盘按键对应的按键数值(返回-1表示未获取到对应keyName的key)
     static int getKeyCode(const QVariantMap &keyboard, const QString &keyName);

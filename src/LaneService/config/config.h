@@ -15,6 +15,7 @@ public:
     bool loadConfig();
 
 public:
-    ST_DatabaseCfg m_dbConfig;
-    ST_RpcServerCfg m_serverConfig;
+    ConfigDef::ST_LogCfg m_logConfig;
+    ConfigDef::ST_DatabaseCfg m_dbConfig;
+    ConfigDef::ST_RpcServerCfg m_serverConfig;
 };

@@ -3,13 +3,18 @@
 #include "ElaWidgetTools/ElaPushButton.h"
 #include "ElaWidgetTools/ElaTableView.h"
 #include "ElaWidgetTools/ElaText.h"
+#include "Logger.h"
+#include "config/config.h"
 #include "global/constant.h"
+#include "global/globalmanager.h"
+#include "global/signalmanager.h"
 #include "gui/component/mgsmenu.h"
 #include "gui/component/mgspagearea.h"
 #include "gui/component/mgsrecenttradepanel.h"
 #include "gui/component/mgsscrolltext.h"
 #include "gui/mgsauthdialog.h"
 #include "gui/mgsplateeditdialog.h"
+#include "utils/bizutils.h"
 #include "utils/uiutils.h"
 
 #include <QApplication>
@@ -18,8 +23,7 @@
 #include <QKeyEvent>
 #include <QVBoxLayout>
 
-#include "global/globalmanager.h"
-#include "global/signalmanager.h"
+using namespace Utils;
 
 MgsMtcOutPage::MgsMtcOutPage(QWidget *parent)
     : MgsBasePage(parent)
@@ -347,27 +351,27 @@ void MgsMtcOutPage::setTradeHint(const QString &tradeHint, const QString &color 
 void MgsMtcOutPage::keyPressEvent(QKeyEvent *event)
 {
     int key = event->key();
-    qDebug() << "KeyName:" << QKeySequence(key).toString();
-
-    if (key == Qt::Key_S) {
-        event->accept();
-    } else if (key == Qt::Key_I) {
-        m_authDialog->show();
-        event->accept();
-    } else if (key == Qt::Key_Right) {
-        MgsPlateEditDialog *dlg = new MgsPlateEditDialog();
-        dlg->setAttribute(Qt::WA_DeleteOnClose);
-        dlg->setPlate(m_plate->text());
-        dlg->show();
-        event->accept();
-    } else if (key == Qt::Key_W) {
-        menu->show();
-        menu->setFocus();
-        event->accept();
-    } else {
-        qDebug() << "无效按键";
-        MgsBasePage::keyPressEvent(event); // 默认处理其他键
-    }
+    LOG_INFO().noquote() << "接收到按键:" << key << "，"
+                         << BizUtils::getKeyName(GM_INSTANCE->m_config->m_keyboard, key);
+    // if (key == Qt::Key_S) {
+    //     event->accept();
+    // } else if (key == Qt::Key_I) {
+    //     m_authDialog->show();
+    //     event->accept();
+    // } else if (key == Qt::Key_Right) {
+    //     MgsPlateEditDialog *dlg = new MgsPlateEditDialog();
+    //     dlg->setAttribute(Qt::WA_DeleteOnClose);
+    //     dlg->setPlate(m_plate->text());
+    //     dlg->show();
+    //     event->accept();
+    // } else if (key == Qt::Key_W) {
+    //     menu->show();
+    //     menu->setFocus();
+    //     event->accept();
+    // } else {
+    //     qDebug() << "无效按键";
+    //     MgsBasePage::keyPressEvent(event); // 默认处理其他键
+    // }
 }
 
 MgsPageArea *MgsMtcOutPage::initTradeInfoArea()

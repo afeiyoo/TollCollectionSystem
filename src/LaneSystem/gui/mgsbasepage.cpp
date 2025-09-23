@@ -7,6 +7,7 @@
 #include "ElaWidgetTools/ElaText.h"
 #include "ElaWidgetTools/ElaToolBar.h"
 #include "ElaWidgetTools/ElaToolButton.h"
+#include "Logger.h"
 #include "global/constant.h"
 #include "global/globalmanager.h"
 #include "global/signalmanager.h"
@@ -17,6 +18,8 @@
 #include "gui/component/mgsscrolltext.h"
 #include "gui/component/mgsweightinfopanel.h"
 #include "gui/mgsplateeditdialog.h"
+#include "utils/fileutils.h"
+#include "utils/uiutils.h"
 
 #include <QDebug>
 #include <QFrame>
@@ -329,6 +332,17 @@ MgsDevicePanel *MgsBasePage::initDeviceIconArea()
     deviceIconPanel->setMaximumHeight(90);
 
     return deviceIconPanel;
+}
+
+void MgsBasePage::screenShot()
+{
+    LOG_INFO().noquote() << "开始截图";
+    Utils::FileName saveDir = Utils::FileName::fromString(qApp->applicationDirPath() + "/captures");
+    QString error;
+    bool ok = Utils::UiUtils::screenShot(saveDir, &error);
+    if (!ok) {
+        LOG_ERROR().noquote() << error;
+    }
 }
 
 void MgsBasePage::initUi()

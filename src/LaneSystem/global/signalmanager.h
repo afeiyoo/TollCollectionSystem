@@ -24,6 +24,9 @@ signals:
     void sigCloseLane();
     // 开道
     void sigOpenLane();
-    // 界面日志区刷新
+
+	//按键
+    void sigKeyPress(uint key);
+	// 界面日志区刷新
     void sigLogAppend(const QString& log);
 };

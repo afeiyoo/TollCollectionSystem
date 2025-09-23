@@ -7,6 +7,8 @@
 #include "global/globalmanager.h"
 #include "gui/mgsmainwindow.h"
 
+#include "bizutils.h".h "
+
 #include <QFile>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>

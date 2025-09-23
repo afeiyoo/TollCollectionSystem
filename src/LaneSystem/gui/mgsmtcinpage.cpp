@@ -325,15 +325,10 @@ void MgsMtcInPage::keyPressEvent(QKeyEvent *event)
 {
     int key = event->key();
     LOG_INFO().noquote() << "按键: " << BizUtils::getKeyName(GM_INSTANCE->m_config->m_keyboard, key)
-                         << QString("【%1】").arg(BizUtils::getKeyDesc(GM_INSTANCE->m_config->m_keyboard, key));
+                         << QString("【%1】").arg(BizUtils::getKeyDescByCode(GM_INSTANCE->m_config->m_keyboard, key));
 
     if (key == Qt::Key_S) {
-        Utils::FileName saveDir = Utils::FileName::fromString(qApp->applicationDirPath() + "/captures");
-        QString error;
-        bool ok = Utils::UiUtils::screenShot(saveDir, &error);
-        if (!ok) {
-            qDebug() << error;
-        }
+        this->screenShot();
         event->accept();
     } else if (key == Qt::Key_W) {
         GM_INSTANCE->m_modeMan->showMenu();
