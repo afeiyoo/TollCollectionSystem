@@ -28,10 +28,11 @@ SOURCES += \
     global/globalmanager.cpp \
     global/modemanager.cpp \
     global/signalmanager.cpp \
-    gui/component/mgscontentdialog.cpp \
+    gui/component/mgsbasedialog.cpp \
     gui/component/mgsdevicepanel.cpp \
     gui/component/mgsiconbutton.cpp \
     gui/component/mgsmenu.cpp \
+    gui/component/mgsoptionsdialog.cpp \
     gui/component/mgspagearea.cpp \
     gui/component/mgsplateedit.cpp \
     gui/component/mgsrecenttradepanel.cpp \
@@ -69,10 +70,11 @@ HEADERS += \
     global/globalmanager.h \
     global/modemanager.h \
     global/signalmanager.h \
-    gui/component/mgscontentdialog.h \
+    gui/component/mgsbasedialog.h \
     gui/component/mgsdevicepanel.h \
     gui/component/mgsiconbutton.h \
     gui/component/mgsmenu.h \
+    gui/component/mgsoptionsdialog.h \
     gui/component/mgspagearea.h \
     gui/component/mgsplateedit.h \
     gui/component/mgsrecenttradepanel.h \

@@ -5,9 +5,8 @@
 #include "bend/mtcin/mideskprocess.h"
 #include "config/config.h"
 #include "global/globalmanager.h"
+#include "gui/component/mgsoptionsdialog.h"
 #include "gui/mgsmainwindow.h"
-
-#include "bizutils.h".h "
 
 #include <QFile>
 #include <QNetworkAccessManager>

@@ -172,8 +172,8 @@ QMessageBox::StandardButton UiUtils::showMessageBoxInfo(const QString &title,
     box.setTextFormat(Qt::RichText);
     box.setIcon(QMessageBox::Information);
 
-    box.setText(QString("<h2>%1</h2>").arg(title));
-    box.setInformativeText(QString("<span style='font-size:11pt;'>%1</span>").arg(informativeText));
+    box.setText(QString("<span style='font-size:25px; font-weight:bold;'>%1</span>").arg(title));
+    box.setInformativeText(QString("<span style='font-size:17px;'>%1</span>").arg(informativeText));
 
     box.setStandardButtons(buttons);
 
@@ -215,8 +215,8 @@ QMessageBox::StandardButton UiUtils::showMessageBoxQuestion(const QString &title
     box.setTextFormat(Qt::RichText);
     box.setIcon(QMessageBox::Question);
 
-    box.setText(QString("<h2>%1</h2>").arg(title));
-    box.setInformativeText(QString("<span style='font-size:11pt;'>%1</span>").arg(informativeText));
+    box.setText(QString("<span style='font-size:25px; font-weight:bold;'>%1</span>").arg(title));
+    box.setInformativeText(QString("<span style='font-size:17px;'>%1</span>").arg(informativeText));
 
     box.setStandardButtons(buttons);
 
@@ -258,8 +258,8 @@ QMessageBox::StandardButton UiUtils::showMessageBoxWarning(const QString &title,
     box.setTextFormat(Qt::RichText);
     box.setIcon(QMessageBox::Warning);
 
-    box.setText(QString("<h2>%1</h2>").arg(title));
-    box.setInformativeText(QString("<span style='font-size:11pt;'>%1</span>").arg(informativeText));
+    box.setText(QString("<span style='font-size:25px; font-weight:bold;'>%1</span>").arg(title));
+    box.setInformativeText(QString("<span style='font-size:17px;'>%1</span>").arg(informativeText));
 
     box.setStandardButtons(buttons);
 
@@ -301,8 +301,8 @@ QMessageBox::StandardButton UiUtils::showMessageBoxError(const QString &title,
     box.setTextFormat(Qt::RichText);
     box.setIcon(QMessageBox::Critical);
 
-    box.setText(QString("<h2>%1</h2>").arg(title));
-    box.setInformativeText(QString("<span style='font-size:11pt;'>%1</span>").arg(informativeText));
+    box.setText(QString("<span style='font-size:25px; font-weight:bold;'>%1</span>").arg(title));
+    box.setInformativeText(QString("<span style='font-size:17px;'>%1</span>").arg(informativeText));
 
     box.setStandardButtons(buttons);
 

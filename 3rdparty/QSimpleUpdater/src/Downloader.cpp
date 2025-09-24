@@ -235,7 +235,7 @@ void Downloader::installUpdate()
     // 2025-09-21 第三方库修改 弹窗提示前关闭下载对话框
 
     /* Ask the user to install the download */
-    QString title = "<h2>" + tr("为了安装更新，您可能需要退出应用程序！") + "</h2>";
+    QString title = tr("为了安装更新，您可能需要退出应用程序！");
     QString text = tr("是否开始安装更新包？");
     if (m_mandatoryUpdate)
         text = tr("是否开始安装更新包？<br/><br/><strong>本次为强制更新，若取消将无法上班！</strong>");
@@ -474,7 +474,7 @@ void Downloader::keyPressEvent(QKeyEvent *event)
         // 取消下载
         cancelDownload();
         event->accept();
-    }else{
+    } else {
         QWidget::keyPressEvent(event);
     }
 }

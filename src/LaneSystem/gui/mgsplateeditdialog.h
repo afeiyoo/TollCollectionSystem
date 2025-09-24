@@ -9,7 +9,7 @@ class ElaListView;
 class MgsColorDelegate;
 class MgsColorModel;
 class MgsPlateEdit;
-class MgsContentDialog;
+class MgsBaseDialog;
 class MgsKeyDelegate;
 class MgsPlateEditDialog : public QWidget
 {
@@ -34,7 +34,7 @@ private:
     MgsPlateEdit *m_plateEdit = nullptr;
     ElaText *m_plateEditIcon = nullptr;
     // 确认对话框
-    MgsContentDialog *m_contentDialog = nullptr;
+    MgsBaseDialog *m_contentDialog = nullptr;
     // 车牌颜色选择模型视图
     ElaListView *m_tab0 = nullptr;
     QStringListModel *m_model0 = nullptr;

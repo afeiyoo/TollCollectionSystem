@@ -460,7 +460,7 @@ void Updater::setUpdateAvailable(const bool available)
         if (!m_changelog.isEmpty())
             text += tr("<strong>更新内容:</strong><br/>%1").arg(m_changelog);
 
-        QString title = "<h2>" + tr("%2 的新版本 %1 已发布！").arg(latestVersion()).arg(moduleName()) + "</h2>";
+        QString title = tr("%2 的新版本 %1 已发布！").arg(latestVersion()).arg(moduleName());
 
         QMessageBox::StandardButton clickBtn = UiHelper::showMessageBoxInfo(title,
                                                                             text,
@@ -491,7 +491,7 @@ void Updater::setUpdateAvailable(const bool available)
     }
 
     else if (notifyOnFinish()) {
-        QString title = "<h2>" + tr("恭喜！你正在使用的 %1 为最新版本").arg(moduleName()) + "</h2>";
+        QString title = tr("恭喜！你正在使用的 %1 为最新版本").arg(moduleName());
         UiHelper::showMessageBoxInfo(title, "当前无可用更新。", QMessageBox::Close);
     }
 }
