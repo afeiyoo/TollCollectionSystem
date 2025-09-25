@@ -281,6 +281,29 @@ QString DataService::getStationName(const QString &nodeId)
     }
 }
 
+QString DataService::getLaneIP(const QString &stationId, int laneId)
+{
+    QSqlDatabase sdb = GM_INSTANCE->m_dbFactory->getDatabase("oracle");
+    QString sql(R"(SELECT ipaddr FROM t_lane WHERE stationid = ? AND laneid = ? AND ipaddr NOT IN ('0000', '0.0.0.0'))");
+
+    EasyQtSql::Transaction t(sdb);
+    try {
+        EasyQtSql::PreparedQuery query = t.prepare(sql);
+        EasyQtSql::QueryResult res = query.exec(stationId, laneId);
+
+        LOG_INFO().noquote() << "执行SQL语句: " << Utils::DataDealUtils::fullExecutedQuery(res.unwrappedQuery());
+
+        if (!res.next())
+            return "";
+
+        QString data = res.value("ipaddr").toString();
+        return data;
+    } catch (EasyQtSql::DBException &e) {
+        LOG_ERROR().noquote() << e.lastError.text() << '\t' << e.lastQuery;
+        return "";
+    }
+}
+
 QString DataService::getGrayCardRemark(const QString &cardId)
 {
     QSqlDatabase sdb = GM_INSTANCE->m_dbFactory->getDatabase("oracle");

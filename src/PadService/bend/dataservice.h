@@ -42,6 +42,9 @@ public:
     // 获取收费站名称
     QString getStationName(const QString &nodeId);
 
+    // 获取车道IP
+    QString getLaneIP(const QString &stationId, int laneId);
+
     // 获取灰名单卡信息
     QString getGrayCardRemark(const QString &cardId);
 

@@ -55,6 +55,9 @@ private:
     // 本地图片获取
     QString getLocalImage(const QString &picName);
 
+    // 3.3.23 设备控制
+    QString doDealCmd23(const QVariantMap &aMap);
+
     // 3.3.24 车牌识别
     QString doDealCmd24(const QByteArray &reqBody);
 
