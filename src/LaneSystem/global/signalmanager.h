@@ -25,8 +25,11 @@ signals:
     // 开道
     void sigOpenLane();
 
-	//按键
+    //按键
     void sigKeyPress(uint key);
-	// 界面日志区刷新
-    void sigLogAppend(const QString& log);
+    // 界面日志区刷新
+    void sigLogAppend(const QString &log);
+
+    // 选项对话框请求
+    void sigOptionSelected(int dlgID, uint option);
 };

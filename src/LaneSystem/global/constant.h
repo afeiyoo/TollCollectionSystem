@@ -38,9 +38,25 @@ const char ALICE_BULE_COLOR[] = "#F0F8FF"; // 光标选中背景色
 const char NAVY_BLUE_COLOR[] = "#3399ff";
 } // namespace Color
 
+// 字体大小
+namespace FontSize {
+const char LARGE_TITLE_SIZE = 30;
+const char TITLE_SIZE = 25;
+const char SUBTITLE_SIZE = 20;
+const char BODY_SIZE = 17;
+const char CONTROL_SIZE = 15;
+const char CAPTION_SIZE = 12;
+} // namespace FontSize
+
 // 特殊字符
 namespace Character {
 const char EMPTY_CHARACTER[] = "*";
 } // namespace Character
+
+// 交互对话框ID
+namespace DialogID {
+const int INVALID_DLG = 0x0000;
+const int TEST_DLG = 0x0001;
+} // namespace DialogID
 
 } // namespace Constant

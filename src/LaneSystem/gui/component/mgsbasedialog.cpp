@@ -17,8 +17,6 @@ MgsBaseDialog::MgsBaseDialog(QWidget *parent)
     setWindowFlags(Qt::Window | Qt::WindowTitleHint);
 
     initUi();
-
-    UiUtils::moveToCenter(this);
 }
 
 MgsBaseDialog::~MgsBaseDialog() {}

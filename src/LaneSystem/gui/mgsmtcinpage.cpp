@@ -9,6 +9,7 @@
 #include "global/modemanager.h"
 #include "global/signalmanager.h"
 #include "gui/component/mgsdevicepanel.h"
+#include "gui/component/mgsoptionsdialog.h"
 #include "gui/component/mgspagearea.h"
 #include "gui/component/mgsrecenttradepanel.h"
 #include "gui/component/mgsscrolltext.h"
@@ -33,6 +34,9 @@ MgsMtcInPage::MgsMtcInPage(QWidget *parent)
 {
     m_authDialog = new MgsAuthDialog(this);
     m_authDialog->hide();
+
+    m_optionsDialog = new MgsOptionsDialog(this);
+    m_optionsDialog->hide();
 }
 
 MgsMtcInPage::~MgsMtcInPage() {}
@@ -334,6 +338,8 @@ void MgsMtcInPage::keyPressEvent(QKeyEvent *event)
         GM_INSTANCE->m_modeMan->showMenu();
         event->accept();
     } else if (key == Qt::Key_Y) {
+        m_optionsDialog->setOptions(Constant::DialogID::TEST_DLG, "测试窗口", {"0. 功能1", "1. 功能2", "2. 功能3"});
+        m_optionsDialog->exec();
         event->accept();
     } else if (key == Qt::Key_J) {
         static bool isLow = false;

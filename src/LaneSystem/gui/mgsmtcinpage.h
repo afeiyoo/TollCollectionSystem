@@ -7,6 +7,7 @@ class MgsMenu;
 class MgsAuthDialog;
 class MgsPageArea;
 class MgsWeightInfoPanel;
+class MgsOptionsDialog;
 class ElaText;
 class MgsMtcInPage : public MgsBasePage
 {
@@ -104,4 +105,5 @@ private:
     ElaText *m_obuHint = nullptr;
     // 子窗口
     MgsAuthDialog *m_authDialog = nullptr;
+    MgsOptionsDialog *m_optionsDialog = nullptr;
 };
