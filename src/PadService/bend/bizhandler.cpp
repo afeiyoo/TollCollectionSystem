@@ -975,6 +975,58 @@ QString BizHandler::getLocalImage(const QString &picName)
     return result;
 }
 
+QString BizHandler::doDealCmd23(const QVariantMap &aMap)
+{
+    int operateType = 0;
+    QString operateData;
+    QString stationID;
+    int laneID = 0;
+    QString deviceNumber;
+
+    if (aMap.contains("operateType"))
+        operateType = aMap["operateType"].toInt();
+    if (aMap.contains("operateData"))
+        operateData = aMap["operateData"].toString();
+    if (aMap.contains("stationdID"))
+        stationID = aMap["stationID"].toString();
+    if (aMap.contains("laneID"))
+        laneID = aMap["laneID"].toInt();
+    if (aMap.contains("deviceNumber"))
+        deviceNumber = aMap["deviceNum"].toString();
+
+    if (operateType != 1 && operateType != 2)
+        throw BaseException(1, "响应失败: 操作类型异常");
+    if (operateData.isEmpty())
+        throw BaseException(1, "响应失败: 操作数据为空");
+    if (stationID.isEmpty())
+        throw BaseException(1, "响应失败: 站代码为空");
+    if (laneID == 0)
+        throw BaseException(1, "响应失败：车道号为空");
+    if (deviceNumber.isEmpty())
+        throw BaseException(1, "响应失败: 设备编号为空");
+
+    QString reqBody = GM_INSTANCE->m_jsonSerializer->serialize(aMap);
+    LOG_INFO().noquote() << "车道设备控制请求: " << reqBody;
+
+    QString laneIP = m_ds.getLaneIP(stationID, laneID);
+    QString devCtrlurl = QString("http://%1:13592/devCtrl").arg(laneIP);
+    QUrl url(devCtrlurl);
+    auto reply = Http().instance().post(url, reqBody.toUtf8(), "application/json");
+    QString result = blockUtilResponse(reply, Http().instance().getReadTimeout());
+
+    bool ok = false;
+    QVariantMap resMap = GM_INSTANCE->m_jsonParser->parse(result.toUtf8(), &ok).toMap();
+    if (!ok)
+        throw BaseException(1, "响应失败: 解析车道设备控制返回内容异常");
+
+    int status = resMap["status"].toInt();
+    if (status != 0) {
+        resMap["status"] = 1;
+    }
+    QString dealtData = GM_INSTANCE->m_jsonSerializer->serialize(resMap);
+    return dealtData;
+}
+
 QString BizHandler::doDealCmd24(const QByteArray &reqBody)
 {
     LOG_INFO().noquote() << "车牌识别获取请求: " << QString::fromUtf8(reqBody.left(1024));
@@ -1017,8 +1069,8 @@ QString BizHandler::doDealCmd25(const QVariantMap &aMap)
     LOG_INFO().noquote() << "返回状态名单信息查询结果: " << result;
 
     QVariantMap resMap = GM_INSTANCE->m_jsonParser->parse(result.toUtf8()).toMap();
-    int subCode = resMap["subCode"].toInt();    // 返回码
-    QString info = resMap["info"].toString();   // 信息
+    int subCode = resMap["subCode"].toInt();  // 返回码
+    QString info = resMap["info"].toString(); // 信息
 
     resMap["status"] = subCode == 200 ? 0 : 1;
     resMap["desc"] = info;
@@ -1051,7 +1103,7 @@ QString BizHandler::doDealCmd26(const QVariantMap &aMap)
     if (shiftId == 0)
         throw BaseException(1, "响应失败: 班次号为空");
     if (laneId == 0)
-        throw BaseException(1, "响应失败： 车道号为空");
+        throw BaseException(1, "响应失败：车道号为空");
     if (userId.isEmpty())
         throw BaseException(1, "响应失败: 员工号为空");
 
