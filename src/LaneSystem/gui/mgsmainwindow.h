@@ -29,8 +29,6 @@ private:
     void initUi();
 
 private:
-    // 状态栏
-    ElaStatusBar *m_statusBar = nullptr;
     // 主页面
     MgsBasePage *m_mainPage = nullptr;
 };

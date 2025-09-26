@@ -18,6 +18,7 @@
 #include "gui/component/mgsscrolltext.h"
 #include "gui/component/mgsweightinfopanel.h"
 #include "gui/mgsplateeditdialog.h"
+#include "utils/datadealutils.h"
 #include "utils/fileutils.h"
 #include "utils/uiutils.h"
 
@@ -26,20 +27,24 @@
 #include <QHBoxLayout>
 #include <QTimer>
 
+using namespace Utils;
+
 MgsBasePage::MgsBasePage(QWidget *parent)
     : QWidget(parent)
 {
-    setFocus(); // 设置焦点
-
     createTopWidget();
+    createBottomWidget();
 
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
-    mainLayout->setContentsMargins(0, 0, 0, 0);
+    mainLayout->setContentsMargins(0, 0, 0, 2);
     mainLayout->setSpacing(0);
     mainLayout->addWidget(m_topWidget);
     mainLayout->addStretch();
+    mainLayout->addWidget(m_bottomWidget);
 
     m_mainWidget = new QWidget(this);
+    m_mainWidget->setObjectName("mainWidget");
+    m_mainWidget->setStyleSheet(QString("#mainWidget { background-color: %1; }").arg(Constant::Color::ICE_BLUE_COLOR));
     addCentralWidget(m_mainWidget);
 
     connect(GM_INSTANCE->m_signalMan, &SignalManager::sigLogAppend, this, &MgsBasePage::onLogAppend);
@@ -50,13 +55,14 @@ MgsBasePage::~MgsBasePage() {}
 void MgsBasePage::createTopWidget()
 {
     m_topWidget = new QWidget(this);
-    m_topWidget->setFixedHeight(50);
-    m_topWidget->setStyleSheet(QString("background-color: %1;").arg(Constant::Color::GRAY_COLOR));
-    m_topWidget->setAttribute(Qt::WA_TransparentForMouseEvents, true);
+    m_topWidget->setObjectName("topWidget");
+    m_topWidget->setFixedHeight(40);
+    m_topWidget->setStyleSheet(QString("#m_topWidget { background-color: %1; }").arg(Constant::Color::WHITE_COLOR));
+    UiUtils::disableMouseEvents(m_topWidget);
 
     // 图标
     ElaImageCard *pixmap = new ElaImageCard(m_topWidget);
-    pixmap->setFixedSize(170, 50);
+    pixmap->setFixedSize(140, 40);
     pixmap->setIsPreserveAspectCrop(false);
     pixmap->setCardImage(QImage(Constant::Path::APP_BANNER));
 
@@ -64,7 +70,7 @@ void MgsBasePage::createTopWidget()
     ElaToolBar *infoBar = new ElaToolBar(m_topWidget);
     infoBar->setToolButtonStyle(Qt::ToolButtonIconOnly);
     infoBar->setToolBarSpacing(10);
-    infoBar->setFixedHeight(50);
+    infoBar->setFixedHeight(40);
 
     m_stationInfo = new ElaToolButton(m_topWidget);
     m_userInfo = new ElaToolButton(m_topWidget);
@@ -75,19 +81,20 @@ void MgsBasePage::createTopWidget()
         toolButton->setToolButtonStyle(Qt::ToolButtonTextOnly);
         infoBar->addWidget(toolButton);
         QFont font = toolButton->font();
-        font.setPixelSize(20);
-        font.setBold(true);
+        font.setWeight(QFont::DemiBold);
+        font.setPixelSize(17);
         toolButton->setFont(font);
     }
 
     // 车道模式标签
     m_modeText = new ElaPushButton(m_topWidget);
-    m_modeText->setBorderRadius(15);
-    m_modeText->setFixedHeight(45);
+    m_modeText->setBorderRadius(8);
+    m_modeText->setMinimumWidth(100);
+    m_modeText->setFixedHeight(32);
     m_modeText->setLightDefaultColor(QColor(Constant::Color::BLUE_COLOR));
     m_modeText->setLightTextColor(QColor(Constant::Color::WHITE_COLOR));
     QFont font = m_modeText->font();
-    font.setPixelSize(20);
+    font.setPixelSize(17);
     font.setBold(true);
     m_modeText->setFont(font);
 
@@ -109,14 +116,148 @@ void MgsBasePage::addCentralWidget(QWidget *w)
     layout->insertWidget(layout->indexOf(m_topWidget) + 1, w, 1);
 }
 
-ElaImageCard *MgsBasePage::initCapImageArea()
+void MgsBasePage::createBottomWidget()
 {
-    ElaImageCard *capImage = new ElaImageCard();
-    capImage->setIsPreserveAspectCrop(false);
-    capImage->setCardImage(QImage(Constant::Path::CAP_AREA_BACKGROUND));
-    capImage->setMinimumHeight(290);
+    // 状态区
+    QWidget *statusWidget = new QWidget(this);
+    statusWidget->setFixedHeight(20);
 
-    return capImage;
+    ElaText *supportInfo = new ElaText(statusWidget);
+    supportInfo->setText("技术支持: 福建省高速公路信息科技有限公司");
+
+    ElaText *clock = new ElaText(statusWidget);
+    clock->setText(DataDealUtils::curDateTimeStr());
+    QTimer *timer = new QTimer(clock);
+    connect(timer, &QTimer::timeout, clock, [clock]() { clock->setText(DataDealUtils::curDateTimeStr()); });
+    timer->start(1000); // 每秒刷新
+
+    QList<ElaText *> statusTexts = {supportInfo, clock};
+    for (auto *t : statusTexts) {
+        t->setIsWrapAnywhere(false);
+        QFont font = t->font();
+        font.setPixelSize(13);
+        font.setWeight(QFont::Normal);
+        t->setFont(font);
+    }
+
+    QHBoxLayout *statusLayout = new QHBoxLayout(statusWidget);
+    statusLayout->setAlignment(Qt::AlignCenter);
+    statusLayout->setContentsMargins(0, 0, 0, 0);
+    statusLayout->setSpacing(70);
+    statusLayout->addWidget(supportInfo);
+    statusLayout->addWidget(clock);
+
+    // 版本信息区
+    QWidget *versionWidget = new QWidget(this);
+    versionWidget->setFixedHeight(25);
+
+    ElaText *virtualGantryLabel = new ElaText("承载门架:", versionWidget);
+    ElaText *appVerLabel = new ElaText("系统版本:", versionWidget);
+    ElaText *feeRateVerLabel = new ElaText("费率版本:", versionWidget);
+    ElaText *blackVerLabel = new ElaText("状态名单版本:", versionWidget);
+    m_virtualGantryInfo = new ElaText(versionWidget);
+    m_appVer = new ElaText(versionWidget);
+    m_feeRateVer = new ElaText(versionWidget);
+    m_fullBlackVer = new ElaText(versionWidget);
+    m_partBlackVer = new ElaText(versionWidget);
+
+    QList<ElaText *> verTexts = {virtualGantryLabel,
+                                 appVerLabel,
+                                 feeRateVerLabel,
+                                 blackVerLabel,
+                                 m_fullBlackVer,
+                                 m_partBlackVer,
+                                 m_appVer,
+                                 m_feeRateVer,
+                                 m_virtualGantryInfo};
+    for (auto *t : verTexts) {
+        t->setStyleSheet(QString("color: %1").arg(Constant::Color::BLUE_COLOR));
+        t->setIsWrapAnywhere(false);
+        QFont font = t->font();
+        font.setPixelSize(14);
+        font.setWeight(QFont::Normal);
+        t->setFont(font);
+    }
+
+    QHBoxLayout *versionLayout = new QHBoxLayout(versionWidget);
+    versionLayout->setAlignment(Qt::AlignCenter);
+    versionLayout->setContentsMargins(0, 0, 0, 0);
+    versionLayout->setSpacing(5);
+    versionLayout->addWidget(virtualGantryLabel);
+    versionLayout->addWidget(m_virtualGantryInfo);
+    versionLayout->addSpacing(40);
+    versionLayout->addWidget(appVerLabel);
+    versionLayout->addWidget(m_appVer);
+    versionLayout->addSpacing(30);
+    versionLayout->addWidget(feeRateVerLabel);
+    versionLayout->addWidget(m_feeRateVer);
+    versionLayout->addSpacing(30);
+    versionLayout->addWidget(blackVerLabel);
+    versionLayout->addWidget(m_fullBlackVer);
+    versionLayout->addSpacing(15);
+    versionLayout->addWidget(m_partBlackVer);
+
+    m_bottomWidget = new QWidget(this);
+    QVBoxLayout *bottomLayout = new QVBoxLayout(m_bottomWidget);
+    bottomLayout->setContentsMargins(0, 0, 0, 0);
+    bottomLayout->setSpacing(0);
+    bottomLayout->addWidget(versionWidget);
+    bottomLayout->addWidget(statusWidget);
+}
+
+MgsPageArea *MgsBasePage::initDisplayArea()
+{
+    MgsPageArea *displayArea = new MgsPageArea();
+    displayArea->setBorderRadius(0);
+
+    m_capImage = new ElaImageCard(displayArea);
+    m_capImage->setBorderRadius(0);
+    m_capImage->setIsPreserveAspectCrop(false);
+    m_capImage->setCardImage(QImage(Constant::Path::CAP_AREA_BACKGROUND));
+    m_capImage->setMinimumHeight(300);
+
+    QWidget *vehModeAndInfoBoardArea = new QWidget(displayArea);
+    vehModeAndInfoBoardArea->setStyleSheet(QString("background-color: %1").arg("#e2ecf6"));
+    vehModeAndInfoBoardArea->setMinimumHeight(45);
+    vehModeAndInfoBoardArea->setMaximumHeight(55);
+
+    m_infoBoard = new ElaText(vehModeAndInfoBoardArea);
+    m_infoBoard->setStyleSheet(QString("color: %1;").arg(Constant::Color::RED_COLOR));
+    m_infoBoard->setMinimumWidth(100);
+    m_vehMode = new ElaText(vehModeAndInfoBoardArea);
+    m_vehMode->setStyleSheet(QString("color: %1;").arg(Constant::Color::BLUE_COLOR));
+    m_vehMode->setMinimumWidth(100);
+    ElaText *splitter = new ElaText("|", vehModeAndInfoBoardArea);
+    splitter->setStyleSheet(QString("color: %1;").arg(Constant::Color::GRAY_COLOR));
+
+    QList<ElaText *> texts = {m_infoBoard, m_vehMode, splitter};
+    for (auto *t : texts) {
+        t->setAlignment(Qt::AlignCenter);
+        t->setIsWrapAnywhere(false);
+        t->setTextPixelSize(23);
+        QFont font = t->font();
+        font.setBold(true);
+        t->setFont(font);
+    }
+
+    QHBoxLayout *vehModeAndInfoBoardAreaLayout = new QHBoxLayout(vehModeAndInfoBoardArea);
+    vehModeAndInfoBoardAreaLayout->setContentsMargins(0, 0, 0, 0);
+    vehModeAndInfoBoardAreaLayout->setSpacing(0);
+    vehModeAndInfoBoardAreaLayout->addStretch(0);
+    vehModeAndInfoBoardAreaLayout->addWidget(m_infoBoard);
+    vehModeAndInfoBoardAreaLayout->addStretch(0);
+    vehModeAndInfoBoardAreaLayout->addWidget(splitter);
+    vehModeAndInfoBoardAreaLayout->addStretch(0);
+    vehModeAndInfoBoardAreaLayout->addWidget(m_vehMode);
+    vehModeAndInfoBoardAreaLayout->addStretch(0);
+
+    QVBoxLayout *displayAreaLayout = new QVBoxLayout(displayArea);
+    displayAreaLayout->setContentsMargins(0, 0, 0, 0);
+    displayAreaLayout->setSpacing(0);
+    displayAreaLayout->addWidget(m_capImage);
+    displayAreaLayout->addWidget(vehModeAndInfoBoardArea);
+
+    return displayArea;
 }
 
 MgsPageArea *MgsBasePage::initVehModeAndInfoBoardArea()
@@ -171,48 +312,10 @@ ElaPlainTextEdit *MgsBasePage::initLogBrowseArea()
     logBrowser->setReadOnly(true);
     logBrowser->setTextInteractionFlags(Qt::NoTextInteraction); // 禁止选择、复制等
     QFont font = logBrowser->font();
-    font.setPixelSize(13);
+    font.setPixelSize(14);
     logBrowser->setFont(font);
 
     return logBrowser;
-}
-
-MgsPageArea *MgsBasePage::initVersionInfoArea()
-{
-    MgsPageArea *versionInfoArea = new MgsPageArea();
-    versionInfoArea->setBackgroundColor(QColor(Constant::Color::BLUE_COLOR));
-    versionInfoArea->setMinimumHeight(65);
-    versionInfoArea->setMaximumHeight(90);
-
-    m_fullBlackVer = new ElaText("全量状态名单: 20250716", versionInfoArea);
-    m_partBlackVer = new ElaText("增量状态名单: 202507311750", versionInfoArea);
-    m_appVer = new ElaText("当前软件版本: 25051301", versionInfoArea);
-    m_feeRateVer = new ElaText("当前费率版本: 1271", versionInfoArea);
-    m_virtualGantryInfo = new ElaText("承载门架: 福州西B向门架(35013C)", versionInfoArea);
-
-    QList<ElaText *> texts = {m_fullBlackVer, m_partBlackVer, m_virtualGantryInfo, m_appVer, m_feeRateVer};
-    for (auto *t : texts) {
-        t->setIsWrapAnywhere(false);
-        t->setTextPixelSize(13);
-        t->setStyleSheet(QString("color: %1").arg(Constant::Color::WHITE_COLOR));
-    }
-
-    QGridLayout *versionInfoAreaLayout = new QGridLayout(versionInfoArea);
-    versionInfoAreaLayout->setContentsMargins(9, 0, 9, 0);
-    versionInfoAreaLayout->setVerticalSpacing(0);
-
-    versionInfoAreaLayout->addWidget(m_appVer, 0, 0);
-    versionInfoAreaLayout->addItem(new QSpacerItem(10, 0, QSizePolicy::Preferred, QSizePolicy::Minimum), 0, 1);
-    versionInfoAreaLayout->addWidget(m_feeRateVer, 0, 2);
-
-    versionInfoAreaLayout->addWidget(m_fullBlackVer, 1, 0);
-    versionInfoAreaLayout->addItem(new QSpacerItem(10, 0, QSizePolicy::Preferred, QSizePolicy::Minimum), 1, 1);
-    versionInfoAreaLayout->addWidget(m_partBlackVer, 1, 2);
-
-    // 独占一行（占满三列）
-    versionInfoAreaLayout->addWidget(m_virtualGantryInfo, 2, 0, 1, 3);
-
-    return versionInfoArea;
 }
 
 MgsPageArea *MgsBasePage::initScrollTipArea()
@@ -351,7 +454,7 @@ void MgsBasePage::initUi()
     initRightUi();
 
     QHBoxLayout *layout = new QHBoxLayout(m_mainWidget);
-    layout->setContentsMargins(5, 1, 5, 1);
+    layout->setContentsMargins(5, 5, 5, 0);
     layout->setSpacing(5);
     layout->addWidget(m_leftLayout, 40);
     layout->addWidget(m_rightLayout, 60);
@@ -361,35 +464,35 @@ void MgsBasePage::setFullBlackVer(const QString &ver)
 {
     if (!m_fullBlackVer)
         return;
-    m_fullBlackVer->setText(QString("全量状态名单: %1").arg(ver));
+    m_fullBlackVer->setText(QString("全量%1").arg(ver));
 }
 
 void MgsBasePage::setPartBlackVer(const QString &ver)
 {
     if (!m_partBlackVer)
         return;
-    m_partBlackVer->setText(QString("增量状态名单: %1").arg(ver));
+    m_partBlackVer->setText(QString("增量%1").arg(ver));
 }
 
 void MgsBasePage::setVirtualGantryInfo(const QString &info)
 {
     if (!m_virtualGantryInfo)
         return;
-    m_virtualGantryInfo->setText(QString("承载门架信息: %1").arg(info));
+    m_virtualGantryInfo->setText(QString("%1").arg(info));
 }
 
 void MgsBasePage::setAppVer(const QString &ver)
 {
     if (!m_appVer)
         return;
-    m_appVer->setText(QString("当前软件版本: %1").arg(ver));
+    m_appVer->setText(QString(" %1").arg(ver));
 }
 
 void MgsBasePage::setFeeRateVer(const QString &ver)
 {
     if (!m_feeRateVer)
         return;
-    m_feeRateVer->setText(QString("当前费率版本: %1").arg(ver));
+    m_feeRateVer->setText(QString("%1").arg(ver));
 }
 
 void MgsBasePage::setCurWeightInfoCount(const QString &curWeightInfoCount)
@@ -485,13 +588,9 @@ void MgsBasePage::onLogAppend(const QString &log)
 
 void MgsBasePage::initLeftUi()
 {
-    // 抓拍显示区域
-    m_capImageArea = initCapImageArea();
-    m_capImageArea->setParent(this);
-
-    // 客货流程及情报板显示区域
-    m_vehModeAndInfoBoardArea = initVehModeAndInfoBoardArea();
-    m_vehModeAndInfoBoardArea->setParent(this);
+    // 抓拍与流程显示区域
+    m_displayArea = initDisplayArea();
+    m_displayArea->setParent(this);
 
     // 交易信息显示区域
     m_tradeInfoArea = initTradeInfoArea();
@@ -499,34 +598,22 @@ void MgsBasePage::initLeftUi()
 
     QWidget *leftSubWidget1 = new QWidget(this);
     QVBoxLayout *leftSubWidgetLayout1 = new QVBoxLayout(leftSubWidget1);
-    leftSubWidgetLayout1->setContentsMargins(0, 0, 0, 0);
-    leftSubWidgetLayout1->setSpacing(1);
-    leftSubWidgetLayout1->addWidget(m_capImageArea, 65);
-    leftSubWidgetLayout1->addWidget(m_vehModeAndInfoBoardArea, 10);
-    leftSubWidgetLayout1->addWidget(m_tradeInfoArea, 25);
+    leftSubWidgetLayout1->setContentsMargins(0, 0, 0, 4);
+    leftSubWidgetLayout1->setSpacing(5);
+    leftSubWidgetLayout1->addWidget(m_displayArea, 55);
+    leftSubWidgetLayout1->addWidget(m_tradeInfoArea, 45);
 
     // 日志显示区域
     m_logBrowser = initLogBrowseArea();
     m_logBrowser->setParent(this);
 
-    // 版本信息显示区域
-    m_versionInfoArea = initVersionInfoArea();
-    m_versionInfoArea->setParent(this);
-
-    QWidget *leftSubWidget2 = new QWidget(this);
-    QVBoxLayout *leftSubLayout2 = new QVBoxLayout(leftSubWidget2);
-    leftSubLayout2->setContentsMargins(0, 0, 0, 0);
-    leftSubLayout2->setSpacing(1);
-    leftSubLayout2->addWidget(m_logBrowser, 70);
-    leftSubLayout2->addWidget(m_versionInfoArea, 30);
-
     // 左侧主布局
     m_leftLayout = new QSplitter(Qt::Vertical, this);
     m_leftLayout->setChildrenCollapsible(false);
     m_leftLayout->addWidget(leftSubWidget1);
-    m_leftLayout->addWidget(leftSubWidget2);
+    m_leftLayout->addWidget(m_logBrowser);
     m_leftLayout->setHandleWidth(1);
-    m_leftLayout->setSizes({700, 300}); // 初始按比例设置总高度为 1000 时的分配
+    m_leftLayout->setSizes({800, 200}); // 初始按比例设置总高度为 1000 时的分配
 }
 
 void MgsBasePage::initRightUi()
@@ -621,9 +708,9 @@ void MgsBasePage::setModeText(const QString &mode)
 
 void MgsBasePage::setCapImage(const QImage &img)
 {
-    if (!m_capImageArea)
+    if (!m_capImage)
         return;
-    m_capImageArea->setCardImage(img);
+    m_capImage->setCardImage(img);
 }
 
 void MgsBasePage::setVehMode(const QString &vehMode, const QString &color /*= #ffffff */)

@@ -1,13 +1,10 @@
 #include "mgsmainwindow.h"
 
 #include <QCoreApplication>
+#include <QDateTime>
 #include <QStackedLayout>
 #include <QTimer>
 #include <QVBoxLayout>
-
-#include "ElaWidgetTools/ElaLCDNumber.h"
-#include "ElaWidgetTools/ElaStatusBar.h"
-#include "ElaWidgetTools/ElaToolButton.h"
 
 #include "global/constant.h"
 #include "global/globalmanager.h"
@@ -61,11 +58,11 @@ void MgsMainWindow::initMtcIn()
     m_mainPage->setPaperCardCnt(23);
     m_mainPage->setHolidayFreeVehCnt(23);
 
-    m_mainPage->setFullBlackVer("20250716");
-    m_mainPage->setPartBlackVer("202507311750");
-    m_mainPage->setVirtualGantryInfo("福清镜洋");
-    m_mainPage->setAppVer("25051301");
-    m_mainPage->setAppVer("1271");
+    m_mainPage->setFullBlackVer("20250801");
+    m_mainPage->setPartBlackVer("202508011215");
+    m_mainPage->setVirtualGantryInfo("福州西B向门架(340901.H)");
+    m_mainPage->setAppVer("1.0.1");
+    m_mainPage->setFeeRateVer("1098");
 
     m_mainPage->setScrollTip("欢迎使用福建省高速公路收费软件（如遇到软件问题请致电福建省高速公路信息科技有限公司）");
 
@@ -356,22 +353,4 @@ void MgsMainWindow::initUi()
     setIsNavigationBarEnable(false);
     setWindowButtonFlags(ElaAppBarType::None);
     setWindowIcon(QIcon(Constant::Path::APP_ICON));
-
-    // 状态栏
-    m_statusBar = new ElaStatusBar(this);
-
-    ElaToolButton *supportInfo = new ElaToolButton(this);
-    supportInfo->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
-    supportInfo->setElaIcon(ElaIconType::Phone);
-    supportInfo->setText("技术支持: 福建省高速公路信息科技有限公司");
-    supportInfo->setAttribute(Qt::WA_TransparentForMouseEvents, true);
-    m_statusBar->addWidget(supportInfo);
-
-    ElaLCDNumber *clock = new ElaLCDNumber(this);
-    clock->setIsUseAutoClock(true);
-    clock->setAutoClockFormat("yyyy-MM-dd hh:mm:ss");
-    clock->setIsTransparent(true);
-    m_statusBar->addPermanentWidget(clock);
-
-    setStatusBar(m_statusBar);
 }

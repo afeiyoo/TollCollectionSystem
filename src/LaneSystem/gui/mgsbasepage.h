@@ -2,6 +2,7 @@
 
 #include <QGraphicsOpacityEffect>
 #include <QSplitter>
+#include <QVBoxLayout>
 #include <QWidget>
 
 class MgsWeightInfoPanel;
@@ -118,16 +119,14 @@ public slots:
     void onLogAppend(const QString &log);
 
 protected:
-    // 抓拍区域初始化
-    ElaImageCard *initCapImageArea();
+    // 抓拍与流程区域初始化
+    MgsPageArea *initDisplayArea();
     // 客货流程及情报板显示区域初始化
     MgsPageArea *initVehModeAndInfoBoardArea();
     // 交易信息区域初始化（由子类各自实现）
     virtual MgsPageArea *initTradeInfoArea();
     // 日志显示区域初始化
     ElaPlainTextEdit *initLogBrowseArea();
-    // 版本信息显示区域初始化
-    MgsPageArea *initVersionInfoArea();
     // 滚动提示区域初始化
     MgsPageArea *initScrollTipArea();
     // 车辆信息区域初始化（由子类各自实现）
@@ -144,11 +143,14 @@ protected:
     MgsDevicePanel *initDeviceIconArea();
     // 各子类公用，界面截图
     void screenShot();
+
 private:
     // 创建顶部信息栏
     void createTopWidget();
     // 创建主显示区
     void addCentralWidget(QWidget *w);
+    // 创建底部状态栏
+    void createBottomWidget();
 
     void initLeftUi();
     void initRightUi();
@@ -164,12 +166,11 @@ private:
 
     // 主区域
     QWidget *m_mainWidget = nullptr;
-    QSplitter *m_leftLayout = nullptr;  //  左侧主布局
-    QSplitter *m_rightLayout = nullptr; // 右侧主布局
-    // 抓拍显示区域
-    ElaImageCard *m_capImageArea = nullptr;
-    // 客货流程及情报板显示区域
-    MgsPageArea *m_vehModeAndInfoBoardArea = nullptr;
+    QSplitter *m_leftLayout = nullptr; //  左侧主布局
+    QSplitter *m_rightLayout = nullptr;  // 右侧主布局
+    // 抓拍与流程显示区域
+    MgsPageArea *m_displayArea = nullptr;
+    ElaImageCard *m_capImage = nullptr;
     ElaText *m_vehMode = nullptr;
     ElaText *m_infoBoard = nullptr;
     // 交易信息显示区域
@@ -177,13 +178,6 @@ private:
     // 日志显示区域
     ElaPlainTextEdit *m_logBrowser = nullptr;
     QStringList m_logBuffer;
-    // 版本信息显示区域
-    MgsPageArea *m_versionInfoArea = nullptr;
-    ElaText *m_fullBlackVer = nullptr;      // 全量状态名单版本
-    ElaText *m_partBlackVer = nullptr;      // 增量状态名单版本
-    ElaText *m_virtualGantryInfo = nullptr; // 承载门架信息
-    ElaText *m_appVer = nullptr;            // 软件版本
-    ElaText *m_feeRateVer = nullptr;        // 费率版本
     // 滚动提示显示区域
     MgsPageArea *m_scrollTipArea = nullptr;
     MgsScrollText *m_scrollTip = nullptr;
@@ -205,4 +199,12 @@ private:
     MgsRecentTradePanel *m_recentTradePanel = nullptr;
     // 设备图标显示区域
     MgsDevicePanel *m_deviceIconPanel = nullptr;
+
+    // 底部信息栏
+    QWidget *m_bottomWidget = nullptr;
+    ElaText *m_fullBlackVer = nullptr;      // 全量状态名单版本
+    ElaText *m_partBlackVer = nullptr;      // 增量状态名单版本
+    ElaText *m_virtualGantryInfo = nullptr; // 承载门架信息
+    ElaText *m_appVer = nullptr;            // 软件版本
+    ElaText *m_feeRateVer = nullptr;        // 费率版本
 };

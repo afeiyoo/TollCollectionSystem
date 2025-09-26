@@ -29,6 +29,7 @@ const char KEYBOARD_FILE_PATH[] = ":/static/config/Keyboard_%1.json";
 
 // 界面颜色
 namespace Color {
+const char ICE_BLUE_COLOR[] = "#f8fbff";
 const char GRAY_COLOR[] = "#cdcdcd";
 const char BLUE_COLOR[] = "#007bff";
 const char GREEN_COLOR[] = "#00f91a";

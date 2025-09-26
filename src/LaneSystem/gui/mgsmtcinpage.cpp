@@ -366,7 +366,8 @@ void MgsMtcInPage::keyPressEvent(QKeyEvent *event)
 MgsPageArea *MgsMtcInPage::initTradeInfoArea()
 {
     MgsPageArea *tradeInfoArea = new MgsPageArea();
-    tradeInfoArea->setBackgroundColor(Qt::transparent);
+    tradeInfoArea->setBorderRadius(0);
+    tradeInfoArea->setBackgroundColor(Constant::Color::WHITE_COLOR);
     tradeInfoArea->setMinimumHeight(140);
     tradeInfoArea->setMaximumHeight(180);
 
