@@ -5,24 +5,34 @@ QT       *= core gui network
 TARGET = LaneSystem
 TEMPLATE = app
 
-# 编译得到的最终产物输出路径
-DESTDIR = $$MGS_BIN_PATH/$$TARGET
+win32 {
+    DESTDIR = $$MGS_BIN_PATH/win/$$TARGET
+} else {
+    DESTDIR = $$MGS_BIN_PATH/linux/$$TARGET
+}
 
 DEFINES += USE_ELAWIDGETTOOLS
 
 include($$THIRD_PARTY_LIBRARY_PATH/utils/Utils.pri)
 include($$THIRD_PARTY_LIBRARY_PATH/EasyQtSql/EasyQtSql.pri)
+include($$THIRD_PARTY_LIBRARY_PATH/HttpClient/HttpClient.pri)
 
 SOURCES += \
-    # bend/mtcin/cardrobothandler.cpp \
-    # bend/mtcin/mtcindeskhandler.cpp \
+    bend/mtcin/autocardprocess.cpp \
+    bend/mtcin/mibizenv.cpp \
+    bend/mtcin/mideskprocess.cpp \
+    config/config.cpp \
+    config/laneenv.cpp \
+    dao/dataservice.cpp \
+    dao/midataservice.cpp \
     global/globalmanager.cpp \
     global/modemanager.cpp \
     global/signalmanager.cpp \
-    gui/component/mgscontentdialog.cpp \
+    gui/component/mgsbasedialog.cpp \
     gui/component/mgsdevicepanel.cpp \
     gui/component/mgsiconbutton.cpp \
     gui/component/mgsmenu.cpp \
+    gui/component/mgsoptionsdialog.cpp \
     gui/component/mgspagearea.cpp \
     gui/component/mgsplateedit.cpp \
     gui/component/mgsrecenttradepanel.cpp \
@@ -40,25 +50,31 @@ SOURCES += \
     gui/mgsplateeditdialog.cpp \
     main.cpp\
     # claneform.cpp \
-    cbizenv.cpp \
-    # bend/mtcout/cmodeskprocess.cpp \
+    # cbizenv.cpp \
+    bend/mtcout/cmodeskprocess.cpp \
     # bend/mtcout/csptprocess.cpp \
     # bend/etc/cetcprocess.cpp \
-    # bend/etc/cetcdeskprocess.cpp
+ \    # bend/etc/cetcdeskprocess.cpp
+    tools/laneauth.cpp
 
 HEADERS += \
-    # bend/mtcin/cardrobothandler.h \
-    # bend/mtcin/mtcindeskhandler.h \
+    bend/mtcin/autocardprocess.h \
+    bend/mtcin/mibizenv.h \
+    bend/mtcin/mideskprocess.h \
     # claneform.h \
+    config/config.h \
+    config/laneenv.h \
+    dao/dataservice.h \
+    dao/midataservice.h \
     global/constant.h \
     global/globalmanager.h \
     global/modemanager.h \
     global/signalmanager.h \
-    gui/component/mgscontentdialog.h \
-    global/tlaneconfig.h \
+    gui/component/mgsbasedialog.h \
     gui/component/mgsdevicepanel.h \
     gui/component/mgsiconbutton.h \
     gui/component/mgsmenu.h \
+    gui/component/mgsoptionsdialog.h \
     gui/component/mgspagearea.h \
     gui/component/mgsplateedit.h \
     gui/component/mgsrecenttradepanel.h \
@@ -74,13 +90,13 @@ HEADERS += \
     gui/mgsmtcinpage.h \
     gui/mgsmtcoutpage.h \
     gui/mgsplateeditdialog.h \
-    ibizservice.h \
-    cbizenv.h \
-    # bend/mtcout/cmodeskprocess.h \
+    # cbizenv.h \
+    bend/mtcout/cmodeskprocess.h \
     # bend/mtcout/csptprocess.h \
     # bend/etc/cetcprocess.h \
     # bend/etc/cetcdeskprocess.h \
-    # ILaneDeviceCtrl.h
+ \    # ILaneDeviceCtrl.h
+    tools/laneauth.h
 
 FORMS += claneform.ui
 
@@ -88,17 +104,20 @@ FORMS += claneform.ui
 unix:!macx|win32: LIBS += \
     -l$$qtLibraryTargetName(ElaWidgetTools) -l$$qtLibraryTargetName(CuteLogger) \
     -l$$qtLibraryTargetName(LaneService) -l$$qtLibraryTargetName(Jcon) \
-    -l$$qtLibraryTargetName(QSimpleUpdater)
+    -l$$qtLibraryTargetName(QSimpleUpdater) -l$$qtLibraryTargetName(QJson) \
 
 INCLUDEPATH += \
     $$THIRD_PARTY_LIBRARY_PATH/ElaWidgetTools \
     $$THIRD_PARTY_LIBRARY_PATH/CuteLogger/include \
     $$THIRD_PARTY_LIBRARY_PATH/Jcon \
     $$PWD/../LaneService \
-    $$THIRD_PARTY_LIBRARY_PATH/QSimpleUpdater/include
+    $$THIRD_PARTY_LIBRARY_PATH/QSimpleUpdater/include \
+    $$THIRD_PARTY_LIBRARY_PATH/QJson/include
 
 RESOURCES += \
     resource.qrc
+
+RC_ICONS += mgskj.ico
 
 copyLibsToDestdir($$qtLibraryTargetName(CuteLogger))
 copyLibsToDestdir($$qtLibraryTargetName(ElaWidgetTools))

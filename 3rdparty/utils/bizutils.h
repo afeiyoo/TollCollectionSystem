@@ -20,10 +20,22 @@ public:
     static QString getPlateNoColor(const QString &fullPlate);
 
     // 从车牌中获取并返回颜色编码
-    static PlateColorType::PlateColor getColorCodeFromPlate(const QString &fullPlate);
+    static EM_PlateColor::PlateColor getColorCodeFromPlate(const QString &fullPlate);
 
     // 根据颜色编码获取车牌颜色 0-蓝 1-黄 2-黑 3-白 4-绿 5-拼 6-渐 7-临 9-未知
-    static QString getColorFormColorCode(PlateColorType::PlateColor colorCode);
+    static QString getColorFormColorCode(EM_PlateColor::PlateColor colorCode);
+
+    // 获取按键对应的车道键盘按键名称
+    static QString getKeyName(const QVariantMap &keyboard, uint keyCode);
+
+    // 获取按键值对应的车道键盘按键描述
+    static QString getKeyDescByCode(const QVariantMap &keyboard, uint keyCode);
+
+    // 获取按键名称对应的车道键盘按键描述
+    static QString getKeyDescByName(const QVariantMap &keyboard, const QString &keyName);
+
+    // 获取车道键盘按键对应的按键数值(返回-1表示未获取到对应keyName的key)
+    static int getKeyCode(const QVariantMap &keyboard, const QString &keyName);
 
     /*******************************************************/
     /****                   DTP传输相关                  ****/

@@ -192,7 +192,7 @@ QString BizHandler::doDealCmd16(const QVariantMap &aMap)
         map["status"] = "0";
         map["desc"] = "成功设置补费票段";
         dealtData = GM_INSTANCE->m_jsonSerializer->serialize(map);
-    } else if (tradeType == 8) {
+    } else if (tradeType == 8 || tradeType == 9) {
         // 稽核打票
         if (tradeId.isEmpty())
             throw BaseException(1, "响应失败: 交易号为空");
@@ -207,7 +207,7 @@ QString BizHandler::doDealCmd16(const QVariantMap &aMap)
         GM_INSTANCE->createSqlServerConnection(stationIP);
         // 获取票据信息
         QString id = QString("sqlserver_%1").arg(stationIP);
-        QVariantMap resMap = m_ds.getTicketUseInfo(laneID, id);
+        QVariantMap resMap = m_ds.getTicketUseInfo(laneID, ticketNum, id);
         if (resMap.isEmpty())
             throw BaseException(1, "响应失败: 未查询到相关票据信息");
 
@@ -247,7 +247,8 @@ QString BizHandler::doDealCmd16(const QVariantMap &aMap)
             throw BaseException(1, "响应失败: 站级数据传输异常");
 
         // 更新LastNum
-        m_ds.updateTicketUseInfo(laneID, ticketNum.toInt(), id);
+        int dataId = resMap["DataID"].toInt();
+        m_ds.updateTicketUseInfo(dataId, laneID, ticketNum.toInt(), id);
 
         // 更新班次表
         if (m_ds.getOutShiftSettleCount(stationID, shiftDate, shiftNum, id) == 0) {
@@ -264,8 +265,6 @@ QString BizHandler::doDealCmd16(const QVariantMap &aMap)
         map["status"] = "0";
         map["desc"] = "成功录入票据信息";
         dealtData = GM_INSTANCE->m_jsonSerializer->serialize(map);
-    } else if (tradeType == 9) {
-        // 补打票
     }
     return dealtData;
 }
@@ -1020,7 +1019,14 @@ QString BizHandler::doDealCmd25(const QVariantMap &aMap)
     QString result = blockUtilResponse(reply, Http().instance().getReadTimeout());
     LOG_INFO().noquote() << "返回状态名单信息查询结果: " << result;
 
-    return result;
+    QVariantMap resMap = GM_INSTANCE->m_jsonParser->parse(result.toUtf8()).toMap();
+    int subCode = resMap["subCode"].toInt();  // 返回码
+    QString info = resMap["info"].toString(); // 信息
+
+    resMap["status"] = subCode == 200 ? 0 : 1;
+    resMap["desc"] = info;
+    QString dealtData = GM_INSTANCE->m_jsonSerializer->serialize(resMap);
+    return dealtData;
 }
 
 QString BizHandler::doDealCmd26(const QVariantMap &aMap)
@@ -1778,7 +1784,7 @@ void BizHandler::saveAndReplaceContainerPic(const QString &base64Data, QVariantM
 #else
     QString picUUID = QUuid::createUuid().toString(QUuid::WithoutBraces);
 #endif
-    QString picName = QString("%1.jpg").arg(picUUID);
+    QString picName = QString("/%1.jpg").arg(picUUID);
     QString targetPath = (GM_INSTANCE->m_pictureDir + picName).toString();
 
     Utils::FileSaver saver(targetPath);
@@ -2058,12 +2064,14 @@ QString BizHandler::doDealCmd39(const QVariantMap &aMap)
     sendMap["querySql"]
         = QString("SELECT tradeid, passid, exvehplate, ennetid, enstation, exnetid, exstation, extime, entotalweight, "
                   "totalweight, cardtype, shouldpay, factpay, provincenum, cardbiztype, reserve, usertype, obuplate "
-                  "FROM t_etc_out WHERE "
-                  "(usertype = 21 OR usertype = 22) AND extime >= '%1' AND extime < '%2' UNION ALL "
+                  "FROM T_ETC_OUT WHERE "
+                  "(usertype = 21 OR usertype = 22) AND extime >= TO_DATE('%1', 'YYYY-MM-DD HH24:MI:SS') AND extime < "
+                  "TO_DATE('%2', 'YYYY-MM-DD HH24:MI:SS') UNION ALL "
                   "SELECT tradeid, passid, exvehplate, ennetid, enstation, exnetid, exstation, extime, entotalweight, "
-                  "totalweight, cardtype, shouldpay, factpay, NULL AS provincenum, cardbiztype, reserve, usertype, "
-                  "NULL AS obuplate FROM t_mtc_out "
-                  "WHERE (usertype = 21 OR usertype = 22) AND extime >= '%3' AND extime < '%4'")
+                  "totalweight, cardtype, shouldpay, factpay, provincenum, cardbiztype, reserve, usertype, "
+                  "'' AS obuplate FROM T_MTC_OUT "
+                  "WHERE (usertype = 21 OR usertype = 22) AND extime >= TO_DATE('%3', 'YYYY-MM-DD HH24:MI:SS') AND "
+                  "extime < TO_DATE('%4', 'YYYY-MM-DD HH24:MI:SS')")
               .arg(startTime, stopTime, startTime, stopTime);
     sendMap["dataType"] = 4;
 
@@ -2076,10 +2084,14 @@ QString BizHandler::doDealCmd39(const QVariantMap &aMap)
     auto reply = Http().instance().post(url, sendData.toUtf8(), "application/json");
 
     QString result = blockUtilResponse(reply, Http().instance().getReadTimeout());
-    LOG_INFO().noquote() << "返回本站绿通流水查询结果: " << result;
+    LOG_INFO().noquote() << "返回本站绿通流水查询结果: " << result.left(1024);
 
-    QVariantMap resMap = GM_INSTANCE->m_jsonParser->parse(result.toUtf8()).toMap();
-    if (resMap["errCode"].toInt() == 1) {
+    bool ok = false;
+    QVariantMap resMap = GM_INSTANCE->m_jsonParser->parse(result.toUtf8(), &ok).toMap();
+    if (!ok)
+        throw BaseException(1, "响应失败: json内容解析失败");
+
+    if (resMap["errCode"].toInt() != 0) {
         QString errorMessage = resMap["errorMessage"].toString();
         throw BaseException(1, QString("响应失败: 站级服务返回查询失败 %1").arg(errorMessage));
     }

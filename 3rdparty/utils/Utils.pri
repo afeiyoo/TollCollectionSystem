@@ -7,6 +7,7 @@ HEADERS += \
     $$PWD/defs.h \
     $$PWD/fileutils.h \
     $$PWD/hostosinfo.h \
+    $$PWD/httplib.h \
     $$PWD/iniutils.h \
     $$PWD/networkutils.h \
     $$PWD/optional.h \
@@ -14,6 +15,7 @@ HEADERS += \
     $$PWD/predicates.h \
     $$PWD/qtcassert.h \
     $$PWD/savefile.h \
+    $$PWD/sm4.h \
     $$PWD/sqlutils.h \
     $$PWD/stdafx.h \
 
@@ -26,6 +28,7 @@ SOURCES += \
     $$PWD/networkutils.cpp \
     $$PWD/qtcassert.cpp \
     $$PWD/savefile.cpp \
+    $$PWD/sm4.cpp \
     $$PWD/sqlutils.cpp \
 
 contains(QT, gui) {

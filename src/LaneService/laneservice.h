@@ -12,7 +12,7 @@ public:
     ~LaneService() override;
 
     // 服务初始化
-    void init();
+    bool init();
 
     // 命令01：通用数据库操作
     Q_INVOKABLE QString dbCreate(const QString &reqJson);

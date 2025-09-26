@@ -5,7 +5,7 @@
 #include "global/constant.h"
 #include "global/globalmanager.h"
 #include "global/signalmanager.h"
-#include "gui/component/mgscontentdialog.h"
+#include "gui/component/mgsbasedialog.h"
 #include "gui/component/mgsplateedit.h"
 #include "gui/delegate/mgscolordelegate.h"
 #include "gui/delegate/mgskeydelegate.h"
@@ -31,11 +31,11 @@ MgsPlateEditDialog::MgsPlateEditDialog(QWidget *parent)
     initUi();
 
     // 窗口关闭对话框
-    m_contentDialog = new MgsContentDialog(this);
-    connect(m_contentDialog, &MgsContentDialog::rightButtonClicked, this, &MgsPlateEditDialog::close);
-    connect(m_contentDialog, &MgsContentDialog::rightButtonClicked, this, [this]() {
-        emit GM_INSTANCE->m_signalMan->sigPlateChanged(m_plateEdit->getPlate());
-    });
+    // m_contentDialog = new MgsContentDialog(this);
+    // connect(m_contentDialog, &MgsContentDialog::rightButtonClicked, this, &MgsPlateEditDialog::close);
+    // connect(m_contentDialog, &MgsContentDialog::rightButtonClicked, this, [this]() {
+    //     emit GM_INSTANCE->m_signalMan->sigPlateChanged(m_plateEdit->getPlate());
+    // });
 
     // 跟踪当前光标位置
     connect(m_tab0->selectionModel(),
@@ -273,8 +273,8 @@ void MgsPlateEditDialog::keyPressEvent(QKeyEvent *event)
         event->accept();
     } else if (key == Qt::Key_S) {
         QString title = QString("车牌修改为: %1").arg(m_plateEdit->getPlate());
-        m_contentDialog->setContent(title, "按【确认】保存，按【返回】取消");
-        m_contentDialog->exec();
+        // m_contentDialog->setContent(title, "按【确认】保存，按【返回】取消");
+        // m_contentDialog->exec();
         event->accept();
     } else {
         qDebug() << "无效按键";

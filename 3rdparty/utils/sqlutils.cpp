@@ -38,7 +38,7 @@ protected:
     bool fatalError(const QXmlParseException &exception);
 
 private:
-    void loadSqlFiles(const FileNameList &sqlFiles);
+    bool loadSqlFiles(const FileNameList &sqlFiles);
 
 private:
     QString m_sqlNamespace;
@@ -87,9 +87,7 @@ bool SqlUtilsPrivate::startElement(const QString &namespaceURI,
     return true;
 }
 
-bool SqlUtilsPrivate::endElement(const QString &namespaceURI,
-                                 const QString &localName,
-                                 const QString &qName)
+bool SqlUtilsPrivate::endElement(const QString &namespaceURI, const QString &localName, const QString &qName)
 {
     Q_UNUSED(namespaceURI)
     Q_UNUSED(localName)
@@ -108,7 +106,7 @@ bool SqlUtilsPrivate::endElement(const QString &namespaceURI,
         if (!def.isEmpty()) {
             m_currentText += def;
         } else {
-            LOG_INFO() << QString("未找到标签 ==> 标签名: %1").arg(defKey);
+            LOG_INFO().noquote() << QString("未找到标签 ==> 标签名: %1").arg(defKey);
         }
     } else if (SQL_TAGNAME_DEFINE == qName) {
         m_defines.insert(buildKey(m_sqlNamespace, m_currentDefineId), m_currentText.simplified());
@@ -125,27 +123,29 @@ bool SqlUtilsPrivate::characters(const QString &str)
 
 bool SqlUtilsPrivate::fatalError(const QXmlParseException &exception)
 {
-    LOG_INFO() << QString("解析错误 ==> 行: %1, 列: %2, 错误提示: %3")
-                      .arg(exception.lineNumber())
-                      .arg(exception.columnNumber())
-                      .arg(exception.message());
+    LOG_INFO().noquote() << QString("解析错误 ==> 行: %1, 列: %2, 错误提示: %3")
+                                .arg(exception.lineNumber())
+                                .arg(exception.columnNumber())
+                                .arg(exception.message());
     return false;
 }
 
-void SqlUtilsPrivate::loadSqlFiles(const FileNameList &sqlFiles)
+bool SqlUtilsPrivate::loadSqlFiles(const FileNameList &sqlFiles)
 {
     for (const auto &fileName : sqlFiles) {
-        LOG_INFO() << QString("加载 SQL 文件: %1").arg(fileName.toString());
+        LOG_INFO().noquote() << QString("加载 SQL 文件: %1").arg(fileName.fileName(1));
 
         QFile file(fileName.toString());
         QXmlInputSource inputSource(&file);
         QXmlSimpleReader reader;
         reader.setContentHandler(this);
         reader.setErrorHandler(this);
-        reader.parse(inputSource);
+        if (!reader.parse(inputSource))
+            return false;
 
         m_defines.clear();
     }
+    return true;
 }
 
 SqlUtils::SqlUtils(QObject *parent)
@@ -164,15 +164,15 @@ QString SqlUtils::getSql(const QString &sqlNamespace, const QString &sqlId)
     QString sql = d->m_sqls.value(d->buildKey(sqlNamespace, sqlId));
 
     if (sql.isEmpty()) {
-        LOG_WARNING() << QString("未找到对应 SQL ==> SQLID: %1::%2").arg(sqlNamespace).arg(sqlId);
+        LOG_WARNING().noquote() << QString("未找到对应 SQL ==> SQLID: %1::%2").arg(sqlNamespace).arg(sqlId);
     }
 
     return sql;
 }
 
-void SqlUtils::loadSqlFiles(const FileNameList &sqlFiles)
+bool SqlUtils::loadSqlFiles(const FileNameList &sqlFiles)
 {
     Q_D(SqlUtils);
-    d->loadSqlFiles(sqlFiles);
+    return d->loadSqlFiles(sqlFiles);
 }
 } // namespace Utils

@@ -27,13 +27,25 @@
 #include <QList>
 #include <QObject>
 
-#if defined(QSU_SHARED)
-#   define QSU_DECL Q_DECL_EXPORT
-#elif defined(QSU_IMPORT)
-#   define QSU_DECL Q_DECL_IMPORT
+#if defined(Q_OS_WIN)
+    #if defined(QSU_SHARED)
+        #define QSU_DECL Q_DECL_EXPORT
+    #elif defined(QSU_IMPORT)
+        #define QSU_DECL
+    #else
+        #define QSU_DECL Q_DECL_IMPORT
+    #endif
 #else
-#   define QSU_DECL
+    #define QSU_DECL
 #endif
+
+// #if defined(QSU_SHARED)
+//     #define QSU_DECL Q_DECL_EXPORT
+// #elif defined(QSU_IMPORT)
+//     #define QSU_DECL Q_DECL_IMPORT
+// #else
+//     #define QSU_DECL
+// #endif
 
 class Updater;
 
@@ -75,6 +87,7 @@ public:
    bool getUpdateAvailable(const QString &url) const;
    bool getDownloaderEnabled(const QString &url) const;
    bool usesCustomInstallProcedures(const QString &url) const;
+   bool getNetworkErrorOccured(const QString& url) const;
 
    QString getOpenUrl(const QString &url) const;
    QString getChangelog(const QString &url) const;
@@ -84,6 +97,7 @@ public:
    QString getLatestVersion(const QString &url) const;
    QString getModuleVersion(const QString &url) const;
    QString getUserAgentString(const QString &url) const;
+
 
 public slots:
    void checkForUpdates(const QString &url);
@@ -108,4 +122,4 @@ private:
    Updater *getUpdater(const QString &url) const;
 };
 
-#endif
+    #endif

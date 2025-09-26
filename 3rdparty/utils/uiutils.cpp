@@ -168,12 +168,12 @@ QMessageBox::StandardButton UiUtils::showMessageBoxInfo(const QString &title,
 {
     QMessageBox box;
     box.setWindowTitle(QObject::tr("提示"));
-    box.setWindowFlags(Qt::Dialog | Qt::WindowTitleHint | Qt::CustomizeWindowHint);
-    box.setTextFormat(Qt::MarkdownText);
+    box.setWindowFlags(Qt::Dialog | Qt::WindowTitleHint | Qt::WindowSystemMenuHint);
+    box.setTextFormat(Qt::RichText);
     box.setIcon(QMessageBox::Information);
 
-    box.setText("## " + title);
-    box.setInformativeText(informativeText);
+    box.setText(QString("<span style='font-size:25px; font-weight:bold;'>%1</span>").arg(title));
+    box.setInformativeText(QString("<span style='font-size:17px;'>%1</span>").arg(informativeText));
 
     box.setStandardButtons(buttons);
 
@@ -211,12 +211,55 @@ QMessageBox::StandardButton UiUtils::showMessageBoxQuestion(const QString &title
 {
     QMessageBox box;
     box.setWindowTitle(QObject::tr("选择"));
-    box.setWindowFlags(Qt::Dialog | Qt::WindowTitleHint | Qt::CustomizeWindowHint);
-    box.setTextFormat(Qt::MarkdownText);
+    box.setWindowFlags(Qt::Dialog | Qt::WindowTitleHint | Qt::WindowSystemMenuHint);
+    box.setTextFormat(Qt::RichText);
     box.setIcon(QMessageBox::Question);
 
-    box.setText("## " + title);
-    box.setInformativeText(informativeText);
+    box.setText(QString("<span style='font-size:25px; font-weight:bold;'>%1</span>").arg(title));
+    box.setInformativeText(QString("<span style='font-size:17px;'>%1</span>").arg(informativeText));
+
+    box.setStandardButtons(buttons);
+
+    QPushButton *okBtn = nullptr;
+    QPushButton *cancelBtn = nullptr;
+    for (QMessageBox::StandardButton b :
+         {QMessageBox::Ok, QMessageBox::Cancel, QMessageBox::Yes, QMessageBox::No, QMessageBox::Close}) {
+        if (buttons.testFlag(b)) {
+            if (auto btn = qobject_cast<QPushButton *>(box.button(b))) {
+                if (b == QMessageBox::Ok || b == QMessageBox::Yes) {
+                    btn->setProperty("color", "blue");
+                    btn->setText(QObject::tr("确定"));
+                    okBtn = btn;
+                } else {
+                    btn->setProperty("color", "gray");
+                    btn->setText(QObject::tr("取消"));
+                    cancelBtn = btn;
+                }
+                btn->setStyle(new ButtonStyle(btn->style()));
+                btn->setProperty("stdButton", int(b));
+                btn->setAttribute(Qt::WA_TransparentForMouseEvents, true);
+            }
+        }
+    }
+
+    KeyPressFilter *filter = new KeyPressFilter(&box, okBtn, cancelBtn);
+    box.installEventFilter(filter);
+
+    return static_cast<QMessageBox::StandardButton>(box.exec());
+}
+
+QMessageBox::StandardButton UiUtils::showMessageBoxWarning(const QString &title,
+                                                           const QString &informativeText,
+                                                           QMessageBox::StandardButtons buttons)
+{
+    QMessageBox box;
+    box.setWindowTitle(QObject::tr("警告"));
+    box.setWindowFlags(Qt::Dialog | Qt::WindowTitleHint | Qt::WindowSystemMenuHint);
+    box.setTextFormat(Qt::RichText);
+    box.setIcon(QMessageBox::Warning);
+
+    box.setText(QString("<span style='font-size:25px; font-weight:bold;'>%1</span>").arg(title));
+    box.setInformativeText(QString("<span style='font-size:17px;'>%1</span>").arg(informativeText));
 
     box.setStandardButtons(buttons);
 
@@ -254,12 +297,12 @@ QMessageBox::StandardButton UiUtils::showMessageBoxError(const QString &title,
 {
     QMessageBox box;
     box.setWindowTitle(QObject::tr("错误"));
-    box.setWindowFlags(Qt::Dialog | Qt::WindowTitleHint | Qt::CustomizeWindowHint);
-    box.setTextFormat(Qt::MarkdownText);
+    box.setWindowFlags(Qt::Dialog | Qt::WindowTitleHint | Qt::WindowSystemMenuHint);
+    box.setTextFormat(Qt::RichText);
     box.setIcon(QMessageBox::Critical);
 
-    box.setText("## " + title);
-    box.setInformativeText(informativeText);
+    box.setText(QString("<span style='font-size:25px; font-weight:bold;'>%1</span>").arg(title));
+    box.setInformativeText(QString("<span style='font-size:17px;'>%1</span>").arg(informativeText));
 
     box.setStandardButtons(buttons);
 

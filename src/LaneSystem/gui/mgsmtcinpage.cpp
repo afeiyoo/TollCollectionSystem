@@ -2,14 +2,19 @@
 
 #include "ElaWidgetTools/ElaTableView.h"
 #include "ElaWidgetTools/ElaText.h"
+#include "Logger.h"
+#include "config/config.h"
 #include "global/constant.h"
 #include "global/globalmanager.h"
 #include "global/modemanager.h"
+#include "global/signalmanager.h"
 #include "gui/component/mgsdevicepanel.h"
+#include "gui/component/mgsoptionsdialog.h"
 #include "gui/component/mgspagearea.h"
 #include "gui/component/mgsrecenttradepanel.h"
 #include "gui/component/mgsscrolltext.h"
 #include "gui/mgsauthdialog.h"
+#include "utils/bizutils.h"
 #include "utils/fileutils.h"
 #include "utils/uiutils.h"
 
@@ -22,11 +27,16 @@
 #include <QLabel>
 #include <QSplitter>
 
+using namespace Utils;
+
 MgsMtcInPage::MgsMtcInPage(QWidget *parent)
     : MgsBasePage(parent)
 {
     m_authDialog = new MgsAuthDialog(this);
     m_authDialog->hide();
+
+    m_optionsDialog = new MgsOptionsDialog(this);
+    m_optionsDialog->hide();
 }
 
 MgsMtcInPage::~MgsMtcInPage() {}
@@ -318,32 +328,37 @@ void MgsMtcInPage::setTradeHint(const QString &tradeHint, const QString &color)
 void MgsMtcInPage::keyPressEvent(QKeyEvent *event)
 {
     int key = event->key();
-    qDebug() << "KeyName:" << QKeySequence(key).toString();
+    LOG_INFO().noquote() << "按键: " << BizUtils::getKeyName(GM_INSTANCE->m_config->m_keyboard, key)
+                         << QString("【%1】").arg(BizUtils::getKeyDescByCode(GM_INSTANCE->m_config->m_keyboard, key));
 
     if (key == Qt::Key_S) {
-        Utils::FileName saveDir = Utils::FileName::fromString(qApp->applicationDirPath() + "/captures");
-        QString error;
-        bool ok = Utils::UiUtils::screenShot(saveDir, &error);
-        if (!ok) {
-            qDebug() << error;
-        }
-        event->accept();
-    } else if (key == Qt::Key_I) {
-        m_authDialog->show();
+        this->screenShot();
         event->accept();
     } else if (key == Qt::Key_W) {
         GM_INSTANCE->m_modeMan->showMenu();
         event->accept();
     } else if (key == Qt::Key_Y) {
-        GM_INSTANCE->m_modeMan->onModeChanged(new MtcInPaperMode());
-        GM_INSTANCE->m_modeMan->showMenu();
+        m_optionsDialog->setOptions(Constant::DialogID::TEST_DLG, "测试窗口", {"0. 功能1", "1. 功能2", "2. 功能3"});
+        m_optionsDialog->exec();
         event->accept();
     } else if (key == Qt::Key_J) {
         static bool isLow = false;
         setWeightLow(isLow ? false : true);
         event->accept();
+    } else if (key == Qt::Key_G) {
+        emit GM_INSTANCE->m_signalMan->sigCloseLane();
+        event->accept();
+    } else if (key == Qt::Key_O) {
+        emit GM_INSTANCE->m_signalMan->sigOpenLane();
+        event->accept();
+    } else if (key == Qt::Key_I) {
+        emit GM_INSTANCE->m_signalMan->sigShiftIn();
+        event->accept();
+    } else if (key == Qt::Key_U) {
+        emit GM_INSTANCE->m_signalMan->sigShiftOut();
+        event->accept();
     } else {
-        qDebug() << "无效按键";
+        qDebug() << "按键功能未实现";
         MgsBasePage::keyPressEvent(event); // 默认处理其他键
     }
 }

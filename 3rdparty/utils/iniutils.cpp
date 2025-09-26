@@ -2,8 +2,6 @@
 
 #include "qtcassert.h"
 
-#include "Logger.h"
-
 #include <QDataStream>
 #include <QDir>
 #include <QFile>
@@ -17,7 +15,7 @@ namespace Utils {
 
 IniUtils::IniUtils(const QString &filepath, QIODevice::OpenMode mode, QObject *parent)
     : QObject(parent)
-    , m_iniPath(filepath)
+    , m_iniPath(QDir::fromNativeSeparators(filepath))
     , m_iniMode(mode)
 {
     load();
@@ -28,20 +26,31 @@ IniUtils::~IniUtils()
     save();
 }
 
-void IniUtils::dumpInfo() const
+QString IniUtils::dumpInfo() const
 {
-    LOG_INFO().noquote() << "dump ini info";
+    QString helpInfo;
+    QTextStream stream(&helpInfo);
+
+    stream << "start loading " << m_iniPath.split('/').last() << " ==> ";
 
     for (const auto &agroup : m_iniData.datas) {
         if (!agroup.isHead)
-            LOG_INFO().noquote() << "【group】" << agroup.group;
+            stream << agroup.group << " {";
 
+        bool first = true;
         for (const auto &arow : agroup.rows) {
             if (arow.isValid) {
-                LOG_INFO().noquote() << "\t【key】" << arow.key << "【value】" << arow.value;
+                if (!first)
+                    stream << ", ";
+                stream << arow.key << ":" << arow.value.toString();
+                first = false;
             }
         }
+        if (!agroup.isHead)
+            stream << "}; ";
     }
+
+    return helpInfo;
 }
 
 QStringList IniUtils::groups() const
@@ -112,7 +121,6 @@ bool IniUtils::save()
     QTC_ASSERT(!(QIODevice::ReadOnly == m_iniMode), return false);
 
     if (m_iniData.change && isWritable()) {
-        LOG_INFO().noquote() << "save ini" << m_iniPath;
         QFile file(m_iniPath);
         // QIODevice::Text on windows endl=\r\n
         if (file.open(QIODevice::WriteOnly | QIODevice::Truncate | QIODevice::Text)) {
@@ -149,14 +157,12 @@ void IniUtils::load(const QString &filepath)
 
     m_iniData = IniData{};
     const QString path = filepath.isEmpty() ? m_iniPath : filepath;
-    m_iniPath = path;
+    m_iniPath = QDir::fromNativeSeparators(path);
 
     QFile file(path);
     if ((QIODevice::WriteOnly == m_iniMode) || !file.exists() || !file.open(QIODevice::ReadOnly | QIODevice::Text)) {
         return;
     }
-
-    LOG_INFO().noquote() << "loading ini" << m_iniPath;
 
     IniData iniData;
     IniGroup iniGroup;

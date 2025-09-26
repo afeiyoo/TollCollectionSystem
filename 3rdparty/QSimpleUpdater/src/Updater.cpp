@@ -46,6 +46,7 @@ Updater::Updater()
     m_moduleName = qApp->applicationName();
     m_moduleVersion = qApp->applicationVersion();
     m_mandatoryUpdate = false;
+    m_networkErrorOccured = false;
 
     m_downloader = new Downloader();
     m_manager = new QNetworkAccessManager();
@@ -228,6 +229,12 @@ bool Updater::useCustomInstallProcedures() const
     return m_downloader->useCustomInstallProcedures();
 }
 
+// 2025-09-22 第三方库修改 网络异常状态获取
+bool Updater::networkErrorOccured() const
+{
+    return m_networkErrorOccured;
+}
+
 /**
  * Downloads and interpets the update definitions file referenced by the
  * \c url() function.
@@ -372,6 +379,12 @@ void Updater::setDownloadPassword(const QString &password)
     m_downloadPassword = password;
 }
 
+// 2025-09-22 第三方库修改 网络异常状态获取
+void Updater::setNetworkErrorOccured(const bool status)
+{
+    m_networkErrorOccured = status;
+}
+
 /**
  * Called when the download of the update definitions file is finished.
  */
@@ -387,10 +400,13 @@ void Updater::onReply(QNetworkReply *reply)
 
     /* There was a network error */
     if (reply->error() != QNetworkReply::NoError) {
+        setNetworkErrorOccured(true);
         setUpdateAvailable(false);
         emit checkingFinished(url());
         return;
     }
+    // 2025-09-22 第三方库修改 网络异常状态获取
+    setNetworkErrorOccured(false);
 
     /* The application wants to interpret the appcast by itself */
     if (customAppcast()) {
@@ -436,15 +452,15 @@ void Updater::setUpdateAvailable(const bool available)
 
     // 2025-08-23 第三方库修改 对话框样式规范
     if (updateAvailable() && (notifyOnUpdate() || notifyOnFinish())) {
-        QString text = tr("是否现在下载更新包？");
+        QString text = tr("是否立即更新？");
         if (m_mandatoryUpdate) {
-            text = tr("是否现在下载更新包？<br /><strong>本次为强制更新，取消将退出应用程序!</strong>");
+            text = tr("是否立即更新？<br /><strong>本次为强制更新，若取消将无法上班!</strong>");
         }
         text += "<br/><br/>";
         if (!m_changelog.isEmpty())
             text += tr("<strong>更新内容:</strong><br/>%1").arg(m_changelog);
 
-        QString title = "<h3>" + tr("%2 的新版本 %1 已发布！").arg(latestVersion()).arg(moduleName()) + "</h3>";
+        QString title = tr("%2 的新版本 %1 已发布！").arg(latestVersion()).arg(moduleName());
 
         QMessageBox::StandardButton clickBtn = UiHelper::showMessageBoxInfo(title,
                                                                             text,
@@ -468,13 +484,14 @@ void Updater::setUpdateAvailable(const bool available)
                 QDesktopServices::openUrl(QUrl(downloadUrl()));
         } else if (clickBtn == QMessageBox::Cancel) {
             if (m_mandatoryUpdate) {
-                QApplication::quit();
+                // 2025-09-21 第三方库修改 强制更新时不退出程序
+                // QApplication::quit();
             }
         }
     }
 
     else if (notifyOnFinish()) {
-        QString title = "<h3>" + tr("恭喜！你正在使用的 %1 为最新版本").arg(moduleName()) + "</h3>";
+        QString title = tr("恭喜！你正在使用的 %1 为最新版本").arg(moduleName());
         UiHelper::showMessageBoxInfo(title, "当前无可用更新。", QMessageBox::Close);
     }
 }

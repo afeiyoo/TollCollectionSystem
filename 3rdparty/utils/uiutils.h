@@ -54,6 +54,11 @@ public:
     static QMessageBox::StandardButton showMessageBoxError(const QString &title,
                                                            const QString &informativeText,
                                                            QMessageBox::StandardButtons buttons);
+
+    // 显示警告对话框
+    static QMessageBox::StandardButton showMessageBoxWarning(const QString &title,
+                                                             const QString &informativeText,
+                                                             QMessageBox::StandardButtons buttons);
 };
 
 } // namespace Utils

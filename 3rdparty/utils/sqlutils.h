@@ -55,7 +55,7 @@ public:
     // 取得 SQL 语句
     QString getSql(const QString &sqlNamespace, const QString &sqlId);
     // 加载 SQL 语句存储文件
-    void loadSqlFiles(const FileNameList &sqlFiles);
+    bool loadSqlFiles(const FileNameList &sqlFiles);
 };
 
 } // namespace Utils

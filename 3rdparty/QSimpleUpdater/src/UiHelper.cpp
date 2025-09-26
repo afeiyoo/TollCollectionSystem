@@ -16,8 +16,8 @@ QMessageBox::StandardButton UiHelper::showMessageBoxInfo(const QString &title,
     box.setWindowFlags(Qt::Dialog | Qt::WindowTitleHint | Qt::WindowSystemMenuHint);
     box.setTextFormat(Qt::RichText);
     box.setIcon(QMessageBox::Information);
-    box.setText(title);
-    box.setInformativeText(informativeText);
+    box.setText(QString("<span style='font-size:25px; font-weight:bold;'>%1</span>").arg(title));
+    box.setInformativeText(QString("<span style='font-size:17px;'>%1</span>").arg(informativeText));
 
     box.setStandardButtons(buttons);
 
@@ -59,8 +59,8 @@ QMessageBox::StandardButton UiHelper::showMessageBoxQuestion(const QString &titl
     box.setWindowFlags(Qt::Dialog | Qt::WindowTitleHint | Qt::WindowSystemMenuHint);
     box.setTextFormat(Qt::RichText);
     box.setIcon(QMessageBox::Question);
-    box.setText(title);
-    box.setInformativeText(informativeText);
+    box.setText(QString("<span style='font-size:25px; font-weight:bold;'>%1</span>").arg(title));
+    box.setInformativeText(QString("<span style='font-size:17px;'>%1</span>").arg(informativeText));
 
     box.setStandardButtons(buttons);
 

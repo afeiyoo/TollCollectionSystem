@@ -19,7 +19,8 @@ public:
 
     static GlobalManager *instance();
 
-    void init();
+    bool initForLocal();
+    bool initForOnline();
 
 public:
     // 全局配置信息

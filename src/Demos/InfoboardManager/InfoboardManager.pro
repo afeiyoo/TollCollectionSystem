@@ -5,7 +5,11 @@ QT       *= core gui network
 TARGET = InfoboardManager
 TEMPLATE = app
 
-DESTDIR = $$MGS_BIN_PATH/$$TARGET
+win32 {
+    DESTDIR = $$MGS_BIN_PATH/win/$$TARGET
+} else {
+    DESTDIR = $$MGS_BIN_PATH/linux/$$TARGET
+}
 
 include($$THIRD_PARTY_LIBRARY_PATH/utils/Utils.pri)
 

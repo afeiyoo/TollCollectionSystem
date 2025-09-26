@@ -462,17 +462,17 @@ bool DataService::insertEmgcSeqNum(const QString &stationId)
     }
 }
 
-QVariantMap DataService::getTicketUseInfo(int laneId, const QString &id)
+QVariantMap DataService::getTicketUseInfo(int laneId, const QString &ticketNum, const QString &id)
 {
     QSqlDatabase sdb = GM_INSTANCE->m_dbFactory->getDatabase(id);
 
-    QString sql(
-        R"(SELECT TOP 1 * FROM t_ticketusemanage WHERE laneid = ? AND isused = 1 AND lastnum != stopnum AND remark LIKE '%SPT-POS:30%' ORDER BY operatetime)");
+    QString sql = QString(
+        R"(SELECT TOP 1 * FROM t_ticketusemanage WHERE laneid = ? AND isused = 1 AND lastnum != stopnum AND startnum <= ? AND stopnum >= ? AND remark LIKE '%SPT-POS:30%' ORDER BY dataid)");
 
     EasyQtSql::Transaction t(sdb);
     try {
         EasyQtSql::PreparedQuery query = t.prepare(sql);
-        EasyQtSql::QueryResult res = query.exec(laneId);
+        EasyQtSql::QueryResult res = query.exec(laneId, ticketNum, ticketNum);
 
         LOG_INFO().noquote() << "执行SQL语句: " << Utils::DataDealUtils::fullExecutedQuery(res.unwrappedQuery());
 
@@ -487,16 +487,20 @@ QVariantMap DataService::getTicketUseInfo(int laneId, const QString &id)
     }
 }
 
-bool DataService::updateTicketUseInfo(int laneId, int newSeqNum, const QString &id)
+bool DataService::updateTicketUseInfo(int dataId, int laneId, int newSeqNum, const QString &id)
 {
     QSqlDatabase sdb = GM_INSTANCE->m_dbFactory->getDatabase(id);
 
     EasyQtSql::Transaction t(sdb);
     try {
-        EasyQtSql::NonQueryResult res
-            = t.update("t_ticketusemanage")
-                  .set("lastnum", newSeqNum)
-                  .where("laneid = ? AND isused = 1 AND lastnum != stopnum AND remark LIKE '%SPT-POS:30%'", laneId);
+        EasyQtSql::NonQueryResult res = t.update("t_ticketusemanage")
+                                            .set("lastnum", newSeqNum)
+                                            .where("laneid = ? AND isused = 1 AND lastnum != stopnum AND startnum <= ? "
+                                                   "AND stopnum >= ? AND remark LIKE '%SPT-POS:30%' AND dataid = ?",
+                                                   laneId,
+                                                   newSeqNum,
+                                                   newSeqNum,
+                                                   dataId);
 
         LOG_INFO().noquote() << "执行SQL语句: " << Utils::DataDealUtils::fullExecutedQuery(res.unwrappedQuery());
 

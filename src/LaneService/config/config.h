@@ -1,8 +1,6 @@
 #pragma once
 
-#include "global/defs.h"
-#include "utils/fileutils.h"
-#include "utils/iniutils.h"
+#include "utils/defs.h"
 
 #include <QObject>
 
@@ -14,15 +12,10 @@ public:
 
     ~Config() override;
 
-    void loadConfig(const Utils::FileName &configPath);
-
-    void dumpConfig();
+    bool loadConfig();
 
 public:
-    ST_DatabaseConfig m_dbConfig;
-    ST_RpcServerConfig m_serverConfig;
-    ST_LogConfig m_logConfig;
-
-private:
-    Utils::IniUtils *m_ini = nullptr;
+    ConfigDef::ST_LogCfg m_logConfig;
+    ConfigDef::ST_DatabaseCfg m_dbConfig;
+    ConfigDef::ST_RpcServerCfg m_serverConfig;
 };

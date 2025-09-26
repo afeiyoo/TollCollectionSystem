@@ -64,10 +64,8 @@ Downloader::Downloader(QWidget *parent)
     setWindowFlags(Qt::Dialog | Qt::CustomizeWindowHint | Qt::WindowTitleHint);
 
     /* Configure the appearance and behavior of the buttons */
-    m_ui->openButton->setEnabled(false);
-    m_ui->openButton->setVisible(false);
-    connect(m_ui->stopButton, SIGNAL(clicked()), this, SLOT(cancelDownload()));
-    connect(m_ui->openButton, SIGNAL(clicked()), this, SLOT(installUpdate()));
+    // 2025-09-21 第三方库修改 删除下载对话框的打开，停止按钮
+    m_ui->tipLabel->setText(tr("按【取消】键将取消下载..."));
 
     connect(m_manager, &QNetworkAccessManager::authenticationRequired, this, &Downloader::authenticate);
 
@@ -182,8 +180,9 @@ void Downloader::finished()
 
     /* Install the update */
     m_reply->close();
-    installUpdate();
+    // 2025-09-21 第三方库修改 弹窗提示前关闭下载对话框
     setVisible(false);
+    installUpdate();
 }
 
 /**
@@ -193,8 +192,22 @@ void Downloader::finished()
  */
 void Downloader::openDownload()
 {
-    if (!m_fileName.isEmpty())
-        QDesktopServices::openUrl(QUrl::fromLocalFile(m_downloadDir.filePath(m_fileName)));
+    if (!m_fileName.isEmpty()) {
+        // 2025-09-21 第三方库修改 不同平台下的更新包安装流程
+        QString installerPath = m_downloadDir.filePath(m_fileName);
+#ifdef Q_OS_WIN
+        QProcess::startDetached(installerPath);
+#elif defined(Q_OS_LINUX)
+        QFileInfo fi(installerPath);
+        if (!fi.isExecutable()) {
+            QFile::setPermissions(installerPath, fi.permissions() | QFileDevice::ExeUser);
+        }
+        QProcess::startDetached(installerPath);
+#endif
+        QApplication::quit();
+
+        // QDesktopServices::openUrl(QUrl::fromLocalFile(m_downloadDir.filePath(m_fileName)));
+    }
 
     else {
         QMessageBox::critical(this, tr("错误"), tr("找不到已下载的更新文件！"), QMessageBox::Close);
@@ -218,13 +231,14 @@ void Downloader::installUpdate()
     /* Update labels */
     m_ui->stopButton->setText(tr("关闭"));
     m_ui->downloadLabel->setText(tr("下载完成!"));
-    m_ui->timeLabel->setText(tr("完成后将打开安装程序") + "...");
+    m_ui->timeLabel->setText(tr("安装程序将独立打开") + "...");
+    // 2025-09-21 第三方库修改 弹窗提示前关闭下载对话框
 
     /* Ask the user to install the download */
-    QString title = "<h3>" + tr("为了安装更新，您可能需要退出应用程序！") + "</h3>";
+    QString title = tr("为了安装更新，您可能需要退出应用程序！");
     QString text = tr("是否开始安装更新包？");
     if (m_mandatoryUpdate)
-        text = tr("是否开始安装更新包？<br/><br/><strong>本次为强制更新，取消将退出应用程序！</strong>");
+        text = tr("是否开始安装更新包？<br/><br/><strong>本次为强制更新，若取消将无法上班！</strong>");
 
     QMessageBox::StandardButton clickBtn = UiHelper::showMessageBoxQuestion(title,
                                                                             text,
@@ -237,12 +251,10 @@ void Downloader::installUpdate()
     }
     /* Wait */
     else {
-        if (m_mandatoryUpdate)
-            QApplication::quit();
-
-        m_ui->openButton->setEnabled(true);
-        m_ui->openButton->setVisible(true);
-        m_ui->timeLabel->setText(tr("选择确定以应用更新"));
+        if (m_mandatoryUpdate) {
+            // 2025-09-21 第三方库修改 强制更新时不退出程序
+            // QApplication::quit();
+        }
     }
 }
 
@@ -253,25 +265,18 @@ void Downloader::installUpdate()
 void Downloader::cancelDownload()
 {
     if (!m_reply->isFinished()) {
-        QString title = "<h3>" + tr("是否确定取消下载？") + "</h3>";
-        QString text;
+        // 2025-09-22 第三方库修改 取消下载时不提示
+        hide();
+        m_reply->abort();
         if (m_mandatoryUpdate) {
-            text = tr("本次为强制更新，取消将退出应用程序！");
-        }
-
-        QMessageBox::StandardButton clickBtn = UiHelper::showMessageBoxQuestion(title,
-                                                                                text,
-                                                                                QMessageBox::Yes | QMessageBox::No);
-
-        if (clickBtn == QMessageBox::Yes) {
-            hide();
-            m_reply->abort();
-            if (m_mandatoryUpdate)
-                QApplication::quit();
+            // 2025-09-21 第三方库修改 强制更新时不退出程序
+            // QApplication::quit();
         }
     } else {
-        if (m_mandatoryUpdate)
-            QApplication::quit();
+        if (m_mandatoryUpdate) {
+            // 2025-09-21 第三方库修改 强制更新时不退出程序
+            // QApplication::quit();
+        }
 
         hide();
     }
@@ -461,6 +466,17 @@ void Downloader::setDownloadDir(const QString &downloadDir)
 void Downloader::setMandatoryUpdate(const bool mandatory_update)
 {
     m_mandatoryUpdate = mandatory_update;
+}
+
+void Downloader::keyPressEvent(QKeyEvent *event)
+{
+    if (event->key() == Qt::Key_X) {
+        // 取消下载
+        cancelDownload();
+        event->accept();
+    } else {
+        QWidget::keyPressEvent(event);
+    }
 }
 
 /**

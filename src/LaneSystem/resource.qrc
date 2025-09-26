@@ -75,5 +75,7 @@
         <file>static/images/weight_2.png</file>
         <file>static/images/white_plate.png</file>
         <file>static/images/yellow_plate.png</file>
+        <file>static/config/Lane.ini</file>
+        <file>static/config/Keyboard_0.json</file>
     </qresource>
 </RCC>

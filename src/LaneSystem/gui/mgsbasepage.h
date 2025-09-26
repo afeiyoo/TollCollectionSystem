@@ -142,7 +142,8 @@ protected:
     virtual MgsRecentTradePanel *initRecentTradeArea();
     // 设备状态栏区域初始化
     MgsDevicePanel *initDeviceIconArea();
-
+    // 各子类公用，界面截图
+    void screenShot();
 private:
     // 创建顶部信息栏
     void createTopWidget();

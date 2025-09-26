@@ -26,6 +26,12 @@ QT += network
 QT += widgets
 
 DEFINES += QSU_INCLUDE_MOC=1
+shared|dll {
+    DEFINES += QSU_SHARED
+} else {
+    DEFINES += QSU_IMPORT
+}
+
 INCLUDEPATH += $$PWD/include
 
 SOURCES += \

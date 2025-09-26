@@ -3,6 +3,9 @@
 #include "Logger.h"
 #include "config/config.h"
 #include "global/globalmanager.h"
+#include "utils/datadealutils.h"
+
+using namespace Utils;
 
 LaneService::LaneService(QObject *parent)
     : QObject(parent)
@@ -10,17 +13,24 @@ LaneService::LaneService(QObject *parent)
 
 LaneService::~LaneService() {}
 
-void LaneService::init()
+bool LaneService::init()
 {
-    GM_INSTANCE->init();
+#ifdef LANESERVICE_ONLINE
+    if (!GM_INSTANCE->initForOnline())
+        return false;
     GM_INSTANCE->m_rpcServer->registerServices({this});
-
-    LOG_INFO().noquote() << "LaneService 已注册, 监听端口 " << GM_INSTANCE->m_config->m_serverConfig.port;
+    LOG_INFO().noquote() << "服务成功初始化 （网络版服务）";
+    return true;
+#else
+    if (!GM_INSTANCE->initForLocal())
+        return false;
+    LOG_INFO().noquote() << "服务成功初始化（单机版服务）";
+    return true;
+#endif
 }
 
 QString LaneService::dbCreate(const QString &reqJson)
 {
-    LOG_INFO().noquote() << "请求调用API: dbCreate " << reqJson;
     QVariantMap reqMap = GM_INSTANCE->m_jsonParser->parse(reqJson.toUtf8()).toMap();
     QString sqlNamespace = reqMap.value("sqlNamespace", "").toString();
     QString sqlID = reqMap.value("sqlID", "").toString();
@@ -36,7 +46,7 @@ QString LaneService::dbCreate(const QString &reqJson)
             resMap = genResMapForDBOperate(1, -1, "SQL命名空间类型错误", {});
         } else {
             EasyQtSql::NonQueryResult res = t.execNonQuery(sql);
-            LOG_INFO().noquote() << "执行sql语句: " << res.executedQuery();
+            LOG_INFO().noquote() << "执行sql语句: " << DataDealUtils::fullExecutedQuery(res.unwrappedQuery());
             resMap = genResMapForDBOperate(0, res.numRowsAffected(), "成功执行建表语句", {});
 
             t.commit();
@@ -57,7 +67,6 @@ QString LaneService::dbCreate(const QString &reqJson)
 
 QString LaneService::dbUpdate(const QString &reqJson)
 {
-    LOG_INFO().noquote() << "请求调用API: dbUpdate " << reqJson;
     QVariantMap reqMap = GM_INSTANCE->m_jsonParser->parse(reqJson.toUtf8()).toMap();
     QString sqlNamespace = reqMap.value("sqlNamespace", "").toString();
     QString sqlID = reqMap.value("sqlID", "").toString();
@@ -85,11 +94,11 @@ QString LaneService::dbUpdate(const QString &reqJson)
                 QString whereClause = match.captured(2);
                 if (whereClause.isEmpty()) {
                     EasyQtSql::NonQueryResult res = t.update(tableName).set(updateParams).exec();
-                    LOG_INFO().noquote() << "执行sql语句: " << res.executedQuery();
+                    LOG_INFO().noquote() << "执行sql语句: " << DataDealUtils::fullExecutedQuery(res.unwrappedQuery());
                     resMap = genResMapForDBOperate(0, res.numRowsAffected(), "成功执行更新语句", {});
                 } else {
                     EasyQtSql::NonQueryResult res = t.update(tableName).set(updateParams).where(whereClause, whereParams);
-                    LOG_INFO().noquote() << "执行sql语句: " << res.executedQuery();
+                    LOG_INFO().noquote() << "执行sql语句: " << DataDealUtils::fullExecutedQuery(res.unwrappedQuery());
                     resMap = genResMapForDBOperate(0, res.numRowsAffected(), "成功执行更新语句", {});
                 }
 
@@ -112,7 +121,6 @@ QString LaneService::dbUpdate(const QString &reqJson)
 
 QString LaneService::dbRead(const QString &reqJson)
 {
-    LOG_INFO().noquote() << "请求调用API: dbRead " << reqJson;
     QVariantMap reqMap = GM_INSTANCE->m_jsonParser->parse(reqJson.toUtf8()).toMap();
     QString sqlNamespace = reqMap.value("sqlNamespace", "").toString();
     QString sqlID = reqMap.value("sqlID", "").toString();
@@ -130,7 +138,7 @@ QString LaneService::dbRead(const QString &reqJson)
         } else {
             EasyQtSql::PreparedQuery query = t.prepare(sql);
             EasyQtSql::QueryResult res = query.exec(whereParams);
-            LOG_INFO().noquote() << "执行sql语句: " << res.executedQuery();
+            LOG_INFO().noquote() << "执行sql语句: " << DataDealUtils::fullExecutedQuery(res.unwrappedQuery());
 
             QVariantList records;
             while (res.next()) {
@@ -161,7 +169,6 @@ QString LaneService::dbRead(const QString &reqJson)
 
 QString LaneService::dbDelete(const QString &reqJson)
 {
-    LOG_INFO().noquote() << "请求调用API: dbDelete " << reqJson;
     QVariantMap reqMap = GM_INSTANCE->m_jsonParser->parse(reqJson.toUtf8()).toMap();
     QString sqlNamespace = reqMap.value("sqlNamespace", "").toString();
     QString sqlID = reqMap.value("sqlID", "").toString();
@@ -189,11 +196,11 @@ QString LaneService::dbDelete(const QString &reqJson)
 
                 if (whereClause.isEmpty()) {
                     EasyQtSql::NonQueryResult res = t.deleteFrom(tableName).exec();
-                    LOG_INFO().noquote() << "执行sql语句: " << res.executedQuery();
+                    LOG_INFO().noquote() << "执行sql语句: " << DataDealUtils::fullExecutedQuery(res.unwrappedQuery());
                     resMap = genResMapForDBOperate(0, res.numRowsAffected(), "成功执行删除语句", {});
                 } else {
                     EasyQtSql::NonQueryResult res = t.deleteFrom(tableName).where(whereClause, whereParams);
-                    LOG_INFO().noquote() << "执行sql语句: " << res.executedQuery();
+                    LOG_INFO().noquote() << "执行sql语句: " << DataDealUtils::fullExecutedQuery(res.unwrappedQuery());
                     resMap = genResMapForDBOperate(0, res.numRowsAffected(), "成功执行删除语句", {});
                 }
 
@@ -216,7 +223,6 @@ QString LaneService::dbDelete(const QString &reqJson)
 
 QString LaneService::dbInsert(const QString &reqJson)
 {
-    LOG_INFO().noquote() << "请求调用API: dbInsert " << reqJson;
     QVariantMap reqMap = GM_INSTANCE->m_jsonParser->parse(reqJson.toUtf8()).toMap();
     QString sqlNamespace = reqMap.value("sqlNamespace", "").toString();
     QString sqlID = reqMap.value("sqlID", "").toString();

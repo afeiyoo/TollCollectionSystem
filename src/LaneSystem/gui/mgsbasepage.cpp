@@ -7,7 +7,10 @@
 #include "ElaWidgetTools/ElaText.h"
 #include "ElaWidgetTools/ElaToolBar.h"
 #include "ElaWidgetTools/ElaToolButton.h"
+#include "Logger.h"
 #include "global/constant.h"
+#include "global/globalmanager.h"
+#include "global/signalmanager.h"
 #include "gui/component/mgsdevicepanel.h"
 #include "gui/component/mgsiconbutton.h"
 #include "gui/component/mgspagearea.h"
@@ -15,6 +18,8 @@
 #include "gui/component/mgsscrolltext.h"
 #include "gui/component/mgsweightinfopanel.h"
 #include "gui/mgsplateeditdialog.h"
+#include "utils/fileutils.h"
+#include "utils/uiutils.h"
 
 #include <QDebug>
 #include <QFrame>
@@ -37,23 +42,7 @@ MgsBasePage::MgsBasePage(QWidget *parent)
     m_mainWidget = new QWidget(this);
     addCentralWidget(m_mainWidget);
 
-    QTimer *logTimer = new QTimer(this);
-    connect(logTimer, &QTimer::timeout, [=]() {
-        static int counter = 1;
-        static const int maxLogs = 51;
-
-        if (counter > maxLogs) {
-            // 找到 sender()，并关闭这个 QTimer
-            if (QTimer *timer = qobject_cast<QTimer *>(sender())) {
-                timer->stop();
-            }
-            return;
-        }
-
-        QString log = QString("定时日志[ERROR] #%1").arg(counter++);
-        onLogAppend(log);
-    });
-    logTimer->start(1000);
+    connect(GM_INSTANCE->m_signalMan, &SignalManager::sigLogAppend, this, &MgsBasePage::onLogAppend);
 }
 
 MgsBasePage::~MgsBasePage() {}
@@ -345,6 +334,17 @@ MgsDevicePanel *MgsBasePage::initDeviceIconArea()
     return deviceIconPanel;
 }
 
+void MgsBasePage::screenShot()
+{
+    LOG_INFO().noquote() << "开始截图";
+    Utils::FileName saveDir = Utils::FileName::fromString(qApp->applicationDirPath() + "/captures");
+    QString error;
+    bool ok = Utils::UiUtils::screenShot(saveDir, &error);
+    if (!ok) {
+        LOG_ERROR().noquote() << error;
+    }
+}
+
 void MgsBasePage::initUi()
 {
     initLeftUi();
@@ -465,10 +465,8 @@ void MgsBasePage::onLogAppend(const QString &log)
     for (int i = 0; i < m_logBuffer.size(); ++i) {
         const QString &line = m_logBuffer[i];
         QColor textColor = Qt::black;
-        if (line.contains("[ERROR]"))
+        if (line.contains("[ERROR]") || line.contains("[WARN]"))
             textColor = Qt::red;
-        else if (line.contains("[WARN]"))
-            textColor = QColor(255, 165, 0); // 橙黄
 
         QTextCursor cursor = m_logBrowser->textCursor();
         cursor.movePosition(QTextCursor::End);

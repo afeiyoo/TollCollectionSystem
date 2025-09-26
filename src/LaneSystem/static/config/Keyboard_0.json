@@ -1,0 +1,122 @@
+{
+    "Key_Enter": {
+        "Name": "KeyPaid",
+        "Desc": "已付"
+    },
+    "Key_Return": {
+        "Name": "KeyPaid2",
+        "Desc": "已付2"
+    },
+    "Key_Escape": {
+        "Name": "KeyChange",
+        "Desc": "车型/轴更改"
+    },
+    "Key_Minus": {
+        "Name": "KeyCar",
+        "Desc": "客车"
+    },
+    "Key_Semicolon": {
+        "Name": "KeyV",
+        "Desc": "车队"
+    },
+    "Key_Equal": {
+        "Name": "KeyOtherFreeType",
+        "Desc": "动态减免"
+    },
+    "Key_Backslash": {
+        "Name": "KeyV1",
+        "Desc": "一类车"
+    },
+    "Key_BracketLeft": {
+        "Name": "KeyV5",
+        "Desc": "五类车"
+    },
+    "Key_BracketRight": {
+        "Name": "KeyV4",
+        "Desc": "四类车"
+    },
+    "Key_A": {
+        "Name": "KeyMaint",
+        "Desc": "维护"
+    },
+    "Key_B": {
+        "Name": "KeyJC",
+        "Desc": "军车"
+    },
+    "Key_C": {
+        "Name": "KeyV2",
+        "Desc": "二类车"
+    },
+    "Key_D": {
+        "Name": "KeyGW",
+        "Desc": "公务车"
+    },
+    "Key_E": {
+        "Name": "KeyAdd",
+        "Desc": "调整票"
+    },
+    "Key_F": {
+        "Name": "KeyReprint",
+        "Desc": "重打票"
+    },
+    "Key_G": {
+        "Name": "KeyClose",
+        "Desc": "车道关闭"
+    },
+    "Key_H": {
+        "Name": "KeyBreak",
+        "Desc": "违章车"
+    },
+    "Key_I": {
+        "Name": "KeyOn",
+        "Desc": "上班"
+    },
+    "Key_J": {
+        "Name": "KeyOP",
+        "Desc": "鲜果车"
+    },
+    "Key_K": {
+        "Name": "KeySim",
+        "Desc": "模拟"
+    },
+    "Key_L": {
+        "Name": "KeyTruck",
+        "Desc": "货车"
+    },
+    "Key_O": {
+        "Name": "KeyOpen",
+        "Desc": "车道打开"
+    },
+    "Key_R": {
+        "Name": "KeyCancel",
+        "Desc": "废票"
+    },
+    "Key_S": {
+        "Name": "KeyEnter",
+        "Desc": "确认"
+    },
+    "Key_T": {
+        "Name": "KeyUnpaid",
+        "Desc": "未付"
+    },
+    "Key_U": {
+        "Name": "KeyOff",
+        "Desc": "下班"
+    },
+    "Key_V": {
+        "Name": "KeyV3",
+        "Desc": "三类车"
+    },
+    "Key_W": {
+        "Name": "KeyPass",
+        "Desc": "功能"
+    },
+    "Key_X": {
+        "Name": "KeyEsc",
+        "Desc": "返回"
+    },
+    "Key_Right": {
+        "Name": "KeyModify",
+        "Desc": "车牌修改"
+    }
+}

@@ -1,6 +1,6 @@
-#include "cardrobothandler.h"
+#include "cardrobotprocess.h"
 
-CardRobotHandler::CardRobotHandler(ILaneForm *aForm, CBizEnv *bizEnv, TLaneEnv *env, ILaneDeviceCtrl *pCtrl, QObject *parent) : QObject(parent)
+CardRobotProcess::CardRobotProcess(ILaneForm *aForm, CBizEnv *bizEnv, TLaneEnv *env, ILaneDeviceCtrl *pCtrl, QObject *parent) : QObject(parent)
 {
     m_form = aForm;
     m_biz_env = bizEnv;
@@ -13,13 +13,13 @@ CardRobotHandler::CardRobotHandler(ILaneForm *aForm, CBizEnv *bizEnv, TLaneEnv *
     m_thread.start();
 }
 
-CardRobotHandler::~CardRobotHandler()
+CardRobotProcess::~CardRobotProcess()
 {
     m_thread.terminate();
     m_thread.wait();
 }
 
-void CardRobotHandler::onVDChanged(unsigned int newVD)
+void CardRobotProcess::onVDChanged(unsigned int newVD)
 {
 
 }

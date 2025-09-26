@@ -2,6 +2,7 @@
 #include "utils/datadealutils.h"
 
 #include <QDate>
+#include <QDebug>
 #include <QMetaProperty>
 
 using namespace Utils;
@@ -24,14 +25,10 @@ QString BizUtils::getPlateNoColor(const QString &fullPlate)
             return fullPlate;
     }
 
-    if ((pos = checkData.indexOf("蓝")) < 0
-        && (pos = checkData.indexOf("黄")) < 0
-        && (pos = checkData.indexOf("白")) < 0
-        && (pos = checkData.indexOf("绿")) < 0
-        && (pos = checkData.indexOf("拼")) < 0
-        && (pos = checkData.indexOf("渐")) < 0
-        && (pos = checkData.indexOf("黑")) < 0
-        && (pos = checkData.indexOf("临")) < 0) {
+    if ((pos = checkData.indexOf("蓝")) < 0 && (pos = checkData.indexOf("黄")) < 0
+        && (pos = checkData.indexOf("白")) < 0 && (pos = checkData.indexOf("绿")) < 0
+        && (pos = checkData.indexOf("拼")) < 0 && (pos = checkData.indexOf("渐")) < 0
+        && (pos = checkData.indexOf("黑")) < 0 && (pos = checkData.indexOf("临")) < 0) {
         // 所有都没匹配到
         return fullPlate;
     }
@@ -40,39 +37,39 @@ QString BizUtils::getPlateNoColor(const QString &fullPlate)
     return fullPlate.mid(pos + 1, fullPlate.length() - pos - 1);
 }
 
-PlateColorType::PlateColor BizUtils::getColorCodeFromPlate(const QString &fullPlate)
+EM_PlateColor::PlateColor BizUtils::getColorCodeFromPlate(const QString &fullPlate)
 {
     if (fullPlate.length() < 5)
-        return PlateColorType::Unknown;
+        return EM_PlateColor::Unknown;
     if (DataDealUtils::getChineseCountFromString(fullPlate, 4) <= 1) {
         QString prefix = fullPlate.left(2);
         if (prefix.contains(QStringLiteral("白")))
-            return PlateColorType::White;
+            return EM_PlateColor::White;
         else
-            return PlateColorType::Unknown;
+            return EM_PlateColor::Unknown;
     }
     QString checkData = fullPlate.mid(0, 1);
     if (checkData.contains(QStringLiteral("蓝")))
-        return PlateColorType::Blue;
+        return EM_PlateColor::Blue;
     else if (checkData.contains(QStringLiteral("黄")))
-        return PlateColorType::Yellow;
+        return EM_PlateColor::Yellow;
     else if (checkData.contains(QStringLiteral("黑")))
-        return PlateColorType::Black;
+        return EM_PlateColor::Black;
     else if (checkData.contains(QStringLiteral("白")))
-        return PlateColorType::White;
+        return EM_PlateColor::White;
     else if (checkData.contains(QStringLiteral("绿")))
-        return PlateColorType::Green;
+        return EM_PlateColor::Green;
     else if (checkData.contains(QStringLiteral("拼")))
-        return PlateColorType::Plain;
+        return EM_PlateColor::Plain;
     else if (checkData.contains(QStringLiteral("渐")))
-        return PlateColorType::Gradient;
+        return EM_PlateColor::Gradient;
     else if (checkData.contains(QStringLiteral("临")))
-        return PlateColorType::Temporty;
+        return EM_PlateColor::Temporty;
     else
-        return PlateColorType::Unknown;
+        return EM_PlateColor::Unknown;
 }
 
-QString BizUtils::getColorFormColorCode(PlateColorType::PlateColor colorCode)
+QString BizUtils::getColorFormColorCode(EM_PlateColor::PlateColor colorCode)
 {
     QStringList colors;
     colors << QStringLiteral("蓝") << QStringLiteral("黄") << QStringLiteral("黑") << QStringLiteral("白")
@@ -82,6 +79,48 @@ QString BizUtils::getColorFormColorCode(PlateColorType::PlateColor colorCode)
         return "";
 
     return colors.at(colorCode);
+}
+
+QString BizUtils::getKeyName(const QVariantMap &keyboard, uint keyCode)
+{
+    if (keyboard.isEmpty())
+        return "";
+    QMetaEnum metaEnum = QMetaEnum::fromType<Qt::Key>();
+    QString keyStr = metaEnum.valueToKey(keyCode);
+    QVariantMap keyInfo = keyboard[keyStr].toMap();
+    return keyInfo.value("Name", "").toString();
+}
+
+QString BizUtils::getKeyDescByName(const QVariantMap &keyboard, const QString &keyName)
+{
+    if (keyboard.isEmpty())
+        return "";
+    for (auto itor = keyboard.constBegin(); itor != keyboard.constEnd(); itor++) {
+        if (itor->toMap().value("Name") == keyName)
+            return itor->toMap().value("Desc").toString();
+    }
+    return "";
+}
+
+QString BizUtils::getKeyDescByCode(const QVariantMap &keyboard, uint keyCode)
+{
+    if (keyboard.isEmpty())
+        return "";
+    QMetaEnum metaEnum = QMetaEnum::fromType<Qt::Key>();
+    QString keyStr = metaEnum.valueToKey(keyCode);
+    QVariantMap keyInfo = keyboard[keyStr].toMap();
+    return keyInfo.value("Desc", "无效按键").toString();
+}
+
+int BizUtils::getKeyCode(const QVariantMap &keyboard, const QString &keyName)
+{
+    if (keyboard.isEmpty())
+        return -1;
+    QString enumName = keyboard.key(keyName);
+    if (enumName.isEmpty())
+        return -1;
+    QMetaEnum metaEnum = QMetaEnum::fromType<Qt::Key>();
+    return metaEnum.keyToValue(enumName.toLocal8Bit().data());
 }
 
 QString BizUtils::makeDtpContentFromObj(const QObject &obj)

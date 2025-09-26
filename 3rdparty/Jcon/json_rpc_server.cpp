@@ -11,6 +11,7 @@
 #include <QMetaMethod>
 #include <QMetaType>
 #include <QVariant>
+#include <QtConcurrent>
 
 namespace {
 QString logInvoke(const QMetaMethod& meta_method,
@@ -19,8 +20,6 @@ QString logInvoke(const QMetaMethod& meta_method,
 }
 
 namespace jcon {
-
-JsonRpcEndpoint* JsonRpcServer::sm_client_endpoint = nullptr;
 
 JsonRpcServer::JsonRpcServer(QObject* parent,
     std::shared_ptr<JsonRpcLogger> logger)
@@ -97,11 +96,6 @@ void JsonRpcServer::enableSendNotification(bool enabled)
     m_allowNotification = enabled;
 }
 
-JsonRpcEndpoint* JsonRpcServer::clientEndpoint()
-{
-    return sm_client_endpoint;
-}
-
 void JsonRpcServer::jsonRequestReceived(const QJsonObject& request,
     QObject* socket)
 {
@@ -112,52 +106,55 @@ void JsonRpcServer::jsonRequestReceived(const QJsonObject& request,
         return;
     }
 
-    sm_client_endpoint = findClient(socket);
+    // 第三方库修改 2025-09-18 多线程处理请求
+    JsonRpcEndpoint* endpoint = findClient(socket);
+    if(!endpoint)
+        return;
 
     QString method_name = request.value("method").toString();
     if (method_name.isEmpty()) {
         logError("no method present in request");
+        return;
     }
 
     QVariant params = request.value("params").toVariant();
     QString request_id = request.value("id").toVariant().toString();
 
-    QVariant return_value;
-    if (!dispatch(method_name, params, return_value)) {
-        auto msg = QString("method '%1' not found, check name and "
-                           "parameter types ")
-                       .arg(method_name);
-        logError(msg);
+    // 异步执行 dispatch
+    QtConcurrent::run(QThreadPool::globalInstance(), [=]() {
+        QVariant return_value;
+        bool ok = false;
+        QJsonDocument response;
+        QJsonDocument error;
 
-        // send error response if request had valid ID
-        if (request_id != InvalidRequestId) {
-            QJsonDocument error = createErrorResponse(request_id,
-                JsonRpcError::EC_MethodNotFound,
-                msg);
-
-            if (!sm_client_endpoint) {
-                logError("invalid client socket, cannot send response");
-                return;
-            }
-
-            sm_client_endpoint->send(error);
-            return;
-        }
-    }
-
-    // send response if request had valid ID
-    if (request_id != InvalidRequestId) {
-        QJsonDocument response = createResponse(request_id,
-            return_value,
-            method_name);
-
-        if (!sm_client_endpoint) {
-            logError("invalid client socket, cannot send response");
-            return;
+        try {
+            ok = const_cast<JsonRpcServer*>(this)->dispatch(method_name, params, return_value);
+        } catch (std::exception& e) {
+            error = createErrorResponse(request_id,
+                                        JsonRpcError::EC_InternalError,
+                                        e.what());
         }
 
-        sm_client_endpoint->send(response);
-    }
+        if (!ok && error.isEmpty()) {
+            auto msg = QString("method '%1' not found, check name and parameter types").arg(method_name);
+            error = createErrorResponse(request_id,
+                                        JsonRpcError::EC_MethodNotFound,
+                                        msg);
+        }
+
+        if (error.isEmpty() && request_id != InvalidRequestId) {
+            response = createResponse(request_id, return_value, method_name);
+        }
+
+        // 回到 endpoint 所在线程，安全发送响应
+        QMetaObject::invokeMethod(endpoint, [endpoint, response, error]() {
+            if (!endpoint) return; // 再次检查
+            if (!error.isEmpty())
+                endpoint->send(error);
+            else if (!response.isEmpty())
+                endpoint->send(response);
+        }, Qt::QueuedConnection);
+    });
 }
 
 bool JsonRpcServer::dispatch(const QString& method_name,

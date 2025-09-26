@@ -165,6 +165,12 @@ bool QSimpleUpdater::usesCustomInstallProcedures(const QString &url) const
    return getUpdater(url)->useCustomInstallProcedures();
 }
 
+// 2025-09-22 第三方库修改 网络异常状态获取
+bool QSimpleUpdater::getNetworkErrorOccured(const QString &url) const
+{
+    return getUpdater(url)->networkErrorOccured();
+}
+
 /**
  * Returns the URL to open in a web browser of the \c Updater instance
  * registered with the given \a url.

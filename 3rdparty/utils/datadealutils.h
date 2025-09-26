@@ -123,7 +123,7 @@ public:
     static QByteArray asciiStrToByteArray(const QString &str);
 
     // 字节数组转16进制字符串
-    static QString byteArrayToHexStr(const QByteArray &data);
+    static QString byteArrayToHexStr(const QByteArray &data, bool withBlack = true);
 
     // 去除字符串中的空格 type: -1-移除左侧空格 0-移除所有空格 1-移除右侧空格 2-移除首尾空格
     // 3-移除首尾空格,中间空格保留1个
