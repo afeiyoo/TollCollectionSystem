@@ -1920,10 +1920,13 @@ QVariantList BizHandler::getDurationOutTrades(const QString &stationServiceUrl,
         = QString(
               "SELECT tradeid, passid, exvehplate, cardid, enstationname, exstationname, factpay, extime, ticketnum "
               "FROM t_mtc_out WHERE paytype = 0 AND isvalid = 1 AND (exvehplate = '%1' OR cardid = '%2') AND "
-              "exshiftdate > '%3' AND exshiftdate < '%4' UNION ALL SELECT tradeid, passid, exvehplate, "
+              "exshiftdate > TO_DATE('%3', 'YYYY-MM-DD HH24:MI:SS') AND exshiftdate < TO_DATE('%4', 'YYYY-MM-DD "
+              "HH24:MI:SS') UNION ALL SELECT tradeid, "
+              "passid, exvehplate, "
               "cardid, enstationname, exstationname, factpay, extime, ticketnum FROM "
               "t_etc_out WHERE (paytype = 2 OR paytype = 0)  AND isvalid = 1 AND (exvehplate = '%5' OR cardid = '%6') "
-              "AND exshiftdate > '%7' AND exshiftdate < '%8'")
+              "AND exshiftdate > TO_DATE('%7', 'YYYY-MM-DD HH24:MI:SS') AND exshiftdate < TO_DATE('%8', 'YYYY-MM-DD "
+              "HH24:MI:SS')")
               .arg(vehPlate, cardId, startTime, stopTime, vehPlate, cardId, startTime, stopTime);
     sendMap["dataType"] = 4;
 
