@@ -97,6 +97,21 @@ private:
     // 3.3.34 临时免征车查询列表
     QString doDealCmd34(const QVariantMap &aMap);
 
+    // 3.3.38 获取出口流水是否补打票信息
+    QString doDealCmd38(const QVariantMap &aMap);
+    // 查询指定时间段内的第三方支付和现金支付
+    QVariantList getDurationOutTrades(const QString &stationServiceUrl,
+                                      const QString &vehPlate,
+                                      const QString &cardId,
+                                      const QString &startTime,
+                                      const QString &stopTime);
+    // 查询指定TradeID的票据使用信息
+    bool getMTicketUseExist(const QString &stationServiceUrl, const QString &tradeId);
+    // 查询指定TradeID的废票使用信息
+    bool getScrapTicketExist(const QString &stationServiceUrl, const QString &tradeId);
+    // 查询指定TradeID的弃票使用信息
+    bool getDiscardTicket(const QString &stationServiceUrl, const QString &tradeId);
+
     // 3.3.39 获取出口绿通流水
     QString doDealCmd39(const QVariantMap &aMap);
 
