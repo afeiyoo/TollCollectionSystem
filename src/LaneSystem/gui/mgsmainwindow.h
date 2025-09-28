@@ -25,8 +25,8 @@ public:
     // 报警弹窗提示
     void showFormWarningHint(const QString &title, const QStringList &strs);
 
-private:
-    void initUi();
+protected:
+    void showEvent(QShowEvent *event) override;
 
 private:
     // 主页面

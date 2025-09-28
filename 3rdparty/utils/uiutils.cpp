@@ -32,7 +32,7 @@ UiUtils::~UiUtils() {}
 void UiUtils::addLine(QBoxLayout *layout,
                       Qt::Orientation orientation /*= Qt::Vertical*/,
                       int thickness /*= 3*/,
-                      QString color /*= #e0e0e0*/)
+                      QString color /*= #cdcdcd*/)
 {
     if (!layout)
         return;

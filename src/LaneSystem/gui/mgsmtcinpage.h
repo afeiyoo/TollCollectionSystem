@@ -62,7 +62,7 @@ public:
 
     // 交易提示区域API
     void setTradeHint(const QString &tradeHint, const QString &color = "#007bff") override;
-    void setObuHint(const QString &obuHint, const QString &color = "#08c134") override;
+    void setObuHint(const QString &obuHint, const QString &color = "#000000") override;
     void appendHintButton(const QString &hint,
                           const QString &fontColor = "#ffffff",
                           const QString &bgColor = "#08c134") override;

@@ -15,7 +15,6 @@
 #include "gui/mgsetcpage.h"
 #include "gui/mgsmtcinpage.h"
 #include "gui/mgsmtcoutpage.h"
-#include "utils/datadealutils.h"
 #include "utils/uiutils.h"
 
 using namespace Utils;
@@ -23,7 +22,11 @@ using namespace Utils;
 MgsMainWindow::MgsMainWindow(QWidget *parent)
     : ElaWindow(parent)
 {
-    initUi();
+    setAppBarHeight(0);
+    setIsFixedSize(true);
+    setIsNavigationBarEnable(false);
+    setWindowButtonFlags(ElaAppBarType::None);
+    setWindowIcon(QIcon(Constant::Path::APP_ICON));
 
     // 程序退出时，清理界面资源
     connect(qApp, &QCoreApplication::aboutToQuit, this, [this]() { MgsMainWindow::deleteLater(); });
@@ -45,7 +48,7 @@ void MgsMainWindow::initMtcIn()
     m_mainPage->setModeText("混合入口发卡/券");
 
     m_mainPage->setVehMode("客车流程");
-    m_mainPage->setInfoBoard("车道关闭");
+    m_mainPage->setInfoBoard("车道关闭", Constant::Color::WARN_TEXT);
 
     m_mainPage->setTotalVehCnt(20);
     m_mainPage->setTotalCardCnt(123);
@@ -314,43 +317,34 @@ void MgsMainWindow::initEtc()
 
 void MgsMainWindow::showFormErrorHint(const QString &title, const QStringList &strs)
 {
-    QString logInfo = DataDealUtils::curDateTimeStr() + " [ERROR] " + title;
-    emit GM_INSTANCE->m_signalMan->sigLogAppend(logInfo);
+    emit GM_INSTANCE->m_signalMan->sigLogAppend(EM_LogLevel::ERROR, title);
     QString message = strs.join("<br/>");
     UiUtils::showMessageBoxError(title, message, QMessageBox::Yes | QMessageBox::Cancel);
 }
 
 void MgsMainWindow::showFormInfoHint(const QString &title, const QStringList &strs)
 {
-    QString logInfo = DataDealUtils::curDateTimeStr() + " [INFO] " + title;
-    emit GM_INSTANCE->m_signalMan->sigLogAppend(logInfo);
+    emit GM_INSTANCE->m_signalMan->sigLogAppend(EM_LogLevel::INFO, title);
     QString message = strs.join("<br/>");
     UiUtils::showMessageBoxInfo(title, message, QMessageBox::Yes | QMessageBox::Cancel);
 }
 
 void MgsMainWindow::showFormQuestionHint(const QString &title, const QStringList &strs)
 {
-    QString logInfo = DataDealUtils::curDateTimeStr() + " [INFO] " + title;
-    emit GM_INSTANCE->m_signalMan->sigLogAppend(logInfo);
+    emit GM_INSTANCE->m_signalMan->sigLogAppend(EM_LogLevel::INFO, title);
     QString message = strs.join("<br/>");
     UiUtils::showMessageBoxQuestion(title, message, QMessageBox::Yes | QMessageBox::Cancel);
 }
 
 void MgsMainWindow::showFormWarningHint(const QString &title, const QStringList &strs)
 {
-    QString logInfo = DataDealUtils::curDateTimeStr() + " [WARN] " + title;
-    emit GM_INSTANCE->m_signalMan->sigLogAppend(logInfo);
+    emit GM_INSTANCE->m_signalMan->sigLogAppend(EM_LogLevel::WARN, title);
     QString message = strs.join("<br/>");
     UiUtils::showMessageBoxWarning(title, message, QMessageBox::Yes | QMessageBox::Cancel);
 }
 
-void MgsMainWindow::initUi()
+void MgsMainWindow::showEvent(QShowEvent *event)
 {
-    // 窗口基础设置
-    setAppBarHeight(0);
-    setIsFixedSize(true);
-    setIsStayTop(true); // 窗口置顶
-    setIsNavigationBarEnable(false);
-    setWindowButtonFlags(ElaAppBarType::None);
-    setWindowIcon(QIcon(Constant::Path::APP_ICON));
+    // setIsStayTop(true); // 窗口置顶
+    ElaWindow::showEvent(event);
 }

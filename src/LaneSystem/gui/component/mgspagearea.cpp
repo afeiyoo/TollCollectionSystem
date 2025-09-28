@@ -24,7 +24,7 @@ void MgsPageArea::paintEvent(QPaintEvent *event)
     painter.setRenderHint(QPainter::Antialiasing);
 
     QRect rect(1, 1, width() - 2, height() - 2);
-    painter.setPen(QColor(229, 229, 229));
+    painter.setPen(QColor("#e5e5e5"));
     // 设置背景刷（根据透明度判断）
     if (m_backgroundColor.alpha() > 0) {
         painter.setBrush(m_backgroundColor);

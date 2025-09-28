@@ -88,6 +88,7 @@ void MgsRecentTradePanel::initUi()
 
     // 表头字体
     QFont headerFont = m_recentTradeView->horizontalHeader()->font();
+    headerFont.setWeight(QFont::DemiBold);
     headerFont.setPixelSize(15);
     m_recentTradeView->horizontalHeader()->setFont(headerFont);
 
@@ -98,9 +99,7 @@ void MgsRecentTradePanel::initUi()
     m_recentTradeView->horizontalHeader()->setSectionResizeMode(QHeaderView::Fixed);
 
     // 索引列行为
-    m_recentTradeView->verticalHeader()->setSectionsMovable(false);
-    m_recentTradeView->verticalHeader()->setSectionsClickable(false);
-    m_recentTradeView->verticalHeader()->setSectionResizeMode(QHeaderView::Fixed);
+    m_recentTradeView->verticalHeader()->setVisible(false);
 
     // 视图行为
     m_recentTradeView->setSelectionMode(QAbstractItemView::NoSelection);
@@ -110,7 +109,7 @@ void MgsRecentTradePanel::initUi()
     m_recentTradeView->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     m_recentTradeView->setShowGrid(true);           // 启用表格线
     m_recentTradeView->setGridStyle(Qt::SolidLine); // 使用实线
-    m_recentTradeView->setStyleSheet(R"(QTableView { gridline-color: #d1d1d1; } )");
+    m_recentTradeView->setStyleSheet(R"(QTableView { gridline-color: #d1d1d1; })");
 
     QVBoxLayout *layout = new QVBoxLayout(this);
     layout->setContentsMargins(0, 1, 0, 1);

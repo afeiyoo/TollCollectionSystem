@@ -55,7 +55,7 @@ void MgsAuthDialog::initUi()
     ElaImageCard *banner = new ElaImageCard(this);
     banner->setFixedSize(240, 70);
     banner->setIsPreserveAspectCrop(false);
-    banner->setCardImage(QImage(Constant::Path::APP_BANNER));
+    banner->setCardImage(QImage(Constant::Path::APP_BIG_ICON));
 
     ElaText *icon1 = new ElaText(this);
     icon1->setElaIcon(ElaIconType::IdCardClip);

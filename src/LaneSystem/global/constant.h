@@ -14,7 +14,7 @@ const int MAX_SAVE_DAY = 90;
 namespace Path {
 const char APP_ICON[] = ":/static/images/mgskj_icon.png";
 const char CAP_AREA_BACKGROUND[] = ":/static/images/demo_pic.jpg";
-const char APP_BANNER[] = ":/static/images/banner.png";
+const char APP_BIG_ICON[] = ":/static/images/banner.png";
 const char WHITE_PLATE[] = ":/static/images/white_plate.png";
 const char BLACK_PLATE[] = ":/static/images/black_plate.png";
 const char YELLOW_PLATE[] = ":/static/images/yellow_plate.png";
@@ -29,11 +29,27 @@ const char KEYBOARD_FILE_PATH[] = ":/static/config/Keyboard_%1.json";
 
 // 界面颜色
 namespace Color {
-const char ICE_BLUE_COLOR[] = "#f8fbff";
+const char MAIN_BG[] = "#f8fbff";            // 主界面背景色
+const char TOP_BAR_BG[] = "#ffffff";         // 顶栏背景色
+const char PAGEAREA_STRESS_BG[] = "#e2ecf6"; // 主界面强调背景色
+const char PAGEAREA_NORMAL_BG[] = "#ffffff"; // 主机面常规背景色
+const char CONFIRM_BUTTOM_BG[] = "#007bff";  // 强调按钮背景色
+
+const char SPLITTER[] = "#cdcdcd"; // 分割线颜色
+const char BORDER[] = "#e5e5e5";   // 边界颜色
+
+const char CONFIRM_BUTTOM_TEXT[] = "#ffffff"; // 强调按钮字体色
+const char STATUS_TEXT[] = "#1f9d5e";         // 绿色状态颜色
+const char INFO_TEXT[] = "#007bff";           // 蓝色信息颜色
+const char WARN_TEXT[] = "#ff0000";           // 红色警告颜色
+const char STRESS_TEXT[] = "#9d4d56";         // 强调提醒颜色
+
+const char LIGHT_BLUE_COLOR[] = "#e2ecf6";
 const char GRAY_COLOR[] = "#cdcdcd";
 const char BLUE_COLOR[] = "#007bff";
 const char GREEN_COLOR[] = "#00f91a";
 const char WHITE_COLOR[] = "#ffffff";
+const char DARK_RED_COLOR[] = "#9d4d56";
 const char RED_COLOR[] = "#ff0000";
 const char ALICE_BULE_COLOR[] = "#F0F8FF"; // 光标选中背景色
 const char NAVY_BLUE_COLOR[] = "#3399ff";
@@ -41,6 +57,17 @@ const char NAVY_BLUE_COLOR[] = "#3399ff";
 
 // 字体大小
 namespace FontSize {
+const char TOP_BAR_SIZE = 18;
+const char BOTTOM_BAR_SIZE = 14;
+const char DISPLAY_AREA_SIZE = 20;
+const char TRADEINFO_AREA_SIZE = 16;
+const char LOG_AREA_SIZE = 14;
+const char SCROLLTIP_AREA_SIZE = 18;
+const char VEHINFO_AREA_SIZE = 17;
+const char TRADE_HINT_SIZE = 28;
+const char OBU_HINT_SIZE = 15;
+const char WEIGHTINFO_AREA_SIZE = 15;
+
 const char LARGE_TITLE_SIZE = 30;
 const char TITLE_SIZE = 25;
 const char SUBTITLE_SIZE = 20;

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "utils/defs.h"
 #include <QObject>
 
 class SignalManager : public QObject
@@ -28,7 +29,7 @@ signals:
     //按键
     void sigKeyPress(uint key);
     // 界面日志区刷新
-    void sigLogAppend(const QString &log);
+    void sigLogAppend(EM_LogLevel::LogLevel logLevel, const QString &log);
 
     // 选项对话框请求
     void sigOptionSelected(int dlgID, uint option);

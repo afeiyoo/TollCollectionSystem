@@ -19,8 +19,6 @@
 #include "utils/uiutils.h"
 
 #include <QApplication>
-#include <QDebug>
-#include <QGraphicsDropShadowEffect>
 #include <QHBoxLayout>
 #include <QHeaderView>
 #include <QKeyEvent>
@@ -80,70 +78,70 @@ void MgsMtcInPage::setTotalVehCnt(int cnt)
 {
     if (!m_totalVehCnt)
         return;
-    m_totalVehCnt->setText(QString("总过车数: %1").arg(cnt));
+    m_totalVehCnt->setText(QString("%1").arg(cnt));
 }
 
 void MgsMtcInPage::setTotalCardCnt(int cnt)
 {
     if (!m_totalCardCnt)
         return;
-    m_totalCardCnt->setText(QString("总发卡数: %1").arg(cnt));
+    m_totalCardCnt->setText(QString("%1").arg(cnt));
 }
 
 void MgsMtcInPage::setNoFlagCardCnt(int cnt)
 {
     if (!m_noFlagCardCnt)
         return;
-    m_noFlagCardCnt->setText(QString("错标卡数: %1").arg(cnt));
+    m_noFlagCardCnt->setText(QString("%1").arg(cnt));
 }
 
 void MgsMtcInPage::setPeccanyVehCnt(int cnt)
 {
     if (!m_peccanyVehCnt)
         return;
-    m_peccanyVehCnt->setText(QString("冲关车数: %1").arg(cnt));
+    m_peccanyVehCnt->setText(QString("%1").arg(cnt));
 }
 
 void MgsMtcInPage::setFleetVehCnt(int cnt)
 {
     if (!m_fleetVehCnt)
         return;
-    m_fleetVehCnt->setText(QString("车队车数: %1").arg(cnt));
+    m_fleetVehCnt->setText(QString("%1").arg(cnt));
 }
 
 void MgsMtcInPage::setCpcCardCnt(int cnt)
 {
     if (!m_cpcCardCnt)
         return;
-    m_cpcCardCnt->setText(QString("通行卡数: %1").arg(cnt));
+    m_cpcCardCnt->setText(QString("%1").arg(cnt));
 }
 
 void MgsMtcInPage::setEtcCardCnt(int cnt)
 {
     if (!m_etcCardCnt)
         return;
-    m_etcCardCnt->setText(QString("闽通卡数: %1").arg(cnt));
+    m_etcCardCnt->setText(QString("%1").arg(cnt));
 }
 
 void MgsMtcInPage::setBadCardCnt(int cnt)
 {
     if (!m_badCardCnt)
         return;
-    m_badCardCnt->setText(QString("坏卡数: %1").arg(cnt));
+    m_badCardCnt->setText(QString("%1").arg(cnt));
 }
 
 void MgsMtcInPage::setPaperCardCnt(int cnt)
 {
     if (!m_paperCardCnt)
         return;
-    m_paperCardCnt->setText(QString("发纸券数: %1").arg(cnt));
+    m_paperCardCnt->setText(QString("%1").arg(cnt));
 }
 
 void MgsMtcInPage::setHolidayFreeVehCnt(int cnt)
 {
     if (!m_holidayFreeVehCnt)
         return;
-    m_holidayFreeVehCnt->setText(QString("动免车数: %1").arg(cnt));
+    m_holidayFreeVehCnt->setText(QString("%1").arg(cnt));
 }
 
 void MgsMtcInPage::setNormalVehCnt(int cnt)
@@ -355,7 +353,11 @@ void MgsMtcInPage::keyPressEvent(QKeyEvent *event)
         emit GM_INSTANCE->m_signalMan->sigShiftIn();
         event->accept();
     } else if (key == Qt::Key_U) {
-        emit GM_INSTANCE->m_signalMan->sigShiftOut();
+        // emit GM_INSTANCE->m_signalMan->sigShiftOut();
+        static int count = 1;
+        emit GM_INSTANCE->m_signalMan->sigLogAppend(
+            EM_LogLevel::WARN,
+            QString("测试数据 %1 封疆大吏深刻搭街坊立刻埃里克几十块的咖啡机拉进了房间啊撒旦立刻就").arg(count++));
         event->accept();
     } else {
         qDebug() << "按键功能未实现";
@@ -367,20 +369,47 @@ MgsPageArea *MgsMtcInPage::initTradeInfoArea()
 {
     MgsPageArea *tradeInfoArea = new MgsPageArea();
     tradeInfoArea->setBorderRadius(0);
-    tradeInfoArea->setBackgroundColor(Constant::Color::WHITE_COLOR);
-    tradeInfoArea->setMinimumHeight(140);
-    tradeInfoArea->setMaximumHeight(180);
+    tradeInfoArea->setBackgroundColor(Constant::Color::PAGEAREA_NORMAL_BG);
+    tradeInfoArea->setMinimumHeight(160);
+    tradeInfoArea->setMaximumHeight(260);
 
-    m_totalVehCnt = new ElaText("总过车数: ", tradeInfoArea);
-    m_totalCardCnt = new ElaText("总发卡数: ", tradeInfoArea);
-    m_noFlagCardCnt = new ElaText("错标卡数: ", tradeInfoArea);
-    m_peccanyVehCnt = new ElaText("冲关车数: ", tradeInfoArea);
-    m_fleetVehCnt = new ElaText("车队车数: ", tradeInfoArea);
-    m_cpcCardCnt = new ElaText("通行卡数: ", tradeInfoArea);
-    m_etcCardCnt = new ElaText("闽通卡数: ", tradeInfoArea);
-    m_badCardCnt = new ElaText("坏卡数: ", tradeInfoArea);
-    m_paperCardCnt = new ElaText("纸券数: ", tradeInfoArea);
-    m_holidayFreeVehCnt = new ElaText("动免车数: ", tradeInfoArea);
+    ElaText *totalVehCntLabel = new ElaText("总过车数:", tradeInfoArea);
+    ElaText *totalCardCntLabel = new ElaText("总发卡数:", tradeInfoArea);
+    ElaText *noFlagCardCntLabel = new ElaText("错标卡数:", tradeInfoArea);
+    ElaText *peccanyVehCntLabel = new ElaText("冲关车数:", tradeInfoArea);
+    ElaText *fleetVehCntLabel = new ElaText("车队车数:", tradeInfoArea);
+    ElaText *cpcCardCntLabel = new ElaText("通行卡数:", tradeInfoArea);
+    ElaText *etcCardCntLabel = new ElaText("闽通卡数:", tradeInfoArea);
+    ElaText *badCardCntLabel = new ElaText("损坏卡数:", tradeInfoArea);
+    ElaText *paperCardCntLabel = new ElaText("纸质券数:", tradeInfoArea);
+    ElaText *holidayFreeVehCntLabel = new ElaText("动免车数:", tradeInfoArea);
+
+    m_totalVehCnt = new ElaText(tradeInfoArea);
+    m_totalCardCnt = new ElaText(tradeInfoArea);
+    m_noFlagCardCnt = new ElaText(tradeInfoArea);
+    m_peccanyVehCnt = new ElaText(tradeInfoArea);
+    m_fleetVehCnt = new ElaText(tradeInfoArea);
+    m_cpcCardCnt = new ElaText(tradeInfoArea);
+    m_etcCardCnt = new ElaText(tradeInfoArea);
+    m_badCardCnt = new ElaText(tradeInfoArea);
+    m_paperCardCnt = new ElaText(tradeInfoArea);
+    m_holidayFreeVehCnt = new ElaText(tradeInfoArea);
+    QList<ElaText *> labels = {totalVehCntLabel,
+                               totalCardCntLabel,
+                               noFlagCardCntLabel,
+                               peccanyVehCntLabel,
+                               fleetVehCntLabel,
+                               cpcCardCntLabel,
+                               etcCardCntLabel,
+                               badCardCntLabel,
+                               paperCardCntLabel,
+                               holidayFreeVehCntLabel};
+    for (auto *l : labels) {
+        QFont font = l->font();
+        font.setPixelSize(Constant::FontSize::TRADEINFO_AREA_SIZE);
+        l->setFont(font);
+        l->setIsWrapAnywhere(false);
+    }
     QList<ElaText *> texts = {m_totalVehCnt,
                               m_totalCardCnt,
                               m_noFlagCardCnt,
@@ -393,22 +422,42 @@ MgsPageArea *MgsMtcInPage::initTradeInfoArea()
                               m_holidayFreeVehCnt};
     for (auto *t : texts) {
         t->setIsWrapAnywhere(false);
-        t->setTextPixelSize(17);
+        QFont font = t->font();
+        font.setWeight(QFont::DemiBold);
+        font.setPixelSize(Constant::FontSize::TRADEINFO_AREA_SIZE);
+        t->setFont(font);
+        t->setStyleSheet(QString("color: %1;").arg(Constant::Color::STRESS_TEXT));
     }
 
     QGridLayout *tradeInfoAreaLayout = new QGridLayout(tradeInfoArea);
-    tradeInfoAreaLayout->setContentsMargins(10, 5, 10, 5);
+    tradeInfoAreaLayout->setContentsMargins(20, 5, 20, 5);
     tradeInfoAreaLayout->setVerticalSpacing(5);
-    tradeInfoAreaLayout->addWidget(m_totalVehCnt, 0, 0);
-    tradeInfoAreaLayout->addWidget(m_totalCardCnt, 1, 0);
-    tradeInfoAreaLayout->addWidget(m_noFlagCardCnt, 2, 0);
-    tradeInfoAreaLayout->addWidget(m_peccanyVehCnt, 3, 0);
-    tradeInfoAreaLayout->addWidget(m_fleetVehCnt, 4, 0);
-    tradeInfoAreaLayout->addWidget(m_cpcCardCnt, 0, 1);
-    tradeInfoAreaLayout->addWidget(m_etcCardCnt, 1, 1);
-    tradeInfoAreaLayout->addWidget(m_badCardCnt, 2, 1);
-    tradeInfoAreaLayout->addWidget(m_paperCardCnt, 3, 1);
-    tradeInfoAreaLayout->addWidget(m_holidayFreeVehCnt, 4, 1);
+    // 标签列紧凑，值列拉伸
+    tradeInfoAreaLayout->setColumnStretch(0, 0);
+    tradeInfoAreaLayout->setColumnStretch(1, 1);
+    tradeInfoAreaLayout->setColumnStretch(2, 0);
+    tradeInfoAreaLayout->setColumnStretch(3, 1);
+
+    tradeInfoAreaLayout->addWidget(totalVehCntLabel, 0, 0);
+    tradeInfoAreaLayout->addWidget(totalCardCntLabel, 1, 0);
+    tradeInfoAreaLayout->addWidget(noFlagCardCntLabel, 2, 0);
+    tradeInfoAreaLayout->addWidget(peccanyVehCntLabel, 3, 0);
+    tradeInfoAreaLayout->addWidget(fleetVehCntLabel, 4, 0);
+    tradeInfoAreaLayout->addWidget(m_totalVehCnt, 0, 1);
+    tradeInfoAreaLayout->addWidget(m_totalCardCnt, 1, 1);
+    tradeInfoAreaLayout->addWidget(m_noFlagCardCnt, 2, 1);
+    tradeInfoAreaLayout->addWidget(m_peccanyVehCnt, 3, 1);
+    tradeInfoAreaLayout->addWidget(m_fleetVehCnt, 4, 1);
+    tradeInfoAreaLayout->addWidget(cpcCardCntLabel, 0, 2);
+    tradeInfoAreaLayout->addWidget(etcCardCntLabel, 1, 2);
+    tradeInfoAreaLayout->addWidget(badCardCntLabel, 2, 2);
+    tradeInfoAreaLayout->addWidget(paperCardCntLabel, 3, 2);
+    tradeInfoAreaLayout->addWidget(holidayFreeVehCntLabel, 4, 2);
+    tradeInfoAreaLayout->addWidget(m_cpcCardCnt, 0, 3);
+    tradeInfoAreaLayout->addWidget(m_etcCardCnt, 1, 3);
+    tradeInfoAreaLayout->addWidget(m_badCardCnt, 2, 3);
+    tradeInfoAreaLayout->addWidget(m_paperCardCnt, 3, 3);
+    tradeInfoAreaLayout->addWidget(m_holidayFreeVehCnt, 4, 3);
 
     return tradeInfoArea;
 }
@@ -416,39 +465,113 @@ MgsPageArea *MgsMtcInPage::initTradeInfoArea()
 MgsPageArea *MgsMtcInPage::initVehInfoArea()
 {
     MgsPageArea *vehInfoArea = new MgsPageArea();
-    vehInfoArea->setMinimumHeight(45);
-    vehInfoArea->setMaximumHeight(50);
-    Utils::UiUtils::applyShadow(vehInfoArea);
+    vehInfoArea->setBackgroundColor(QColor(Constant::Color::PAGEAREA_NORMAL_BG));
+    vehInfoArea->setBorderRadius(0);
 
-    m_plate = new ElaText(vehInfoArea);
-    m_plate->setMinimumWidth(145);
+    // 车辆信息区：抓拍车牌，车型，车种，特情
+    QWidget *carInfoWidget = new QWidget(vehInfoArea);
+    carInfoWidget->setMinimumHeight(40);
+
+    m_plate = new ElaText(carInfoWidget);
+    m_plate->setMinimumWidth(140);
     m_plate->setContentsMargins(9, 0, 9, 0);
-    m_vehClass = new ElaText(vehInfoArea);
+    m_vehClass = new ElaText(carInfoWidget);
     m_vehClass->setMinimumWidth(145);
-    m_vehStatus = new ElaText(vehInfoArea);
+    m_vehStatus = new ElaText(carInfoWidget);
     m_vehStatus->setMinimumWidth(100);
-    m_situation = new ElaText(vehInfoArea);
+    m_situation = new ElaText(carInfoWidget);
     m_situation->setMinimumWidth(100);
 
-    QList<ElaText *> texts = {m_plate, m_vehClass, m_vehStatus, m_situation};
-    for (auto *t : texts) {
-        t->setTextPixelSize(18);
+    QList<ElaText *> carTexts = {m_plate, m_vehClass, m_vehStatus, m_situation};
+    for (auto *t : carTexts) {
+        t->setTextPixelSize(Constant::FontSize::VEHINFO_AREA_SIZE);
         t->setAlignment(Qt::AlignCenter);
         t->setIsWrapAnywhere(false);
     }
 
-    QHBoxLayout *vehInfoAreaLayout = new QHBoxLayout(vehInfoArea);
-    vehInfoAreaLayout->setContentsMargins(10, 5, 10, 5);
-    vehInfoAreaLayout->setSpacing(5);
+    QHBoxLayout *carInfoWidgetHLayout = new QHBoxLayout(carInfoWidget);
+    carInfoWidgetHLayout->setContentsMargins(10, 5, 10, 5);
+    carInfoWidgetHLayout->setSpacing(5);
 
-    vehInfoAreaLayout->addWidget(m_plate);
-    Utils::UiUtils::addLine(vehInfoAreaLayout);
-    vehInfoAreaLayout->addWidget(m_vehClass);
-    Utils::UiUtils::addLine(vehInfoAreaLayout);
-    vehInfoAreaLayout->addWidget(m_vehStatus);
-    Utils::UiUtils::addLine(vehInfoAreaLayout);
-    vehInfoAreaLayout->addWidget(m_situation);
-    vehInfoAreaLayout->addStretch();
+    carInfoWidgetHLayout->addWidget(m_plate);
+    Utils::UiUtils::addLine(carInfoWidgetHLayout, Qt::Vertical, 2, Constant::Color::BORDER);
+    carInfoWidgetHLayout->addWidget(m_vehClass);
+    Utils::UiUtils::addLine(carInfoWidgetHLayout, Qt::Vertical, 2, Constant::Color::BORDER);
+    carInfoWidgetHLayout->addWidget(m_vehStatus);
+    Utils::UiUtils::addLine(carInfoWidgetHLayout, Qt::Vertical, 2, Constant::Color::BORDER);
+    carInfoWidgetHLayout->addWidget(m_situation);
+    carInfoWidgetHLayout->addStretch();
+
+    // 卡内信息区
+    QWidget *cardInfoWidget = new QWidget(vehInfoArea);
+    cardInfoWidget->setMinimumHeight(130);
+
+    ElaText *label1 = new ElaText("卡类型:", cardInfoWidget);
+    ElaText *label2 = new ElaText("卡内余额:", cardInfoWidget);
+    ElaText *label3 = new ElaText("状态:", cardInfoWidget);
+    ElaText *label4 = new ElaText("卡号:", cardInfoWidget);
+    ElaText *label5 = new ElaText("入口站名:", cardInfoWidget);
+    ElaText *label6 = new ElaText("入口时间:", cardInfoWidget);
+    QList<ElaText *> labels = {label1, label2, label3, label4, label5, label6};
+    for (auto *l : labels) {
+        l->setIsWrapAnywhere(false);
+        QFont font = l->font();
+        font.setBold(true);
+        font.setPixelSize(Constant::FontSize::VEHINFO_AREA_SIZE);
+        l->setFont(font);
+    }
+
+    m_cardType = new ElaText(cardInfoWidget);
+    m_cardNum = new ElaText(cardInfoWidget);
+    m_balance = new ElaText(cardInfoWidget);
+    m_enTime = new ElaText(cardInfoWidget);
+    m_enStationName = new ElaText(cardInfoWidget);
+    m_cardStatus = new ElaText(cardInfoWidget);
+    QList<ElaText *> cardTexts = {m_cardType, m_cardNum, m_balance, m_enTime, m_enStationName, m_cardStatus};
+    for (auto *t : cardTexts) {
+        QFont font = t->font();
+        font.setPixelSize(Constant::FontSize::VEHINFO_AREA_SIZE);
+        t->setFont(font);
+        t->setIsWrapAnywhere(false);
+    }
+
+    QGridLayout *cardInfoAreaLayout = new QGridLayout(cardInfoWidget);
+    cardInfoAreaLayout->setContentsMargins(9, 5, 9, 5);
+    cardInfoAreaLayout->setHorizontalSpacing(5);
+    cardInfoAreaLayout->setVerticalSpacing(5);
+
+    // 设置标签列最小化
+    cardInfoAreaLayout->setColumnStretch(0, 0);
+    cardInfoAreaLayout->setColumnStretch(2, 0);
+
+    // 设置值列弹性填充
+    cardInfoAreaLayout->setColumnStretch(1, 1);
+    cardInfoAreaLayout->setColumnStretch(3, 2);
+
+    // 第一行：卡类型、卡号
+    cardInfoAreaLayout->addWidget(label1, 0, 0);
+    cardInfoAreaLayout->addWidget(m_cardType, 0, 1);
+    cardInfoAreaLayout->addWidget(label4, 0, 2);
+    cardInfoAreaLayout->addWidget(m_cardNum, 0, 3);
+
+    // 第二行：卡内余额、入口站名
+    cardInfoAreaLayout->addWidget(label2, 1, 0);
+    cardInfoAreaLayout->addWidget(m_balance, 1, 1);
+    cardInfoAreaLayout->addWidget(label5, 1, 2);
+    cardInfoAreaLayout->addWidget(m_enStationName, 1, 3);
+
+    // 第三行：状态，入口时间
+    cardInfoAreaLayout->addWidget(label3, 2, 0);
+    cardInfoAreaLayout->addWidget(m_cardStatus, 2, 1);
+    cardInfoAreaLayout->addWidget(label6, 2, 2);
+    cardInfoAreaLayout->addWidget(m_enTime, 2, 3);
+
+    QVBoxLayout *vehInfoAreaLayout = new QVBoxLayout(vehInfoArea);
+    vehInfoAreaLayout->setSpacing(0);
+    vehInfoAreaLayout->setContentsMargins(0, 0, 0, 0);
+    vehInfoAreaLayout->addWidget(carInfoWidget);
+    Utils::UiUtils::addLine(vehInfoAreaLayout, Qt::Horizontal, 2, Constant::Color::BORDER);
+    vehInfoAreaLayout->addWidget(cardInfoWidget);
 
     return vehInfoArea;
 }
@@ -536,14 +659,19 @@ MgsPageArea *MgsMtcInPage::initCardInfoArea()
 MgsPageArea *MgsMtcInPage::initTradeHintArea()
 {
     MgsPageArea *tradeHintArea = new MgsPageArea();
-    tradeHintArea->setMinimumHeight(120);
-    tradeHintArea->setMaximumHeight(160);
+    tradeHintArea->setBackgroundColor(QColor(Constant::Color::PAGEAREA_NORMAL_BG));
+    tradeHintArea->setBorderRadius(0);
+    tradeHintArea->setMinimumHeight(125);
 
     m_tradeHint = new MgsScrollText(tradeHintArea);
-    m_tradeHint->setTextPixelSize(30);
+    m_tradeHint->setStyleSheet(QString("color: %1").arg(Constant::Color::INFO_TEXT));
+    QFont tradeHintfont = m_tradeHint->font();
+    tradeHintfont.setPixelSize(Constant::FontSize::TRADE_HINT_SIZE);
+    tradeHintfont.setBold(true);
+    m_tradeHint->setFont(tradeHintfont);
 
     m_obuHint = new ElaText(tradeHintArea);
-    m_obuHint->setTextPixelSize(15);
+    m_obuHint->setTextPixelSize(Constant::FontSize::OBU_HINT_SIZE);
     m_obuHint->setWordWrap(true);
 
     QVBoxLayout *tradeHintAreaLayout = new QVBoxLayout(tradeHintArea);
