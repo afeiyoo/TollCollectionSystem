@@ -7,6 +7,7 @@
 #endif
 #include <QDebug>
 #include <QMetaProperty>
+#include <QTextCodec>
 #include <QVariant>
 
 using namespace Utils;
@@ -803,7 +804,7 @@ QString DataDealUtils::byteArrayToHexStr(const QByteArray &data, bool withBlack)
         temp += hex.mid(i, 2) + " ";
     }
 
-    if(!withBlack)
+    if (!withBlack)
         return temp.replace(" ", "").toUpper();
 
     return temp.trimmed().toUpper();
@@ -859,6 +860,18 @@ int DataDealUtils::getRandomNum(quint32 boundary)
 #else
     return qrand() % boundary;
 #endif
+}
+
+QByteArray DataDealUtils::encodeString(const QString &text, int coding)
+{
+    if (coding == 1) {
+        QTextCodec *codec = QTextCodec::codecForName("GBK");
+        return codec ? codec->fromUnicode(text) : text.toLocal8Bit();
+    } else if (coding == 2) {
+        QTextCodec *codec = QTextCodec::codecForName("UTF-8");
+        return codec ? codec->fromUnicode(text) : text.toUtf8();
+    }
+    return text.toLocal8Bit();
 }
 
 QString DataDealUtils::getInsertSql(QObject *obj)
