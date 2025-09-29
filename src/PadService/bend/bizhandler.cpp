@@ -1920,13 +1920,10 @@ QVariantList BizHandler::getDurationOutTrades(const QString &stationServiceUrl,
         = QString(
               "SELECT tradeid, passid, exvehplate, cardid, enstationname, exstationname, factpay, extime, ticketnum "
               "FROM t_mtc_out WHERE paytype = 0 AND isvalid = 1 AND (exvehplate = '%1' OR cardid = '%2') AND "
-              "exshiftdate > TO_DATE('%3', 'YYYY-MM-DD HH24:MI:SS') AND exshiftdate < TO_DATE('%4', 'YYYY-MM-DD "
-              "HH24:MI:SS') UNION ALL SELECT tradeid, "
-              "passid, exvehplate, "
+              "exshiftdate > '%3' AND exshiftdate < '%4' UNION ALL SELECT tradeid, passid, exvehplate, "
               "cardid, enstationname, exstationname, factpay, extime, ticketnum FROM "
               "t_etc_out WHERE (paytype = 2 OR paytype = 0)  AND isvalid = 1 AND (exvehplate = '%5' OR cardid = '%6') "
-              "AND exshiftdate > TO_DATE('%7', 'YYYY-MM-DD HH24:MI:SS') AND exshiftdate < TO_DATE('%8', 'YYYY-MM-DD "
-              "HH24:MI:SS')")
+              "AND exshiftdate > '%7' AND exshiftdate < '%8'")
               .arg(vehPlate, cardId, startTime, stopTime, vehPlate, cardId, startTime, stopTime);
     sendMap["dataType"] = 4;
 
@@ -2065,16 +2062,14 @@ QString BizHandler::doDealCmd39(const QVariantMap &aMap)
     sendMap["queryType"] = "queryData";
     sendMap["queryAuth"] = "1";
     sendMap["querySql"]
-        = QString("SELECT tradeid, passid, exvehplate, ennetid, enstation, exnetid, exstation, extime, entotalweight, "
-                  "totalweight, cardtype, shouldpay, factpay, provincenum, cardbiztype, reserve, usertype, obuplate "
-                  "FROM T_ETC_OUT WHERE "
-                  "(usertype = 21 OR usertype = 22) AND extime >= TO_DATE('%1', 'YYYY-MM-DD HH24:MI:SS') AND extime < "
-                  "TO_DATE('%2', 'YYYY-MM-DD HH24:MI:SS') UNION ALL "
-                  "SELECT tradeid, passid, exvehplate, ennetid, enstation, exnetid, exstation, extime, entotalweight, "
-                  "totalweight, cardtype, shouldpay, factpay, provincenum, cardbiztype, reserve, usertype, "
-                  "'' AS obuplate FROM T_MTC_OUT "
-                  "WHERE (usertype = 21 OR usertype = 22) AND extime >= TO_DATE('%3', 'YYYY-MM-DD HH24:MI:SS') AND "
-                  "extime < TO_DATE('%4', 'YYYY-MM-DD HH24:MI:SS')")
+        = QString(
+              "SELECT tradeid, passid, exvehplate, ennetid, enstation, exnetid, exstation, extime, entotalweight, "
+              "totalweight, cardtype, shouldpay, factpay, provincenum, cardbiztype, reserve, usertype, obuplate "
+              "FROM T_ETC_OUT WHERE (usertype = 21 OR usertype = 22) AND extime >= '%1' AND extime < '%2' UNION ALL "
+              "SELECT tradeid, passid, exvehplate, ennetid, enstation, exnetid, exstation, extime, entotalweight, "
+              "totalweight, cardtype, shouldpay, factpay, provincenum, cardbiztype, reserve, usertype, "
+              "'' AS obuplate FROM T_MTC_OUT WHERE (usertype = 21 OR usertype = 22) AND extime >= '%3' AND "
+              "extime < '%4'")
               .arg(startTime, stopTime, startTime, stopTime);
     sendMap["dataType"] = 4;
 
