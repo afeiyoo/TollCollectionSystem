@@ -37,7 +37,7 @@ Widget::~Widget()
     delete ui;
 }
 
-#if 0
+#if 1
 void Widget::postToPrinter(bool checked)
 {
     Q_UNUSED(checked);
@@ -70,7 +70,7 @@ void Widget::postToPrinter(bool checked)
 }
 #endif
 
-#if 1
+#if 0
 void Widget::postToPrinter(bool checked)
 {
     Q_UNUSED(checked);
