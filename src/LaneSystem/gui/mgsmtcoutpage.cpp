@@ -602,7 +602,7 @@ MgsPageArea *MgsMtcOutPage::initTradeHintArea()
     MgsPageArea *tradeHintArea = new MgsPageArea();
     tradeHintArea->setBackgroundColor(QColor(Constant::Color::PAGEAREA_NORMAL_BG));
     tradeHintArea->setBorderRadius(0);
-    tradeHintArea->setMinimumHeight(140);
+    tradeHintArea->setMinimumHeight(130);
 
     m_hintButtonLayout = new QHBoxLayout();
     m_hintButtonLayout->setContentsMargins(0, 0, 0, 0);

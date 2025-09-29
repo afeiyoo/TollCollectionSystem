@@ -107,9 +107,6 @@ void MgsRecentTradePanel::initUi()
     m_recentTradeView->verticalHeader()->setVisible(false);
 
     // 视图行为
-    QFont font = m_recentTradeView->font();
-    font.setPixelSize(Constant::FontSize::TRADE_VIEW_SIZE); // 或者 setPixelSize(14)
-    m_recentTradeView->setFont(font);
     m_recentTradeView->setSelectionMode(QAbstractItemView::NoSelection);
     m_recentTradeView->setFocusPolicy(Qt::NoFocus);
     m_recentTradeView->setEditTriggers(QAbstractItemView::NoEditTriggers);
