@@ -2067,7 +2067,7 @@ QString BizHandler::doDealCmd39(const QVariantMap &aMap)
               "totalweight, cardtype, shouldpay, factpay, provincenum, cardbiztype, reserve, usertype, obuplate "
               "FROM T_ETC_OUT WHERE (usertype = 21 OR usertype = 22) AND extime >= '%1' AND extime < '%2' UNION ALL "
               "SELECT tradeid, passid, exvehplate, ennetid, enstation, exnetid, exstation, extime, entotalweight, "
-              "totalweight, cardtype, shouldpay, factpay, provincenum, cardbiztype, reserve, usertype, "
+              "totalweight, cardtype, shouldpay, factpay, '' AS provincenum, cardbiztype, reserve, usertype, "
               "'' AS obuplate FROM T_MTC_OUT WHERE (usertype = 21 OR usertype = 22) AND extime >= '%3' AND "
               "extime < '%4'")
               .arg(startTime, stopTime, startTime, stopTime);
