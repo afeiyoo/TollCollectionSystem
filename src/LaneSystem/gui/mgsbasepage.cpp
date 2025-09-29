@@ -292,7 +292,7 @@ MgsPageArea *MgsBasePage::initScrollTipArea()
     tipIconWidget->setFixedWidth(40);
 
     ElaIconButton *tipIcon = new ElaIconButton(ElaIconType::MessageCaptions, 20, 30, 30, tipIconWidget);
-    tipIcon->setLightIconColor(QColor(Constant::Color::WHITE_COLOR));
+    tipIcon->setLightIconColor(QColor(Constant::Color::CONFIRM_BUTTON_TEXT));
 
     QHBoxLayout *iconHLayout = new QHBoxLayout(tipIconWidget);
     iconHLayout->setContentsMargins(0, 0, 0, 0);

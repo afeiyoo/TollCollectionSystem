@@ -57,7 +57,10 @@ void MIDeskProcess::onShiftIn()
                                                      GM_INSTANCE->m_config->m_businessConfig.laneIP,
                                                      GM_INSTANCE->m_config->m_businessConfig.CNLaneID);
     // if (!authOk) {
-    //     m_mainWindow->showFormErrorHint("车道授权失败", {"该车道未在省中心平台注册", "</br>", "<strong>请及时联系运维人员处理!</strong>"});
+    //     m_mainWindow->showFormErrorHint("车道授权失败",
+    //                                     {"该车道未在省中心平台注册",
+    //                                      "</br>",
+    //                                      "<strong>请及时联系运维人员处理!</strong>"});
     //     return;
     // }
     // 2. 检查程序更新，必须是最新程序才可以登班

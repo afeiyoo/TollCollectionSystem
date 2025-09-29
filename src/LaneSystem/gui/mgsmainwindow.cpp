@@ -10,7 +10,6 @@
 #include "global/globalmanager.h"
 #include "global/signalmanager.h"
 #include "gui/component/mgsdevicepanel.h"
-#include "gui/component/mgsweightinfopanel.h"
 #include "gui/mgsbasepage.h"
 #include "gui/mgsetcpage.h"
 #include "gui/mgsmtcinpage.h"
@@ -81,7 +80,7 @@ void MgsMainWindow::initMtcIn()
     m_mainPage->setEnStationName("福建莆田西站");
     m_mainPage->setCardStatus("正常");
 
-    m_mainPage->setTradeHint("正在交易中，请勿进行其他操作");
+    m_mainPage->setTradeHint("请先上班后再进行操作");
     m_mainPage->setObuHint("大件运输车; 蓝闽Z8699A; 普通车; 专二; OBUSN:35011603000799998;");
 
     m_mainPage->setCurWeightInfo("12轴型 2轴 10.00吨 轴型18.00吨 超限0.00%");
@@ -252,7 +251,14 @@ void MgsMainWindow::initEtc()
     m_mainPage->setShiftInfo("2025-07-31 晚班");
     m_mainPage->setModeText("ETC入口");
 
-    m_mainPage->setVehMode("称重降级", Constant::Color::RED_COLOR);
+    m_mainPage->setVehMode("ETC过车");
+    m_mainPage->setInfoBoard("车道关闭", Constant::Color::WARN_TEXT);
+
+    m_mainPage->setFullBlackVer("20250801");
+    m_mainPage->setPartBlackVer("202508011215");
+    m_mainPage->setVirtualGantryInfo("福州西B向门架(340901.H)");
+    m_mainPage->setAppVer("1.0.1");
+    m_mainPage->setFeeRateVer("1098");
 
     m_mainPage->setTotalVehCnt(32);
     m_mainPage->setNormalVehCnt(20);

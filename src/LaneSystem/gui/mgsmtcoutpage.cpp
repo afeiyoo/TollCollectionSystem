@@ -233,7 +233,7 @@ void MgsMtcOutPage::setSituation(const QString &situation)
     if (!m_situation)
         return;
     m_situation->setText(situation);
-    m_situation->setStyleSheet(QString("color: %1").arg(Constant::Color::RED_COLOR));
+    m_situation->setStyleSheet(QString("color: %1").arg(Constant::Color::WARN_TEXT));
 }
 
 void MgsMtcOutPage::setCardType(const QString &cardType)

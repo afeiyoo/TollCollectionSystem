@@ -14,7 +14,7 @@ MgsBaseDialog::MgsBaseDialog(QWidget *parent)
     setWindowTitle("请选择");
     setWindowModality(Qt::ApplicationModal);
     setFocusPolicy(Qt::StrongFocus);
-    setWindowFlags(Qt::Window | Qt::WindowTitleHint);
+    setWindowFlags(Qt::Dialog | Qt::WindowTitleHint);
 
     initUi();
 }

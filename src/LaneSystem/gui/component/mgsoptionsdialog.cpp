@@ -33,7 +33,7 @@ void MgsOptionsDialog::initUi()
 {
     m_title = new ElaText(this);
     QFont titleFont = m_title->font();
-    titleFont.setPixelSize(Constant::FontSize::TITLE_SIZE);
+    titleFont.setPixelSize(Constant::FontSize::DIALOG_TITLE_SIZE);
     titleFont.setBold(true);
     m_title->setFont(titleFont);
 
@@ -45,22 +45,22 @@ void MgsOptionsDialog::initUi()
     m_optionsView->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     m_optionsView->setIsTransparent(true);
     QFont itemFont = m_optionsView->font();
-    itemFont.setPixelSize(Constant::FontSize::BODY_SIZE);
+    itemFont.setPixelSize(Constant::FontSize::DIALOG_BODY_SIZE);
     m_optionsView->setFont(itemFont);
     m_optionsView->setFocusPolicy(Qt::NoFocus);
 
     m_yesButton = new ElaPushButton("确认", this);
-    m_yesButton->setLightDefaultColor(QColor(Constant::Color::BLUE_COLOR));
-    m_yesButton->setLightTextColor(QColor(Constant::Color::WHITE_COLOR));
+    m_yesButton->setLightDefaultColor(QColor(Constant::Color::CONFIRM_BUTTON_BG));
+    m_yesButton->setLightTextColor(QColor(Constant::Color::CONFIRM_BUTTON_TEXT));
 
     m_noButton = new ElaPushButton("返回", this);
-    m_noButton->setLightDefaultColor(Constant::Color::GRAY_COLOR);
+    m_noButton->setLightDefaultColor(Constant::Color::CANCEL_BUTTON_BG);
     QList<ElaPushButton *> btnList = {m_yesButton, m_noButton};
     for (auto &btn : btnList) {
         btn->setContentsMargins(0, 0, 0, 0);
         btn->setBorderRadius(5);
         QFont btnFont = btn->font();
-        btnFont.setPixelSize(Constant::FontSize::CONTROL_SIZE);
+        btnFont.setPixelSize(Constant::FontSize::DIALOG_BUTTON_SIZE);
         btn->setFont(btnFont);
         btn->setFixedSize(80, 30);
     }
@@ -102,7 +102,7 @@ void MgsOptionsDialog::setOptions(int dlgID, const QString &title, const QString
         QStandardItem *item = new QStandardItem(option);
 
         QFont font = item->font();
-        font.setPixelSize(Constant::FontSize::BODY_SIZE);
+        font.setPixelSize(Constant::FontSize::DIALOG_BODY_SIZE);
         item->setFont(font);
 
         m_model->appendRow(item);
@@ -174,7 +174,7 @@ void MgsOptionsDialog::paintEvent(QPaintEvent *event)
     painter.save();
     painter.setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing);
     painter.setPen(Qt::NoPen);
-    painter.setBrush(QColor(Constant::Color::WHITE_COLOR));
+    painter.setBrush(QColor(Constant::Color::DIALOG_BG));
     // 背景绘制
     int layoutAreaHeight = m_title->height() + m_optionsView->height() + 5;
     painter.drawRect(QRectF(0, 0, width(), layoutAreaHeight));

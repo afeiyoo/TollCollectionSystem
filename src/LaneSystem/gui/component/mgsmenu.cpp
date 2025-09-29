@@ -65,7 +65,7 @@ void MgsMenu::addNewTab(const QString &tabName, const QStringList &funcs, const 
         font.setPixelSize(17);
         item->setFont(font);
         // 确定是否启用
-        QColor color = enableFuncs.contains(i) ? Qt::black : QColor(Constant::Color::GRAY_COLOR);
+        QColor color = enableFuncs.contains(i) ? Qt::black : QColor("#cdcdcd");
         item->setForeground(color);
 
         model->appendRow(item);

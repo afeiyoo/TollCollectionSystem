@@ -34,6 +34,9 @@ const char TOP_BAR_BG[] = "#ffffff";         // 顶栏背景色
 const char PAGEAREA_STRESS_BG[] = "#e2ecf6"; // 主界面强调背景色
 const char PAGEAREA_NORMAL_BG[] = "#ffffff"; // 主机面常规背景色
 const char CONFIRM_BUTTON_BG[] = "#007bff";  // 强调按钮背景色
+const char CANCEL_BUTTON_BG[] = "#cdcdcd";   // 取消按钮背景色
+const char DIALOG_BG[] = "#ffffff";          // 对话框背景色
+const char SELECTED_BG[] = "#F0F8FF";        // 光标选中背景色
 
 const char SPLITTER[] = "#cdcdcd"; // 分割线颜色
 const char BORDER[] = "#e5e5e5";   // 边界颜色
@@ -43,16 +46,7 @@ const char STATUS_TEXT[] = "#1f9d5e";         // 绿色状态颜色
 const char INFO_TEXT[] = "#007bff";           // 蓝色信息颜色
 const char WARN_TEXT[] = "#ff0000";           // 红色警告颜色
 const char STRESS_TEXT[] = "#9d4d56";         // 强调提醒颜色
-
-const char LIGHT_BLUE_COLOR[] = "#e2ecf6";
-const char GRAY_COLOR[] = "#cdcdcd";
-const char BLUE_COLOR[] = "#007bff";
-const char GREEN_COLOR[] = "#00f91a";
-const char WHITE_COLOR[] = "#ffffff";
-const char DARK_RED_COLOR[] = "#9d4d56";
-const char RED_COLOR[] = "#ff0000";
-const char ALICE_BULE_COLOR[] = "#F0F8FF"; // 光标选中背景色
-const char NAVY_BLUE_COLOR[] = "#3399ff";
+const char SELECTED_TEXT[] = "#3399ff";       // 光标选中字体色
 } // namespace Color
 
 // 字体大小
@@ -69,12 +63,9 @@ const char OBU_HINT_SIZE = 15;
 const char WEIGHTINFO_AREA_SIZE = 15;
 const char TRADE_VIEW_SIZE = 14;
 
-const char LARGE_TITLE_SIZE = 30;
-const char TITLE_SIZE = 25;
-const char SUBTITLE_SIZE = 20;
-const char BODY_SIZE = 17;
-const char CONTROL_SIZE = 15;
-const char CAPTION_SIZE = 12;
+const char DIALOG_BUTTON_SIZE = 15;
+const char DIALOG_TITLE_SIZE = 20;
+const char DIALOG_BODY_SIZE = 16;
 } // namespace FontSize
 
 // 特殊字符
