@@ -1848,10 +1848,8 @@ QString BizHandler::doDealCmd38(const QVariantMap &aMap)
     if (aMap.contains("stationId"))
         stationId = aMap["stationId"].toString();
 
-    if (vehPlate.isEmpty())
-        throw BaseException(1, "响应失败: 站代码为空");
-    if (cardId.isEmpty())
-        throw BaseException(1, "响应失败: 卡号为空");
+    if (vehPlate.isEmpty() && cardId.isEmpty())
+        throw BaseException(1, "响应失败: 站代码与站代码为空");
     if (startTime.isEmpty() || stopTime.isEmpty())
         throw BaseException(1, "响应失败：开始或结束时间为空");
     if (stationId.isEmpty())
