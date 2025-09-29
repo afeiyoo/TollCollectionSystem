@@ -103,7 +103,7 @@ public:
     // 称重信息显示区域API
     void setCurWeightInfo(const QString &curWeightInfo);
     void setCurWeightInfoCount(const QString &curWeightInfoCount);
-    void appendWeightInfoItem(const WeightInfoItem &item);
+    void appendWeightInfoItem(const ST_WeightInfoItem &item);
     void setWeightLow(bool isLow);
 
     // 近期交易记录查看区域API
@@ -127,9 +127,6 @@ protected:
 
     // 车辆及卡内信息区域初始化（由子类各自实现）
     virtual MgsPageArea *initVehInfoArea();
-
-    // 卡内信息区域初始化（由子类各自实现）
-    virtual MgsPageArea *initCardInfoArea(); // TODO 待删除
 
     // 交易提示信息区域初始化（由子类各自实现）
     virtual MgsPageArea *initTradeHintArea();
@@ -193,11 +190,8 @@ private:
     MgsPageArea *m_scrollTipArea = nullptr;
     MgsScrollText *m_scrollTip = nullptr;
 
-    // 当前车辆信息显示区域
+    // 当前车辆与卡内信息显示区域
     MgsPageArea *m_vehInfoArea = nullptr;
-
-    // 当前车辆卡内信息显示区域
-    MgsPageArea *m_cardInfoArea = nullptr; // TODO 待删除
 
     // 交易提示区域
     MgsPageArea *m_tradeHintArea = nullptr;

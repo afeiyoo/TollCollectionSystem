@@ -47,7 +47,7 @@ int main(int argc, char *argv[])
     } else {
         LOG_ASSERT_X(false, "系统初始化失败：前端初始化失败（无对应车道类型）");
     }
-    mainWindow.showNormal();
+    mainWindow.showFullScreen();
     LOG_INFO().noquote() << "前端初始化完成";
 
     // 业务处理模块初始化

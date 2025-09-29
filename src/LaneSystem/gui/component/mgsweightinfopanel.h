@@ -1,19 +1,9 @@
 #pragma once
 
+#include "utils/defs.h"
 #include <QAbstractListModel>
 #include <QWidget>
 
-// 称重信息
-struct WeightInfoItem
-{
-    QString plate;
-    uint axisType;
-    uint axisNum;
-    qreal weight;
-    uint status; // 0-等待中，1-已交易
-};
-
-// 模型类
 class WeightInfoModel : public QAbstractListModel
 {
     Q_OBJECT
@@ -24,8 +14,8 @@ public:
 
     enum WeightInfoRoles { PlateRole = Qt::UserRole + 1, AxisTypeRole, AxisNumRole, WeightRole, StatusRole };
 
-    void setItems(const QList<WeightInfoItem> &items);
-    void appendItem(const WeightInfoItem &item);
+    void setItems(const QList<ST_WeightInfoItem> &items);
+    void appendItem(const ST_WeightInfoItem &item);
     void removeItem(const QModelIndex &index);
     void updateItem(const QModelIndex &index, uint status);
 
@@ -37,7 +27,7 @@ protected:
     QHash<int, QByteArray> roleNames() const override;
 
 private:
-    QList<WeightInfoItem> m_dataList;
+    QList<ST_WeightInfoItem> m_dataList;
 };
 
 class ElaListView;
@@ -49,7 +39,7 @@ public:
 
     ~MgsWeightInfoPanel() override;
 
-    void appendItem(const WeightInfoItem &item);
+    void appendItem(const ST_WeightInfoItem &item);
     void updateItem(int row, uint status);
 
 private:

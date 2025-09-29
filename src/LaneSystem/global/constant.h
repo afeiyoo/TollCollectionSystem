@@ -33,12 +33,12 @@ const char MAIN_BG[] = "#f8fbff";            // 主界面背景色
 const char TOP_BAR_BG[] = "#ffffff";         // 顶栏背景色
 const char PAGEAREA_STRESS_BG[] = "#e2ecf6"; // 主界面强调背景色
 const char PAGEAREA_NORMAL_BG[] = "#ffffff"; // 主机面常规背景色
-const char CONFIRM_BUTTOM_BG[] = "#007bff";  // 强调按钮背景色
+const char CONFIRM_BUTTON_BG[] = "#007bff";  // 强调按钮背景色
 
 const char SPLITTER[] = "#cdcdcd"; // 分割线颜色
 const char BORDER[] = "#e5e5e5";   // 边界颜色
 
-const char CONFIRM_BUTTOM_TEXT[] = "#ffffff"; // 强调按钮字体色
+const char CONFIRM_BUTTON_TEXT[] = "#ffffff"; // 强调按钮字体色
 const char STATUS_TEXT[] = "#1f9d5e";         // 绿色状态颜色
 const char INFO_TEXT[] = "#007bff";           // 蓝色信息颜色
 const char WARN_TEXT[] = "#ff0000";           // 红色警告颜色
@@ -67,6 +67,7 @@ const char VEHINFO_AREA_SIZE = 17;
 const char TRADE_HINT_SIZE = 28;
 const char OBU_HINT_SIZE = 15;
 const char WEIGHTINFO_AREA_SIZE = 15;
+const char TRADE_VIEW_SIZE = 14;
 
 const char LARGE_TITLE_SIZE = 30;
 const char TITLE_SIZE = 25;

@@ -361,103 +361,109 @@ MgsPageArea *MgsEtcPage::initTradeInfoArea()
 MgsPageArea *MgsEtcPage::initVehInfoArea()
 {
     MgsPageArea *vehInfoArea = new MgsPageArea();
-    vehInfoArea->setMinimumHeight(45);
-    vehInfoArea->setMaximumHeight(50);
-    Utils::UiUtils::applyShadow(vehInfoArea);
+    vehInfoArea->setBackgroundColor(QColor(Constant::Color::PAGEAREA_NORMAL_BG));
+    vehInfoArea->setBorderRadius(0);
 
-    m_plate = new ElaText(vehInfoArea);
+    // 车辆信息区：抓拍车牌，车型，车种，特情
+    QWidget *carInfoWidget = new QWidget(vehInfoArea);
+    carInfoWidget->setFixedHeight(40);
+
+    m_plate = new ElaText(carInfoWidget);
+    m_plate->setMinimumWidth(140);
     m_plate->setContentsMargins(9, 0, 9, 0);
-    m_vehClass = new ElaText(vehInfoArea);
-    m_vehStatus = new ElaText(vehInfoArea);
-    QList<ElaText *> texts = {m_plate, m_vehClass, m_vehStatus};
-    for (auto *t : texts) {
-        t->setTextPixelSize(18);
+    m_vehClass = new ElaText(carInfoWidget);
+    m_vehClass->setMinimumWidth(150);
+    m_vehStatus = new ElaText(carInfoWidget);
+    m_vehStatus->setMinimumWidth(150);
+    QList<ElaText *> carTexts = {m_plate, m_vehClass, m_vehStatus};
+    for (auto *t : carTexts) {
+        t->setTextPixelSize(Constant::FontSize::VEHINFO_AREA_SIZE);
         t->setAlignment(Qt::AlignCenter);
         t->setIsWrapAnywhere(false);
-        t->setMinimumWidth(150);
     }
 
-    QHBoxLayout *vehInfoAreaLayout = new QHBoxLayout(vehInfoArea);
-    vehInfoAreaLayout->setContentsMargins(10, 5, 10, 5);
-    vehInfoAreaLayout->setSpacing(5);
+    QHBoxLayout *carInfoHLayout = new QHBoxLayout(carInfoWidget);
+    carInfoHLayout->setContentsMargins(10, 5, 10, 5);
+    carInfoHLayout->setSpacing(5);
 
-    vehInfoAreaLayout->addWidget(m_plate);
-    Utils::UiUtils::addLine(vehInfoAreaLayout);
-    vehInfoAreaLayout->addWidget(m_vehClass);
-    Utils::UiUtils::addLine(vehInfoAreaLayout);
-    vehInfoAreaLayout->addWidget(m_vehStatus);
-    vehInfoAreaLayout->addStretch();
+    carInfoHLayout->addWidget(m_plate);
+    Utils::UiUtils::addLine(carInfoHLayout, Qt::Vertical, 2, Constant::Color::BORDER);
+    carInfoHLayout->addWidget(m_vehClass);
+    Utils::UiUtils::addLine(carInfoHLayout, Qt::Vertical, 2, Constant::Color::BORDER);
+    carInfoHLayout->addWidget(m_vehStatus);
+    carInfoHLayout->addStretch();
 
-    return vehInfoArea;
-}
+    // 卡内信息区
+    QWidget *cardInfoWidget = new QWidget(vehInfoArea);
+    cardInfoWidget->setMinimumHeight(120);
+    cardInfoWidget->setMaximumHeight(140);
 
-MgsPageArea *MgsEtcPage::initCardInfoArea()
-{
-    MgsPageArea *cardInfoArea = new MgsPageArea();
-    cardInfoArea->setMinimumHeight(130);
-    cardInfoArea->setMaximumHeight(150);
+    ElaText *label1 = new ElaText("卡类型:", cardInfoWidget);
+    ElaText *label2 = new ElaText("卡号:", cardInfoWidget);
+    ElaText *label3 = new ElaText("卡内余额:", cardInfoWidget);
+    ElaText *label4 = new ElaText("收费金额:", cardInfoWidget);
+    ElaText *label5 = new ElaText("入口站名:", cardInfoWidget);
+    ElaText *label6 = new ElaText("入口时间:", cardInfoWidget);
+    QList<ElaText *> labels = {label1, label2, label3, label4, label5, label6};
+    for (auto *l : labels) {
+        l->setIsWrapAnywhere(false);
+        QFont font = l->font();
+        font.setBold(true);
+        font.setPixelSize(Constant::FontSize::VEHINFO_AREA_SIZE);
+        l->setFont(font);
+    }
 
-    ElaText *text1 = new ElaText("卡类型:", cardInfoArea);
-    ElaText *text2 = new ElaText("卡号:", cardInfoArea);
-    ElaText *text3 = new ElaText("卡内余额:", cardInfoArea);
-    ElaText *text4 = new ElaText("收费金额:", cardInfoArea);
-    ElaText *text5 = new ElaText("入口站名:", cardInfoArea);
-    ElaText *text6 = new ElaText("入口时间:", cardInfoArea);
-    QFont font = text1->font();
-    font.setBold(true);
-    text1->setFont(font);
-    text2->setFont(font);
-    text3->setFont(font);
-    text4->setFont(font);
-    text5->setFont(font);
-    text6->setFont(font);
-
-    m_cardType = new ElaText(cardInfoArea);
-    m_cardNum = new ElaText(cardInfoArea);
-    m_balance = new ElaText(cardInfoArea);
-    m_enTime = new ElaText(cardInfoArea);
-    m_enStationName = new ElaText(cardInfoArea);
-    m_toll = new ElaText(cardInfoArea);
-
-    QList<ElaText *> texts
-        = {text1, text2, text3, text4, text5, text6, m_cardType, m_cardNum, m_balance, m_enTime, m_enStationName, m_toll};
-    for (auto *t : texts) {
-        t->setTextPixelSize(17);
+    m_cardType = new ElaText(cardInfoWidget);
+    m_cardNum = new ElaText(cardInfoWidget);
+    m_balance = new ElaText(cardInfoWidget);
+    m_enTime = new ElaText(cardInfoWidget);
+    m_enStationName = new ElaText(cardInfoWidget);
+    m_toll = new ElaText(cardInfoWidget);
+    QList<ElaText *> cardTexts = {m_cardType, m_cardNum, m_balance, m_enTime, m_enStationName, m_toll};
+    for (auto *t : cardTexts) {
+        QFont font = t->font();
+        font.setPixelSize(Constant::FontSize::VEHINFO_AREA_SIZE);
+        t->setFont(font);
         t->setIsWrapAnywhere(false);
     }
 
-    QGridLayout *cardInfoAreaLayout = new QGridLayout(cardInfoArea);
+    QGridLayout *cardInfoAreaLayout = new QGridLayout(cardInfoWidget);
     cardInfoAreaLayout->setContentsMargins(9, 5, 9, 5);
-    cardInfoAreaLayout->setHorizontalSpacing(10);
+    cardInfoAreaLayout->setHorizontalSpacing(5);
     cardInfoAreaLayout->setVerticalSpacing(5);
 
-    // 设置标签列最小化
+    // 设置标签列最小化，值列弹性拉伸
     cardInfoAreaLayout->setColumnStretch(0, 0);
     cardInfoAreaLayout->setColumnStretch(2, 0);
-
-    // 设置值列弹性填充
     cardInfoAreaLayout->setColumnStretch(1, 1);
     cardInfoAreaLayout->setColumnStretch(3, 2);
 
     // 第一行：卡类型、卡号
-    cardInfoAreaLayout->addWidget(text1, 0, 0);
+    cardInfoAreaLayout->addWidget(label1, 0, 0);
     cardInfoAreaLayout->addWidget(m_cardType, 0, 1);
-    cardInfoAreaLayout->addWidget(text2, 0, 2);
+    cardInfoAreaLayout->addWidget(label2, 0, 2);
     cardInfoAreaLayout->addWidget(m_cardNum, 0, 3);
 
     // 第二行：卡内余额、收费
-    cardInfoAreaLayout->addWidget(text3, 1, 0);
+    cardInfoAreaLayout->addWidget(label3, 1, 0);
     cardInfoAreaLayout->addWidget(m_balance, 1, 1);
-    cardInfoAreaLayout->addWidget(text4, 1, 2);
+    cardInfoAreaLayout->addWidget(label4, 1, 2);
     cardInfoAreaLayout->addWidget(m_toll, 1, 3);
 
     // 第三行：状态，入口时间
-    cardInfoAreaLayout->addWidget(text5, 2, 0);
+    cardInfoAreaLayout->addWidget(label5, 2, 0);
     cardInfoAreaLayout->addWidget(m_enStationName, 2, 1);
-    cardInfoAreaLayout->addWidget(text6, 2, 2);
+    cardInfoAreaLayout->addWidget(label6, 2, 2);
     cardInfoAreaLayout->addWidget(m_enTime, 2, 3);
 
-    return cardInfoArea;
+    QVBoxLayout *vehInfoAreaLayout = new QVBoxLayout(vehInfoArea);
+    vehInfoAreaLayout->setSpacing(0);
+    vehInfoAreaLayout->setContentsMargins(0, 0, 0, 0);
+    vehInfoAreaLayout->addWidget(carInfoWidget);
+    Utils::UiUtils::addLine(vehInfoAreaLayout, Qt::Horizontal, 2, Constant::Color::BORDER);
+    vehInfoAreaLayout->addWidget(cardInfoWidget);
+
+    return vehInfoArea;
 }
 
 MgsPageArea *MgsEtcPage::initTradeHintArea()

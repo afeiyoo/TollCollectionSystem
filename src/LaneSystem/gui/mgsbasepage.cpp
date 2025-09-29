@@ -89,8 +89,8 @@ void MgsBasePage::createTopWidget()
     m_modeText->setBorderRadius(8);
     m_modeText->setMinimumWidth(100);
     m_modeText->setFixedHeight(35);
-    m_modeText->setLightDefaultColor(QColor(Constant::Color::CONFIRM_BUTTOM_BG));
-    m_modeText->setLightTextColor(QColor(Constant::Color::CONFIRM_BUTTOM_TEXT));
+    m_modeText->setLightDefaultColor(QColor(Constant::Color::CONFIRM_BUTTON_BG));
+    m_modeText->setLightTextColor(QColor(Constant::Color::CONFIRM_BUTTON_TEXT));
     QFont font = m_modeText->font();
     font.setPixelSize(Constant::FontSize::TOP_BAR_SIZE);
     font.setBold(true);
@@ -210,13 +210,11 @@ MgsPageArea *MgsBasePage::initDisplayArea()
     m_capImage->setBorderRadius(0);
     m_capImage->setIsPreserveAspectCrop(false);
     m_capImage->setCardImage(QImage(Constant::Path::CAP_AREA_BACKGROUND));
-    m_capImage->setMinimumHeight(300);
+    m_capImage->setMinimumHeight(310);
 
     // 情报板与流程显示区
     QWidget *vehModeAndInfoBoardArea = new QWidget(displayArea);
-    vehModeAndInfoBoardArea->setObjectName("vehModeAndInfoBoardArea");
-    vehModeAndInfoBoardArea->setStyleSheet(
-        QString("#vehModeAndInfoBoardArea { background-color: %1; }").arg(Constant::Color::PAGEAREA_STRESS_BG));
+    vehModeAndInfoBoardArea->setStyleSheet(QString("background-color: %1;").arg(Constant::Color::PAGEAREA_STRESS_BG));
     vehModeAndInfoBoardArea->setMinimumHeight(45);
     vehModeAndInfoBoardArea->setMaximumHeight(50);
 
@@ -262,8 +260,7 @@ MgsPageArea *MgsBasePage::initDisplayArea()
 QPlainTextEdit *MgsBasePage::initLogBrowseArea()
 {
     QPlainTextEdit *logBrowser = new QPlainTextEdit();
-    logBrowser->setObjectName("logBrowser");
-    logBrowser->setStyleSheet(QString("#logBrowser { border: 1px solid %1; }").arg(Constant::Color::BORDER));
+    logBrowser->setStyleSheet(QString("border: 1px solid %1;").arg(Constant::Color::BORDER));
     logBrowser->setReadOnly(true);
     logBrowser->setTextInteractionFlags(Qt::NoTextInteraction); // 禁止选择、复制等
     logBrowser->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -291,17 +288,17 @@ MgsPageArea *MgsBasePage::initScrollTipArea()
     m_scrollTip->setFont(font);
 
     QWidget *tipIconWidget = new QWidget(scrollTipArea);
-    tipIconWidget->setStyleSheet(QString("background-color: %1").arg(Constant::Color::CONFIRM_BUTTOM_BG));
+    tipIconWidget->setStyleSheet(QString("background-color: %1;").arg(Constant::Color::CONFIRM_BUTTON_BG));
     tipIconWidget->setFixedWidth(40);
 
     ElaIconButton *tipIcon = new ElaIconButton(ElaIconType::MessageCaptions, 20, 30, 30, tipIconWidget);
     tipIcon->setLightIconColor(QColor(Constant::Color::WHITE_COLOR));
 
-    QHBoxLayout *iconWidgetLayout = new QHBoxLayout(tipIconWidget);
-    iconWidgetLayout->setContentsMargins(0, 0, 0, 0);
-    iconWidgetLayout->setSpacing(0);
-    iconWidgetLayout->setAlignment(Qt::AlignCenter);
-    iconWidgetLayout->addWidget(tipIcon);
+    QHBoxLayout *iconHLayout = new QHBoxLayout(tipIconWidget);
+    iconHLayout->setContentsMargins(0, 0, 0, 0);
+    iconHLayout->setSpacing(0);
+    iconHLayout->setAlignment(Qt::AlignCenter);
+    iconHLayout->addWidget(tipIcon);
 
     QHBoxLayout *scrollTipHLayout = new QHBoxLayout(scrollTipArea);
     scrollTipHLayout->setContentsMargins(0, 0, 0, 0);
@@ -319,13 +316,6 @@ MgsPageArea *MgsBasePage::initVehInfoArea()
     MgsPageArea *vehInfoArea = new MgsPageArea();
 
     return vehInfoArea;
-}
-
-MgsPageArea *MgsBasePage::initCardInfoArea()
-{
-    MgsPageArea *cardInfoArea = new MgsPageArea();
-
-    return cardInfoArea;
 }
 
 MgsPageArea *MgsBasePage::initTradeHintArea()
@@ -360,13 +350,13 @@ MgsPageArea *MgsBasePage::initWeightInfoArea()
     m_curWeightInfoCount->setTextPixelSize(Constant::FontSize::WEIGHTINFO_AREA_SIZE);
     m_curWeightInfoCount->setIsWrapAnywhere(false);
 
-    QHBoxLayout *weightInfoSubLayout = new QHBoxLayout();
-    weightInfoSubLayout->setContentsMargins(0, 0, 0, 0);
-    weightInfoSubLayout->addWidget(m_curWeightInfo);
-    weightInfoSubLayout->addStretch();
-    weightInfoSubLayout->addWidget(m_weightLow);
-    weightInfoSubLayout->addStretch();
-    weightInfoSubLayout->addWidget(m_curWeightInfoCount);
+    QHBoxLayout *weightSubHLayout = new QHBoxLayout();
+    weightSubHLayout->setContentsMargins(0, 0, 0, 0);
+    weightSubHLayout->addWidget(m_curWeightInfo);
+    weightSubHLayout->addStretch();
+    weightSubHLayout->addWidget(m_weightLow);
+    weightSubHLayout->addStretch();
+    weightSubHLayout->addWidget(m_curWeightInfoCount);
 
     // 称重信息队列
     m_weightInfoPanel = new MgsWeightInfoPanel(weightInfoArea);
@@ -374,7 +364,7 @@ MgsPageArea *MgsBasePage::initWeightInfoArea()
     QVBoxLayout *weightInfoAreaLayout = new QVBoxLayout(weightInfoArea);
     weightInfoAreaLayout->setContentsMargins(5, 5, 5, 5);
     weightInfoAreaLayout->setSpacing(0);
-    weightInfoAreaLayout->addLayout(weightInfoSubLayout);
+    weightInfoAreaLayout->addLayout(weightSubHLayout);
     weightInfoAreaLayout->addStretch();
     weightInfoAreaLayout->addWidget(m_weightInfoPanel);
 
@@ -468,7 +458,7 @@ void MgsBasePage::setCurWeightInfo(const QString &curWeightInfo)
     m_curWeightInfo->setText(curWeightInfo);
 }
 
-void MgsBasePage::appendWeightInfoItem(const WeightInfoItem &item)
+void MgsBasePage::appendWeightInfoItem(const ST_WeightInfoItem &item)
 {
     if (!m_weightInfoPanel)
         return;
@@ -600,8 +590,8 @@ void MgsBasePage::initRightUi()
     QVBoxLayout *rightSubLayout1 = new QVBoxLayout(rightSubWidget1);
     rightSubLayout1->setContentsMargins(0, 0, 0, 4);
     rightSubLayout1->setSpacing(5);
-    rightSubLayout1->addWidget(m_scrollTipArea);
-    rightSubLayout1->addWidget(m_vehInfoArea);
+    rightSubLayout1->addWidget(m_scrollTipArea, 1);
+    rightSubLayout1->addWidget(m_vehInfoArea, 1);
     rightSubLayout1->addWidget(m_tradeHintArea, 1);
     rightSubLayout1->addWidget(m_weightInfoArea);
 
@@ -617,15 +607,15 @@ void MgsBasePage::initRightUi()
     QVBoxLayout *rightSubLayout2 = new QVBoxLayout(rightSubWidget2);
     rightSubLayout2->setContentsMargins(0, 0, 0, 0);
     rightSubLayout2->setSpacing(5);
-    rightSubLayout2->addWidget(m_recentTradePanel, 80);
-    rightSubLayout2->addWidget(m_deviceIconPanel, 20);
+    rightSubLayout2->addWidget(m_recentTradePanel, 75);
+    rightSubLayout2->addWidget(m_deviceIconPanel, 25);
 
     m_rightLayout = new QSplitter(Qt::Vertical, this);
     m_rightLayout->setChildrenCollapsible(false);
     m_rightLayout->addWidget(rightSubWidget1);
     m_rightLayout->addWidget(rightSubWidget2);
     m_rightLayout->setHandleWidth(1);
-    m_rightLayout->setSizes({580, 420});
+    m_rightLayout->setSizes({600, 400});
 }
 
 void MgsBasePage::setStationInfo(const QString &stationInfo)

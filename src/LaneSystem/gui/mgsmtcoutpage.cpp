@@ -17,9 +17,7 @@
 #include "utils/bizutils.h"
 #include "utils/uiutils.h"
 
-#include <QApplication>
 #include <QCoreApplication>
-#include <QDebug>
 #include <QKeyEvent>
 #include <QVBoxLayout>
 
@@ -44,56 +42,56 @@ void MgsMtcOutPage::setStartTicketNum(int num)
 {
     if (!m_startTicketNum)
         return;
-    m_startTicketNum->setText(QString("起始票据: %1").arg(num));
+    m_startTicketNum->setText(QString("%1").arg(num));
 }
 
 void MgsMtcOutPage::setCurTicketNum(int num)
 {
     if (!m_curTicketNum)
         return;
-    m_curTicketNum->setText(QString("当前票据: %1").arg(num));
+    m_curTicketNum->setText(QString("%1").arg(num));
 }
 
 void MgsMtcOutPage::setNormalTicketCnt(int cnt)
 {
     if (!m_normalTicketCnt)
         return;
-    m_normalTicketCnt->setText(QString("正常票数: %1").arg(cnt));
+    m_normalTicketCnt->setText(QString("%1").arg(cnt));
 }
 
 void MgsMtcOutPage::setScrapTicketCnt(int cnt)
 {
     if (!m_scrapTicketCnt)
         return;
-    m_scrapTicketCnt->setText(QString("废票张数: %1").arg(cnt));
+    m_scrapTicketCnt->setText(QString("%1").arg(cnt));
 }
 
 void MgsMtcOutPage::setRestTicketCnt(int cnt)
 {
     if (!m_restTicketCnt)
         return;
-    m_restTicketCnt->setText(QString("剩余票据: %1").arg(cnt));
+    m_restTicketCnt->setText(QString("%1").arg(cnt));
 }
 
 void MgsMtcOutPage::setRecycleCardCnt(int cnt)
 {
     if (!m_recycleCardCnt)
         return;
-    m_recycleCardCnt->setText(QString("回收卡数: %1").arg(cnt));
+    m_recycleCardCnt->setText(QString("%1").arg(cnt));
 }
 
 void MgsMtcOutPage::setThirdPayCnt(int cnt)
 {
     if (!m_thirdPayCnt)
         return;
-    m_thirdPayCnt->setText(QString("第三方: %1").arg(cnt));
+    m_thirdPayCnt->setText(QString("%1").arg(cnt));
 }
 
 void MgsMtcOutPage::setTotalVehCnt(int cnt)
 {
     if (!m_totalVehCnt)
         return;
-    m_totalVehCnt->setText(QString("总过车数: %1").arg(cnt));
+    m_totalVehCnt->setText(QString("%1").arg(cnt));
 }
 
 void MgsMtcOutPage::setTotalCardCnt(int cnt)
@@ -115,7 +113,7 @@ void MgsMtcOutPage::setFleetVehCnt(int cnt)
 {
     if (!m_fleetVehCnt)
         return;
-    m_fleetVehCnt->setText(QString("车队车数: %1").arg(cnt));
+    m_fleetVehCnt->setText(QString("%1").arg(cnt));
 }
 
 void MgsMtcOutPage::setCpcCardCnt(int cnt)
@@ -127,7 +125,7 @@ void MgsMtcOutPage::setEtcCardCnt(int cnt)
 {
     if (!m_etcCardCnt)
         return;
-    m_etcCardCnt->setText(QString("闽通卡数: %1").arg(cnt));
+    m_etcCardCnt->setText(QString("%1").arg(cnt));
 }
 
 void MgsMtcOutPage::setBadCardCnt(int cnt)
@@ -377,21 +375,48 @@ void MgsMtcOutPage::keyPressEvent(QKeyEvent *event)
 MgsPageArea *MgsMtcOutPage::initTradeInfoArea()
 {
     MgsPageArea *tradeInfoArea = new MgsPageArea();
-    tradeInfoArea->setBackgroundColor(Qt::transparent);
-    tradeInfoArea->setMinimumHeight(140);
-    tradeInfoArea->setMaximumHeight(180);
+    tradeInfoArea->setBorderRadius(0);
+    tradeInfoArea->setBackgroundColor(Constant::Color::PAGEAREA_NORMAL_BG);
+    tradeInfoArea->setMinimumHeight(160);
+    tradeInfoArea->setMaximumHeight(260);
 
-    m_startTicketNum = new ElaText("起始票据: ", tradeInfoArea);
-    m_curTicketNum = new ElaText("当前票据: ", tradeInfoArea);
-    m_normalTicketCnt = new ElaText("正常票数: ", tradeInfoArea);
-    m_scrapTicketCnt = new ElaText("废票张数: ", tradeInfoArea);
-    m_restTicketCnt = new ElaText("剩余票数: ", tradeInfoArea);
-    m_totalVehCnt = new ElaText("总过车数: ", tradeInfoArea);
-    m_recycleCardCnt = new ElaText("回收卡数: ", tradeInfoArea);
-    m_etcCardCnt = new ElaText("闽通卡数: ", tradeInfoArea);
-    m_fleetVehCnt = new ElaText("车队车数: ", tradeInfoArea);
-    m_thirdPayCnt = new ElaText("第三方: ", tradeInfoArea);
+    ElaText *startTicketNumLabel = new ElaText("起始票据: ", tradeInfoArea);
+    ElaText *curTicketNumLabel = new ElaText("当前票据: ", tradeInfoArea);
+    ElaText *normalTicketCntLabel = new ElaText("正常票数: ", tradeInfoArea);
+    ElaText *scrapTicketCntLabel = new ElaText("废票张数: ", tradeInfoArea);
+    ElaText *restTicketCntLabel = new ElaText("剩余票数: ", tradeInfoArea);
+    ElaText *totalVehCntLabel = new ElaText("总过车数: ", tradeInfoArea);
+    ElaText *recycleCardCntLabel = new ElaText("回收卡数: ", tradeInfoArea);
+    ElaText *etcCardCntLabel = new ElaText("闽通卡数: ", tradeInfoArea);
+    ElaText *fleetVehCntLabel = new ElaText("车队车数: ", tradeInfoArea);
+    ElaText *thirdPayCntLabel = new ElaText("第三方: ", tradeInfoArea);
+    QList<ElaText *> labels = {startTicketNumLabel,
+                               curTicketNumLabel,
+                               normalTicketCntLabel,
+                               scrapTicketCntLabel,
+                               restTicketCntLabel,
+                               totalVehCntLabel,
+                               recycleCardCntLabel,
+                               etcCardCntLabel,
+                               fleetVehCntLabel,
+                               thirdPayCntLabel};
+    for (auto *l : labels) {
+        l->setIsWrapAnywhere(false);
+        QFont font = l->font();
+        font.setPixelSize(Constant::FontSize::TRADEINFO_AREA_SIZE);
+        l->setFont(font);
+    }
 
+    m_startTicketNum = new ElaText(tradeInfoArea);
+    m_curTicketNum = new ElaText(tradeInfoArea);
+    m_normalTicketCnt = new ElaText(tradeInfoArea);
+    m_scrapTicketCnt = new ElaText(tradeInfoArea);
+    m_restTicketCnt = new ElaText(tradeInfoArea);
+    m_totalVehCnt = new ElaText(tradeInfoArea);
+    m_recycleCardCnt = new ElaText(tradeInfoArea);
+    m_etcCardCnt = new ElaText(tradeInfoArea);
+    m_fleetVehCnt = new ElaText(tradeInfoArea);
+    m_thirdPayCnt = new ElaText(tradeInfoArea);
     QList<ElaText *> texts = {m_startTicketNum,
                               m_curTicketNum,
                               m_normalTicketCnt,
@@ -404,22 +429,42 @@ MgsPageArea *MgsMtcOutPage::initTradeInfoArea()
                               m_thirdPayCnt};
     for (auto *t : texts) {
         t->setIsWrapAnywhere(false);
-        t->setTextPixelSize(17);
+        QFont font = t->font();
+        font.setWeight(QFont::Bold);
+        font.setPixelSize(Constant::FontSize::TRADEINFO_AREA_SIZE);
+        t->setFont(font);
+        t->setStyleSheet(QString("color: %1;").arg(Constant::Color::STRESS_TEXT));
     }
 
     QGridLayout *tradeInfoAreaLayout = new QGridLayout(tradeInfoArea);
-    tradeInfoAreaLayout->setContentsMargins(10, 5, 10, 5);
+    tradeInfoAreaLayout->setContentsMargins(20, 5, 20, 5);
     tradeInfoAreaLayout->setVerticalSpacing(5);
-    tradeInfoAreaLayout->addWidget(m_startTicketNum, 0, 0);
-    tradeInfoAreaLayout->addWidget(m_curTicketNum, 1, 0);
-    tradeInfoAreaLayout->addWidget(m_normalTicketCnt, 2, 0);
-    tradeInfoAreaLayout->addWidget(m_scrapTicketCnt, 3, 0);
-    tradeInfoAreaLayout->addWidget(m_restTicketCnt, 4, 0);
-    tradeInfoAreaLayout->addWidget(m_totalVehCnt, 0, 1);
-    tradeInfoAreaLayout->addWidget(m_recycleCardCnt, 1, 1);
-    tradeInfoAreaLayout->addWidget(m_etcCardCnt, 2, 1);
-    tradeInfoAreaLayout->addWidget(m_fleetVehCnt, 3, 1);
-    tradeInfoAreaLayout->addWidget(m_thirdPayCnt, 4, 1);
+    // 标签列紧凑，值列拉伸
+    tradeInfoAreaLayout->setColumnStretch(0, 0);
+    tradeInfoAreaLayout->setColumnStretch(1, 1);
+    tradeInfoAreaLayout->setColumnStretch(2, 0);
+    tradeInfoAreaLayout->setColumnStretch(3, 1);
+
+    tradeInfoAreaLayout->addWidget(startTicketNumLabel, 0, 0);
+    tradeInfoAreaLayout->addWidget(curTicketNumLabel, 1, 0);
+    tradeInfoAreaLayout->addWidget(normalTicketCntLabel, 2, 0);
+    tradeInfoAreaLayout->addWidget(scrapTicketCntLabel, 3, 0);
+    tradeInfoAreaLayout->addWidget(restTicketCntLabel, 4, 0);
+    tradeInfoAreaLayout->addWidget(m_startTicketNum, 0, 1);
+    tradeInfoAreaLayout->addWidget(m_curTicketNum, 1, 1);
+    tradeInfoAreaLayout->addWidget(m_normalTicketCnt, 2, 1);
+    tradeInfoAreaLayout->addWidget(m_scrapTicketCnt, 3, 1);
+    tradeInfoAreaLayout->addWidget(m_restTicketCnt, 4, 1);
+    tradeInfoAreaLayout->addWidget(totalVehCntLabel, 0, 2);
+    tradeInfoAreaLayout->addWidget(recycleCardCntLabel, 1, 2);
+    tradeInfoAreaLayout->addWidget(etcCardCntLabel, 2, 2);
+    tradeInfoAreaLayout->addWidget(fleetVehCntLabel, 3, 2);
+    tradeInfoAreaLayout->addWidget(thirdPayCntLabel, 4, 2);
+    tradeInfoAreaLayout->addWidget(m_totalVehCnt, 0, 3);
+    tradeInfoAreaLayout->addWidget(m_recycleCardCnt, 1, 3);
+    tradeInfoAreaLayout->addWidget(m_etcCardCnt, 2, 3);
+    tradeInfoAreaLayout->addWidget(m_fleetVehCnt, 3, 3);
+    tradeInfoAreaLayout->addWidget(m_thirdPayCnt, 4, 3);
 
     return tradeInfoArea;
 }
@@ -427,143 +472,137 @@ MgsPageArea *MgsMtcOutPage::initTradeInfoArea()
 MgsPageArea *MgsMtcOutPage::initVehInfoArea()
 {
     MgsPageArea *vehInfoArea = new MgsPageArea();
-    vehInfoArea->setMinimumHeight(45);
-    vehInfoArea->setMaximumHeight(50);
-    Utils::UiUtils::applyShadow(vehInfoArea);
+    vehInfoArea->setBackgroundColor(QColor(Constant::Color::PAGEAREA_NORMAL_BG));
+    vehInfoArea->setBorderRadius(0);
 
-    m_plate = new ElaText(vehInfoArea);
+    // 车辆信息区：抓拍车牌，车型，车种，特情
+    QWidget *carInfoWidget = new QWidget(vehInfoArea);
+    carInfoWidget->setFixedHeight(40);
+
+    m_plate = new ElaText(carInfoWidget);
+    m_plate->setMinimumWidth(140);
     m_plate->setContentsMargins(9, 0, 9, 0);
-    m_plate->setMinimumWidth(145);
-    m_vehClass = new ElaText(vehInfoArea);
+    m_vehClass = new ElaText(carInfoWidget);
     m_vehClass->setMinimumWidth(145);
-    m_vehStatus = new ElaText(vehInfoArea);
+    m_vehStatus = new ElaText(carInfoWidget);
     m_vehStatus->setMinimumWidth(100);
-    m_situation = new ElaText(vehInfoArea);
+    m_situation = new ElaText(carInfoWidget);
     m_situation->setMinimumWidth(100);
 
-    QList<ElaText *> texts = {m_plate, m_vehClass, m_vehStatus, m_situation};
-    for (auto *t : texts) {
-        t->setTextPixelSize(18);
+    QList<ElaText *> carTexts = {m_plate, m_vehClass, m_vehStatus, m_situation};
+    for (auto *t : carTexts) {
+        t->setTextPixelSize(Constant::FontSize::VEHINFO_AREA_SIZE);
         t->setAlignment(Qt::AlignCenter);
         t->setIsWrapAnywhere(false);
     }
 
-    QHBoxLayout *vehInfoAreaLayout = new QHBoxLayout(vehInfoArea);
-    vehInfoAreaLayout->setContentsMargins(10, 5, 10, 5);
-    vehInfoAreaLayout->setSpacing(5);
+    QHBoxLayout *carInfoHLayout = new QHBoxLayout(carInfoWidget);
+    carInfoHLayout->setContentsMargins(10, 5, 10, 5);
+    carInfoHLayout->setSpacing(5);
 
-    vehInfoAreaLayout->addWidget(m_plate);
-    Utils::UiUtils::addLine(vehInfoAreaLayout);
-    vehInfoAreaLayout->addWidget(m_vehClass);
-    Utils::UiUtils::addLine(vehInfoAreaLayout);
-    vehInfoAreaLayout->addWidget(m_vehStatus);
-    Utils::UiUtils::addLine(vehInfoAreaLayout);
-    vehInfoAreaLayout->addWidget(m_situation);
-    vehInfoAreaLayout->addStretch();
+    carInfoHLayout->addWidget(m_plate);
+    Utils::UiUtils::addLine(carInfoHLayout, Qt::Vertical, 2, Constant::Color::BORDER);
+    carInfoHLayout->addWidget(m_vehClass);
+    Utils::UiUtils::addLine(carInfoHLayout, Qt::Vertical, 2, Constant::Color::BORDER);
+    carInfoHLayout->addWidget(m_vehStatus);
+    Utils::UiUtils::addLine(carInfoHLayout, Qt::Vertical, 2, Constant::Color::BORDER);
+    carInfoHLayout->addWidget(m_situation);
+    carInfoHLayout->addStretch();
 
-    return vehInfoArea;
-}
+    // 卡内信息区
+    QWidget *cardInfoWidget = new QWidget(vehInfoArea);
+    cardInfoWidget->setMinimumHeight(140);
+    cardInfoWidget->setMaximumHeight(150);
 
-MgsPageArea *MgsMtcOutPage::initCardInfoArea()
-{
-    MgsPageArea *cardInfoArea = new MgsPageArea();
-    cardInfoArea->setMinimumHeight(130);
-    cardInfoArea->setMaximumHeight(150);
+    ElaText *label1 = new ElaText("卡 号:", cardInfoWidget);
+    ElaText *label2 = new ElaText("类 型:", cardInfoWidget);
+    ElaText *label3 = new ElaText("站 名:", cardInfoWidget);
+    ElaText *label4 = new ElaText("时 间:", cardInfoWidget);
+    ElaText *label5 = new ElaText("称 重:", cardInfoWidget);
+    ElaText *label6 = new ElaText("车 牌:", cardInfoWidget);
+    ElaText *label7 = new ElaText("标 签:", cardInfoWidget);
+    ElaText *label8 = new ElaText("分省信息:", cardInfoWidget);
 
-    ElaText *text1 = new ElaText("卡 号:", cardInfoArea);
-    ElaText *text2 = new ElaText("类 型:", cardInfoArea);
-    ElaText *text3 = new ElaText("站 名:", cardInfoArea);
-    ElaText *text4 = new ElaText("时 间:", cardInfoArea);
-    ElaText *text5 = new ElaText("称 重:", cardInfoArea);
-    ElaText *text6 = new ElaText("车 牌:", cardInfoArea);
-    ElaText *text7 = new ElaText("标 签:", cardInfoArea);
-    ElaText *text8 = new ElaText("分省信息:", cardInfoArea);
-
-    QFont font = text1->font();
-    font.setBold(true);
-    for (auto *t : {text1, text2, text3, text4, text5, text6, text7, text8}) {
-        t->setFont(font);
+    QList<ElaText *> labels = {label1, label2, label3, label4, label5, label6, label7, label8};
+    for (auto *l : labels) {
+        l->setIsWrapAnywhere(false);
+        QFont font = l->font();
+        font.setBold(true);
+        font.setPixelSize(Constant::FontSize::VEHINFO_AREA_SIZE);
+        l->setFont(font);
     }
 
-    m_cardType = new ElaText(cardInfoArea);
-    m_cardNum = new ElaText(cardInfoArea);
-    m_enStationName = new ElaText(cardInfoArea);
-    m_enTime = new ElaText(cardInfoArea);
-    m_weightInfo = new ElaText(cardInfoArea);
-    m_enPlate = new ElaText(cardInfoArea);
-    m_label1 = new ElaText(cardInfoArea);
-    m_splitProvincesInfo = new ElaText(cardInfoArea);
+    m_cardType = new ElaText(cardInfoWidget);
+    m_cardNum = new ElaText(cardInfoWidget);
+    m_enStationName = new ElaText(cardInfoWidget);
+    m_enTime = new ElaText(cardInfoWidget);
+    m_weightInfo = new ElaText(cardInfoWidget);
+    m_enPlate = new ElaText(cardInfoWidget);
+    m_label1 = new ElaText(cardInfoWidget);
+    m_splitProvincesInfo = new ElaText(cardInfoWidget);
 
-    QList<ElaText *> texts = {text1,
-                              text2,
-                              text3,
-                              text4,
-                              text5,
-                              text6,
-                              text7,
-                              text8,
-                              m_cardType,
-                              m_cardNum,
-                              m_enStationName,
-                              m_enTime,
-                              m_weightInfo,
-                              m_enPlate,
-                              m_label1,
-                              m_splitProvincesInfo};
+    QList<ElaText *> texts
+        = {m_cardType, m_cardNum, m_enStationName, m_enTime, m_weightInfo, m_enPlate, m_label1, m_splitProvincesInfo};
     for (auto *t : texts) {
-        t->setTextPixelSize(17);
+        t->setTextPixelSize(Constant::FontSize::VEHINFO_AREA_SIZE);
         t->setIsWrapAnywhere(false);
     }
 
     // 每行都用 QHBoxLayout 控制
     QHBoxLayout *row1 = new QHBoxLayout();
-    row1->setSpacing(10);
-    row1->addWidget(text1);
+    row1->setSpacing(5);
+    row1->addWidget(label1);
     row1->addWidget(m_cardNum, 1);
-    row1->addWidget(text2);
+    row1->addWidget(label2);
     row1->addWidget(m_cardType, 1);
 
     QHBoxLayout *row2 = new QHBoxLayout();
-    row2->setSpacing(10);
-    row2->addWidget(text3);
+    row2->setSpacing(5);
+    row2->addWidget(label3);
     row2->addWidget(m_enStationName, 1);
-    row2->addWidget(text4);
+    row2->addWidget(label4);
     row2->addWidget(m_enTime, 1);
 
     QHBoxLayout *row3 = new QHBoxLayout();
-    row3->setSpacing(10);
-    row3->addWidget(text5);
+    row3->setSpacing(5);
+    row3->addWidget(label5);
     row3->addWidget(m_weightInfo, 1);
-    row3->addWidget(text6);
+    row3->addWidget(label6);
     row3->addWidget(m_enPlate, 1);
 
     QHBoxLayout *row4 = new QHBoxLayout();
-    row4->setSpacing(10);
-    row4->addWidget(text7);
+    row4->setSpacing(5);
+    row4->addWidget(label7);
     row4->addWidget(m_label1, 1);
 
     QHBoxLayout *row5 = new QHBoxLayout();
-    row5->setSpacing(10);
-    row5->addWidget(text8);
+    row5->setSpacing(5);
+    row5->addWidget(label8);
     row5->addWidget(m_splitProvincesInfo, 1);
 
-    QVBoxLayout *vbox = new QVBoxLayout(cardInfoArea);
-    vbox->setContentsMargins(9, 5, 9, 5);
-    vbox->setSpacing(5);
-    vbox->addLayout(row1);
-    vbox->addLayout(row2);
-    vbox->addLayout(row3);
-    vbox->addLayout(row4);
-    vbox->addLayout(row5);
+    QVBoxLayout *cardInfoVLayout = new QVBoxLayout(cardInfoWidget);
+    cardInfoVLayout->setContentsMargins(9, 5, 9, 5);
+    cardInfoVLayout->setSpacing(5);
+    cardInfoVLayout->addLayout(row1);
+    cardInfoVLayout->addLayout(row2);
+    cardInfoVLayout->addLayout(row3);
+    cardInfoVLayout->addLayout(row4);
+    cardInfoVLayout->addLayout(row5);
 
-    return cardInfoArea;
+    QVBoxLayout *vehInfoAreaLayout = new QVBoxLayout(vehInfoArea);
+    vehInfoAreaLayout->setSpacing(0);
+    vehInfoAreaLayout->setContentsMargins(0, 0, 0, 0);
+    vehInfoAreaLayout->addWidget(carInfoWidget);
+    Utils::UiUtils::addLine(vehInfoAreaLayout, Qt::Horizontal, 2, Constant::Color::BORDER);
+    vehInfoAreaLayout->addWidget(cardInfoWidget);
+
+    return vehInfoArea;
 }
 
 MgsPageArea *MgsMtcOutPage::initTradeHintArea()
 {
     MgsPageArea *tradeHintArea = new MgsPageArea();
-    tradeHintArea->setMinimumHeight(120);
-    tradeHintArea->setMaximumHeight(160);
+    tradeHintArea->setMinimumHeight(140);
 
     m_hintButtonLayout = new QHBoxLayout();
     m_hintButtonLayout->setContentsMargins(0, 0, 0, 0);
@@ -597,9 +636,9 @@ MgsRecentTradePanel *MgsMtcOutPage::initRecentTradeArea()
     ElaTableView *view = recentTradePanel->getRecentTradeView();
     // 初始列表宽度
     connect(view, &ElaTableView::tableViewShow, this, [=]() {
-        view->setColumnWidth(0, 90);
+        view->setColumnWidth(0, 100);
         view->setColumnWidth(1, 40);
-        view->setColumnWidth(2, 140);
+        view->setColumnWidth(2, 130);
         view->setColumnWidth(3, 120);
     });
 

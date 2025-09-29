@@ -16,5 +16,6 @@ protected:
     QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const override;
 
 private:
+    // 获取轴型图片 status：0, 等待过车; 1, 允许过车; 2, 超限
     QPixmap getAxisTypePixmap(uint axisType, uint status) const;
 };
