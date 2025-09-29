@@ -514,15 +514,14 @@ MgsPageArea *MgsMtcOutPage::initVehInfoArea()
     cardInfoWidget->setMinimumHeight(140);
     cardInfoWidget->setMaximumHeight(150);
 
-    ElaText *label1 = new ElaText("卡 号:", cardInfoWidget);
-    ElaText *label2 = new ElaText("类 型:", cardInfoWidget);
-    ElaText *label3 = new ElaText("站 名:", cardInfoWidget);
-    ElaText *label4 = new ElaText("时 间:", cardInfoWidget);
-    ElaText *label5 = new ElaText("称 重:", cardInfoWidget);
-    ElaText *label6 = new ElaText("车 牌:", cardInfoWidget);
-    ElaText *label7 = new ElaText("标 签:", cardInfoWidget);
+    ElaText *label1 = new ElaText("卡号:", cardInfoWidget);
+    ElaText *label2 = new ElaText("类型:", cardInfoWidget);
+    ElaText *label3 = new ElaText("站名:", cardInfoWidget);
+    ElaText *label4 = new ElaText("时间:", cardInfoWidget);
+    ElaText *label5 = new ElaText("称重:", cardInfoWidget);
+    ElaText *label6 = new ElaText("车牌:", cardInfoWidget);
+    ElaText *label7 = new ElaText("标签:", cardInfoWidget);
     ElaText *label8 = new ElaText("分省信息:", cardInfoWidget);
-
     QList<ElaText *> labels = {label1, label2, label3, label4, label5, label6, label7, label8};
     for (auto *l : labels) {
         l->setIsWrapAnywhere(false);
@@ -540,7 +539,6 @@ MgsPageArea *MgsMtcOutPage::initVehInfoArea()
     m_enPlate = new ElaText(cardInfoWidget);
     m_label1 = new ElaText(cardInfoWidget);
     m_splitProvincesInfo = new ElaText(cardInfoWidget);
-
     QList<ElaText *> texts
         = {m_cardType, m_cardNum, m_enStationName, m_enTime, m_weightInfo, m_enPlate, m_label1, m_splitProvincesInfo};
     for (auto *t : texts) {
@@ -602,6 +600,8 @@ MgsPageArea *MgsMtcOutPage::initVehInfoArea()
 MgsPageArea *MgsMtcOutPage::initTradeHintArea()
 {
     MgsPageArea *tradeHintArea = new MgsPageArea();
+    tradeHintArea->setBackgroundColor(QColor(Constant::Color::PAGEAREA_NORMAL_BG));
+    tradeHintArea->setBorderRadius(0);
     tradeHintArea->setMinimumHeight(140);
 
     m_hintButtonLayout = new QHBoxLayout();
@@ -611,10 +611,14 @@ MgsPageArea *MgsMtcOutPage::initTradeHintArea()
     m_hintButtonLayout->addStretch();
 
     m_tradeHint = new MgsScrollText(tradeHintArea);
-    m_tradeHint->setTextPixelSize(30);
+    m_tradeHint->setStyleSheet(QString("color: %1").arg(Constant::Color::INFO_TEXT));
+    QFont tradeHintfont = m_tradeHint->font();
+    tradeHintfont.setPixelSize(Constant::FontSize::TRADE_HINT_SIZE);
+    tradeHintfont.setBold(true);
+    m_tradeHint->setFont(tradeHintfont);
 
     m_obuHint = new ElaText(tradeHintArea);
-    m_obuHint->setTextPixelSize(15);
+    m_obuHint->setTextPixelSize(Constant::FontSize::OBU_HINT_SIZE);
     m_obuHint->setWordWrap(true);
 
     QVBoxLayout *tradeHintAreaLayout = new QVBoxLayout(tradeHintArea);
@@ -638,8 +642,8 @@ MgsRecentTradePanel *MgsMtcOutPage::initRecentTradeArea()
     connect(view, &ElaTableView::tableViewShow, this, [=]() {
         view->setColumnWidth(0, 100);
         view->setColumnWidth(1, 40);
-        view->setColumnWidth(2, 130);
-        view->setColumnWidth(3, 120);
+        view->setColumnWidth(2, 120);
+        view->setColumnWidth(3, 130);
     });
 
     return recentTradePanel;
