@@ -1873,6 +1873,7 @@ QString BizHandler::doDealCmd38(const QVariantMap &aMap)
         tradeMap["exStation"] = recordMap["exstationname"].toString();
         tradeMap["factFee"] = recordMap["factpay"].toString();
         tradeMap["tradeTime"] = recordMap["extime"].toString();
+        tradeMap["vehClass"] = recordMap["exvehclass"].toString();
         tradeMap["remark"] = "";
 
         bool isUseTicket = getMTicketUseExist(stationServiceUrl, tradeId);
@@ -1916,10 +1917,10 @@ QVariantList BizHandler::getDurationOutTrades(const QString &stationServiceUrl,
     sendMap["queryAuth"] = "1";
     sendMap["querySql"]
         = QString(
-              "SELECT tradeid, passid, exvehplate, cardid, enstationname, exstationname, factpay, extime, ticketnum "
-              "FROM t_mtc_out WHERE paytype = 0 AND isvalid = 1 AND (exvehplate = '%1' OR cardid = '%2') AND "
-              "exshiftdate > '%3' AND exshiftdate < '%4' UNION ALL SELECT tradeid, passid, exvehplate, "
-              "cardid, enstationname, exstationname, factpay, extime, ticketnum FROM "
+              "SELECT tradeid, passid, exvehplate, cardid, enstationname, exstationname, factpay, extime, ticketnum, "
+              "exvehclass FROM t_mtc_out WHERE paytype = 0 AND isvalid = 1 AND (exvehplate = '%1' OR cardid = '%2') "
+              "AND exshiftdate > '%3' AND exshiftdate < '%4' UNION ALL SELECT tradeid, passid, exvehplate, "
+              "cardid, enstationname, exstationname, factpay, extime, ticketnum, exvehclass FROM "
               "t_etc_out WHERE (paytype = 2 OR paytype = 0)  AND isvalid = 1 AND (exvehplate = '%5' OR cardid = '%6') "
               "AND exshiftdate > '%7' AND exshiftdate < '%8'")
               .arg(vehPlate, cardId, startTime, stopTime, vehPlate, cardId, startTime, stopTime);
