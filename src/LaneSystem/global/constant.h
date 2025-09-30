@@ -5,8 +5,7 @@ namespace Constant {
 //日志常量
 namespace Log {
 const char FORMAT_BRIEF[] = "[%{time}{yyyy-MM-dd HH:mm:ss.zzz}] [%{type}] | %{message}\n\n";
-const char FORMAT_DETAIL[]
-    = "[%{time}{yyyy-MM-dd HH:mm:ss.zzz}] [%{type}] [%{threadid}] [%{file}:%{line}] | %{message}\n\n";
+const char FORMAT_DETAIL[] = "[%{time}{yyyy-MM-dd HH:mm:ss.zzz}] [%{type}] [%{threadid}] [%{file}:%{line}] | %{message}\n\n";
 const int MAX_SAVE_DAY = 90;
 } // namespace Log
 
@@ -35,7 +34,7 @@ const char PAGEAREA_STRESS_BG[] = "#e2ecf6"; // 主界面强调背景色
 const char PAGEAREA_NORMAL_BG[] = "#ffffff"; // 主机面常规背景色
 const char CONFIRM_BUTTON_BG[] = "#007bff";  // 强调按钮背景色
 const char CANCEL_BUTTON_BG[] = "#cdcdcd";   // 取消按钮背景色
-const char DIALOG_BG[] = "#ffffff";          // 对话框背景色
+const char DIALOG_BG[] = "#f8fbff";          // 对话框背景色
 const char SELECTED_BG[] = "#F0F8FF";        // 光标选中背景色
 
 const char SPLITTER[] = "#cdcdcd"; // 分割线颜色

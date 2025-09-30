@@ -47,14 +47,14 @@ int main(int argc, char *argv[])
     } else {
         LOG_ASSERT_X(false, "系统初始化失败：前端初始化失败（无对应车道类型）");
     }
-    mainWindow.showFullScreen();
+    mainWindow.showNormal();
     LOG_INFO().noquote() << "前端初始化完成";
 
     // 业务处理模块初始化
     LOG_INFO().noquote() << "业务处理模块初始化";
     if (GM_INSTANCE->m_config->m_businessConfig.laneMode == EM_LaneMode::MTC_IN) {
         LOG_INFO().noquote() << "加载混合入口业务处理模块";
-        new MIDeskProcess(&mainWindow);
+        new MIDeskProcess();
     } else if (GM_INSTANCE->m_config->m_businessConfig.laneMode == EM_LaneMode::MTC_OUT) {
         // TODO 混合出口业务处理模块
     } else if (GM_INSTANCE->m_config->m_businessConfig.laneMode == EM_LaneMode::ETC_IN

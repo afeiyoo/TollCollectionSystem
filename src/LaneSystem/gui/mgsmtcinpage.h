@@ -1,12 +1,8 @@
 #pragma once
 
 #include "gui/mgsbasepage.h"
-#include "gui/mgsplateeditdialog.h"
 
-class MgsMenu;
-class MgsAuthDialog;
 class MgsPageArea;
-class MgsWeightInfoPanel;
 class MgsOptionsDialog;
 class ElaText;
 class MgsMtcInPage : public MgsBasePage
@@ -100,6 +96,5 @@ private:
     MgsScrollText *m_tradeHint = nullptr;
     ElaText *m_obuHint = nullptr;
     // 子窗口
-    MgsAuthDialog *m_authDialog = nullptr;
     MgsOptionsDialog *m_optionsDialog = nullptr;
 };

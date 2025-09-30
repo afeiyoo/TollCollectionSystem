@@ -2,13 +2,12 @@
 
 #include <QObject>
 
-class MgsMainWindow;
 class MIBizEnv;
 class MIDeskProcess : public QObject
 {
     Q_OBJECT
 public:
-    explicit MIDeskProcess(MgsMainWindow *mainWindow, QObject *parent = 0);
+    explicit MIDeskProcess(QObject *parent = 0);
     ~MIDeskProcess() override;
 
 public slots:
@@ -27,7 +26,6 @@ public slots:
     void onUpdateCheckingFinished(const QString &url);
 
 private:
-    MgsMainWindow *m_mainWindow = nullptr;
     MIBizEnv *m_bizEnv = nullptr;
     QThread *m_thread = nullptr;
 };

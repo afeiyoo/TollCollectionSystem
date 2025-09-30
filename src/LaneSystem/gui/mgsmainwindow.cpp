@@ -10,6 +10,7 @@
 #include "global/globalmanager.h"
 #include "global/signalmanager.h"
 #include "gui/component/mgsdevicepanel.h"
+#include "gui/mgsauthdialog.h"
 #include "gui/mgsbasepage.h"
 #include "gui/mgsetcpage.h"
 #include "gui/mgsmtcinpage.h"
@@ -26,6 +27,16 @@ MgsMainWindow::MgsMainWindow(QWidget *parent)
     setIsNavigationBarEnable(false);
     setWindowButtonFlags(ElaAppBarType::None);
     setWindowIcon(QIcon(Constant::Path::APP_ICON));
+
+    // 登录窗口初始化
+    m_authDialog = new MgsAuthDialog(this);
+    m_authDialog->hide();
+
+    connect(GM_INSTANCE->m_signalMan, &SignalManager::sigShowFormInfoHint, this, &MgsMainWindow::onShowFormInfoHint);
+    connect(GM_INSTANCE->m_signalMan, &SignalManager::sigShowFormQuestionHint, this, &MgsMainWindow::onShowFormQuestionHint);
+    connect(GM_INSTANCE->m_signalMan, &SignalManager::sigShowFormWarningHint, this, &MgsMainWindow::onShowFormWarningHint);
+    connect(GM_INSTANCE->m_signalMan, &SignalManager::sigShowFormErrorHint, this, &MgsMainWindow::onShowFormErrorHint);
+    connect(GM_INSTANCE->m_signalMan, &SignalManager::sigShowFormLogin, this, &MgsMainWindow::onShowFormLogin);
 
     // 程序退出时，清理界面资源
     connect(qApp, &QCoreApplication::aboutToQuit, this, [this]() { MgsMainWindow::deleteLater(); });
@@ -303,8 +314,7 @@ void MgsMainWindow::initEtc()
     m_mainPage->appendWeightInfoItem(item2);
 
     for (int i = 0; i < 101; i++) {
-        m_mainPage->appendTradeItem(
-            {"闽A123BDK", "货一", "12:00:04", "莆田西", "记账卡", "23.4", "35011621230300068933"});
+        m_mainPage->appendTradeItem({"闽A123BDK", "货一", "12:00:04", "莆田西", "记账卡", "23.4", "35011621230300068933"});
     }
 
     m_mainPage->setDeviceList({
@@ -325,32 +335,37 @@ void MgsMainWindow::initEtc()
     m_mainPage->setFocus();
 }
 
-void MgsMainWindow::showFormErrorHint(const QString &title, const QStringList &strs)
+void MgsMainWindow::onShowFormErrorHint(const QString &title, const QStringList &strs)
 {
     emit GM_INSTANCE->m_signalMan->sigLogAppend(EM_LogLevel::ERROR, title);
     QString message = strs.join("<br/>");
     UiUtils::showMessageBoxError(title, message, QMessageBox::Yes | QMessageBox::Cancel);
 }
 
-void MgsMainWindow::showFormInfoHint(const QString &title, const QStringList &strs)
+void MgsMainWindow::onShowFormInfoHint(const QString &title, const QStringList &strs)
 {
     emit GM_INSTANCE->m_signalMan->sigLogAppend(EM_LogLevel::INFO, title);
     QString message = strs.join("<br/>");
     UiUtils::showMessageBoxInfo(title, message, QMessageBox::Yes | QMessageBox::Cancel);
 }
 
-void MgsMainWindow::showFormQuestionHint(const QString &title, const QStringList &strs)
+void MgsMainWindow::onShowFormQuestionHint(const QString &title, const QStringList &strs)
 {
     emit GM_INSTANCE->m_signalMan->sigLogAppend(EM_LogLevel::INFO, title);
     QString message = strs.join("<br/>");
     UiUtils::showMessageBoxQuestion(title, message, QMessageBox::Yes | QMessageBox::Cancel);
 }
 
-void MgsMainWindow::showFormWarningHint(const QString &title, const QStringList &strs)
+void MgsMainWindow::onShowFormWarningHint(const QString &title, const QStringList &strs)
 {
     emit GM_INSTANCE->m_signalMan->sigLogAppend(EM_LogLevel::WARN, title);
     QString message = strs.join("<br/>");
     UiUtils::showMessageBoxWarning(title, message, QMessageBox::Yes | QMessageBox::Cancel);
+}
+
+void MgsMainWindow::onShowFormLogin()
+{
+    m_authDialog->show();
 }
 
 void MgsMainWindow::showEvent(QShowEvent *event)

@@ -8,33 +8,29 @@
 #include "utils/uiutils.h"
 
 #include <QCoreApplication>
-#include <QDebug>
 #include <QEvent>
 #include <QFocusEvent>
 #include <QHBoxLayout>
+#include <QPainter>
 #include <QVBoxLayout>
 
+using namespace Utils;
+
 MgsAuthDialog::MgsAuthDialog(QWidget *parent)
-    : QWidget{parent}
+    : QDialog{parent}
 {
     setWindowTitle("身份认证");
     setWindowModality(Qt::ApplicationModal);
-    setFixedSize(300, 380);
-    setWindowIcon(QIcon(Constant::Path::APP_ICON));
     setFocusPolicy(Qt::StrongFocus);
     setWindowFlags(Qt::Window | Qt::WindowTitleHint);
+    setFixedSize(300, 380);
 
     initUi();
 
-    Utils::UiUtils::moveToCenter(this);
+    UiUtils::moveToCenter(this);
 }
 
 MgsAuthDialog::~MgsAuthDialog() {}
-
-void MgsAuthDialog::setTipInfo(const QString &info)
-{
-    m_tipInfo->setText(info);
-}
 
 void MgsAuthDialog::setID(const QString &id)
 {
@@ -52,16 +48,19 @@ void MgsAuthDialog::setName(const QString &name)
 
 void MgsAuthDialog::initUi()
 {
-    ElaImageCard *banner = new ElaImageCard(this);
+    m_mainWidget = new QWidget(this);
+    m_mainWidget->setStyleSheet(QString("background-color: %1;").arg(Constant::Color::DIALOG_BG));
+
+    ElaImageCard *banner = new ElaImageCard(m_mainWidget);
     banner->setFixedSize(240, 70);
     banner->setIsPreserveAspectCrop(false);
     banner->setCardImage(QImage(Constant::Path::APP_BIG_ICON));
 
-    ElaText *icon1 = new ElaText(this);
+    ElaText *icon1 = new ElaText(m_mainWidget);
     icon1->setElaIcon(ElaIconType::IdCardClip);
-    ElaText *icon2 = new ElaText(this);
+    ElaText *icon2 = new ElaText(m_mainWidget);
     icon2->setElaIcon(ElaIconType::ChalkboardUser);
-    ElaText *icon3 = new ElaText(this);
+    ElaText *icon3 = new ElaText(m_mainWidget);
     icon3->setElaIcon(ElaIconType::LockKeyhole);
     QList<ElaText *> icons = {icon1, icon2, icon3};
     for (auto *icon : icons) {
@@ -69,38 +68,37 @@ void MgsAuthDialog::initUi()
         icon->setFixedSize(30, 30);
     }
 
-    m_idEdit = new ElaLineEdit(this);
+    m_idEdit = new ElaLineEdit(m_mainWidget);
     m_idEdit->setPlaceholderText("工号");
     m_idEdit->setDisabled(true);
-    m_nameEdit = new ElaLineEdit(this);
+    m_nameEdit = new ElaLineEdit(m_mainWidget);
     m_nameEdit->setPlaceholderText("姓名");
     m_nameEdit->setDisabled(true);
-    m_passwordEdit = new ElaLineEdit(this);
+    m_passwordEdit = new ElaLineEdit(m_mainWidget);
     m_passwordEdit->setPlaceholderText("密码");
     m_passwordEdit->setEchoMode(QLineEdit::Password);
     QList<ElaLineEdit *> inputs = {m_idEdit, m_nameEdit, m_passwordEdit};
     for (auto *input : inputs) {
         QFont font = input->font();
-        font.setPixelSize(17);
+        font.setPixelSize(Constant::FontSize::DIALOG_BODY_SIZE);
         input->setFont(font);
         input->setFixedHeight(35);
         input->setIsClearButtonEnable(false);
         input->installEventFilter(this);
     }
 
-    m_button = new ElaPushButton(this);
+    m_button = new ElaPushButton(m_mainWidget);
     m_button->setText("确认");
     QFont font = m_button->font();
     font.setPixelSize(17);
     m_button->setFont(font);
-    m_button->setLightDefaultColor(QColor(0, 123, 255));
-    m_button->setLightTextColor(Qt::white);
+    m_button->setLightDefaultColor(Constant::Color::CONFIRM_BUTTON_BG);
+    m_button->setLightTextColor(Constant::Color::CONFIRM_BUTTON_TEXT);
     m_button->setFixedHeight(45);
     m_button->setBorderRadius(5);
-    m_button->setAttribute(Qt::WA_TransparentForMouseEvents, true);
-    m_button->setDisabled(true);
+    UiUtils::disableMouseEvents(m_button);
 
-    QGridLayout *contentLayout = new QGridLayout();
+    QGridLayout *contentLayout = new QGridLayout(m_mainWidget);
     contentLayout->setContentsMargins(25, 20, 25, 0);
     contentLayout->setHorizontalSpacing(10);
     contentLayout->setVerticalSpacing(15);
@@ -124,21 +122,14 @@ void MgsAuthDialog::initUi()
     QHBoxLayout *tipLayout = Utils::UiUtils::createTipWidget("输入密码后，按【确认】键登录系统");
 
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
-    mainLayout->setContentsMargins(5, 5, 5, 5);
+    mainLayout->setContentsMargins(0, 0, 0, 0);
     mainLayout->setSpacing(0);
-    mainLayout->addLayout(contentLayout, 1);
+    mainLayout->addWidget(m_mainWidget);
     mainLayout->addLayout(tipLayout);
 }
 
 bool MgsAuthDialog::eventFilter(QObject *obj, QEvent *event)
 {
-    // 检查三个输入框是否都非空，更新按钮状态
-    if (event->type() == QEvent::KeyRelease || event->type() == QEvent::FocusOut) {
-        bool allFilled = !m_idEdit->text().isEmpty() && !m_nameEdit->text().isEmpty()
-                         && !m_passwordEdit->text().isEmpty();
-        m_button->setEnabled(allFilled);
-    }
-
     // 屏蔽右键菜单
     if ((obj == m_idEdit || obj == m_nameEdit || obj == m_passwordEdit) && event->type() == QEvent::ContextMenu) {
         return true;
@@ -150,8 +141,7 @@ bool MgsAuthDialog::eventFilter(QObject *obj, QEvent *event)
         int key = keyEvent->key();
 
         bool isDigit = (key >= Qt::Key_0 && key <= Qt::Key_9);
-        bool isControlKey = key == Qt::Key_Backspace || key == Qt::Key_Delete || key == Qt::Key_Left
-                            || key == Qt::Key_Right || key == Qt::Key_Tab;
+        bool isControlKey = key == Qt::Key_Backspace || key == Qt::Key_Delete || key == Qt::Key_Left || key == Qt::Key_Right || key == Qt::Key_Tab;
 
         if (!(isDigit || isControlKey)) {
             // 交给父控件处理
@@ -166,8 +156,6 @@ bool MgsAuthDialog::eventFilter(QObject *obj, QEvent *event)
 void MgsAuthDialog::keyPressEvent(QKeyEvent *event)
 {
     int key = event->key();
-    qDebug() << "按键: " << QKeySequence(key).toString();
-
     if (key == Qt::Key_S) {
         event->accept();
     } else if (key == Qt::Key_X) {
@@ -186,4 +174,19 @@ void MgsAuthDialog::showEvent(QShowEvent *event)
     m_nameEdit->clear();
     m_passwordEdit->clear();
     m_passwordEdit->setFocus();
+}
+
+void MgsAuthDialog::paintEvent(QPaintEvent *event)
+{
+    // QPainter painter(this);
+    // painter.save();
+    // painter.setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing);
+    // painter.setPen(Qt::NoPen);
+    // painter.setBrush(QColor(Constant::Color::DIALOG_BG));
+    // // 背景绘制
+    // int layoutAreaHeight = m_title->height() + m_optionsView->height() + 5;
+    // painter.drawRect(QRectF(0, 0, width(), layoutAreaHeight));
+    // painter.restore();
+
+    QDialog::paintEvent(event);
 }

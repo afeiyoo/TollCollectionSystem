@@ -8,12 +8,10 @@
 #include "global/globalmanager.h"
 #include "global/modemanager.h"
 #include "global/signalmanager.h"
-#include "gui/component/mgsdevicepanel.h"
 #include "gui/component/mgsoptionsdialog.h"
 #include "gui/component/mgspagearea.h"
 #include "gui/component/mgsrecenttradepanel.h"
 #include "gui/component/mgsscrolltext.h"
-#include "gui/mgsauthdialog.h"
 #include "utils/bizutils.h"
 #include "utils/fileutils.h"
 #include "utils/uiutils.h"
@@ -30,9 +28,6 @@ using namespace Utils;
 MgsMtcInPage::MgsMtcInPage(QWidget *parent)
     : MgsBasePage(parent)
 {
-    m_authDialog = new MgsAuthDialog(this);
-    m_authDialog->hide();
-
     m_optionsDialog = new MgsOptionsDialog(this);
     m_optionsDialog->hide();
 }
@@ -209,7 +204,7 @@ void MgsMtcInPage::setPlate(const QString &plate)
 
     if (!bgImage.isEmpty()) {
         m_plate->setStyleSheet(
-            QString("border-image: url(%1) 0 0 0 0 stretch stretch; color: %2;").arg(bgImage).arg(textColor.name()));
+            QString("border-image: url(%1) 0 0 0 0 stretch stretch; color: %2;").arg(bgImage, textColor.name()));
     } else {
         m_plate->setStyleSheet(""); // 没有匹配到颜色，清除样式
     }
@@ -353,11 +348,7 @@ void MgsMtcInPage::keyPressEvent(QKeyEvent *event)
         emit GM_INSTANCE->m_signalMan->sigShiftIn();
         event->accept();
     } else if (key == Qt::Key_U) {
-        // emit GM_INSTANCE->m_signalMan->sigShiftOut();
-        static int count = 1;
-        emit GM_INSTANCE->m_signalMan->sigLogAppend(
-            EM_LogLevel::WARN,
-            QString("测试数据 %1 封疆大吏深刻搭街坊立刻埃里克几十块的咖啡机拉进了房间啊撒旦立刻就").arg(count++));
+        emit GM_INSTANCE->m_signalMan->sigShiftOut();
         event->accept();
     } else {
         qDebug() << "按键功能未实现";
