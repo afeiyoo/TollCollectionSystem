@@ -1873,7 +1873,8 @@ QString BizHandler::doDealCmd38(const QVariantMap &aMap)
         tradeMap["exStation"] = recordMap["exstationname"].toString();
         tradeMap["factFee"] = recordMap["factpay"].toString();
         tradeMap["tradeTime"] = recordMap["extime"].toString();
-        tradeMap["vehClass"] = recordMap["exvehclass"].toString();
+        int vehClass = recordMap["exvehclass"].toInt();
+        tradeMap["vehClass"] = Utils::BizUtils::getVehClassName(vehClass);
         tradeMap["remark"] = "";
 
         bool isUseTicket = getMTicketUseExist(stationServiceUrl, tradeId);

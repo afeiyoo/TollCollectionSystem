@@ -37,6 +37,9 @@ public:
     // 获取车道键盘按键对应的按键数值(返回-1表示未获取到对应keyName的key)
     static int getKeyCode(const QVariantMap &keyboard, const QString &keyName);
 
+    // 根据车型编码返回车型名称 isShort: true-获取车型短名称 false-获取长名称车型
+    static QString getVehClassName(uint classCode, bool isShort = true);
+
     /*******************************************************/
     /****                   DTP传输相关                  ****/
     /*******************************************************/

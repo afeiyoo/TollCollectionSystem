@@ -123,6 +123,31 @@ int BizUtils::getKeyCode(const QVariantMap &keyboard, const QString &keyName)
     return metaEnum.keyToValue(enumName.toLocal8Bit().data());
 }
 
+QString BizUtils::getVehClassName(uint classCode, bool isShort)
+{
+    uint var1 = classCode / 10;
+    uint var2 = classCode % 10;
+    if (var1 >= 3 || var2 >= 7 || var2 <= 0)
+        return "车型不明";
+
+    QString vehClassName;
+    QStringList strList1;
+    QStringList strList2;
+    if (isShort) {
+        strList1 = QStringList({"客", "货", "专"});
+        strList2 = QStringList({"", "一", "二", "三", "四", "五", "六"});
+
+        vehClassName = strList1.value(var1) + strList2.value(var2);
+    } else {
+        strList1 = QStringList({"客车", "货车", "专项作业车"});
+        strList2 = QStringList({"", "一类", "二类", "三类", "四类", "五类", "六类"});
+
+        vehClassName = strList2.value(var2) + strList1.value(var1);
+    }
+
+    return vehClassName;
+}
+
 QString BizUtils::makeDtpContentFromObj(const QObject &obj)
 {
     QString content = "<record>";
