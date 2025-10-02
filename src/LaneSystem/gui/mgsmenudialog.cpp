@@ -1,7 +1,6 @@
-#include "mgsmenu.h"
+#include "mgsmenudialog.h"
 
 #include <QGuiApplication>
-#include <QScreen>
 #include <QStackedLayout>
 #include <QStandardItemModel>
 #include <QVBoxLayout>
@@ -16,42 +15,48 @@
 
 using namespace Utils;
 
-MgsMenu::MgsMenu(QWidget *parent)
-    : QWidget(parent)
+MgsMenuDialog::MgsMenuDialog(QWidget *parent)
+    : QDialog(parent)
 {
     setWindowTitle("功能选择");
     setWindowModality(Qt::ApplicationModal);
     setFixedSize(350, 450);
-    setWindowIcon(QIcon(Constant::Path::APP_ICON));
     setFocusPolicy(Qt::StrongFocus);
     setWindowFlags(Qt::Window | Qt::WindowTitleHint);
 
     initUi();
     UiUtils::disableMouseEvents(this);
-
-    UiUtils::moveToCenter(this);
 }
 
-MgsMenu::~MgsMenu() {}
+MgsMenuDialog::~MgsMenuDialog() {}
 
-void MgsMenu::initUi()
+void MgsMenuDialog::initUi()
 {
-    m_pivot = new ElaPivot(this);
+    // 内容区域
+    m_mainWidget = new QWidget(this);
+    m_mainWidget->setStyleSheet(QString("background-color: %1;").arg(Constant::Color::DIALOG_BG));
 
+    m_pivot = new ElaPivot(m_mainWidget);
     m_tabLayout = new QStackedLayout();
-    QHBoxLayout *tipLayout = UiUtils::createTipWidget(
-        "按左右方向键选择分类，按上下方向键选择功能并按【确定】键确认选择");
+
+    QVBoxLayout *contentLayout = new QVBoxLayout(m_mainWidget);
+    contentLayout->setContentsMargins(5, 5, 5, 5);
+    contentLayout->setSpacing(0);
+    contentLayout->addWidget(m_pivot);
+    contentLayout->addLayout(m_tabLayout, 1);
+
+    // 提示
+    QHBoxLayout *tipLayout = UiUtils::createTipWidget("按左右方向键切换分组，按数字键或按上下方向键选择功能，按【返回】键关闭窗口");
 
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
+    mainLayout->setContentsMargins(0, 0, 0, 0);
     mainLayout->setSpacing(0);
-    mainLayout->setContentsMargins(5, 5, 5, 5);
 
-    mainLayout->addWidget(m_pivot);
-    mainLayout->addLayout(m_tabLayout, 1);
+    mainLayout->addWidget(m_mainWidget);
     mainLayout->addLayout(tipLayout);
 }
 
-void MgsMenu::addNewTab(const QString &tabName, const QStringList &funcs, const QList<uint> &enableFuncs)
+void MgsMenuDialog::addNewTab(const QString &tabName, const QStringList &funcs, const QList<uint> &enableFuncs)
 {
     m_pivot->appendPivot(tabName);
     m_tabNames.append(tabName);
@@ -59,13 +64,8 @@ void MgsMenu::addNewTab(const QString &tabName, const QStringList &funcs, const 
     QStandardItemModel *model = new QStandardItemModel(this);
     for (int i = 0; i < funcs.size(); ++i) {
         QStandardItem *item = new QStandardItem(funcs[i]);
-
-        // 设置item样式
-        QFont font = item->font();
-        font.setPixelSize(17);
-        item->setFont(font);
         // 确定是否启用
-        QColor color = enableFuncs.contains(i) ? Qt::black : QColor(Constant::Color::GRAY_COLOR);
+        QColor color = enableFuncs.contains(i) ? Qt::black : QColor("#cdcdcd");
         item->setForeground(color);
 
         model->appendRow(item);
@@ -75,24 +75,18 @@ void MgsMenu::addNewTab(const QString &tabName, const QStringList &funcs, const 
 
     ElaListView *view = new ElaListView(this);
     view->setModel(model);
+    view->setIsTransparent(false);
     view->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     view->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
     QFont font = view->font();
-    font.setPixelSize(17);
+    font.setPixelSize(Constant::FontSize::DIALOG_BODY_SIZE);
     view->setFont(font);
     // 由于tab是窗口的子控件，子控件拦截并处理事件A后，事件A不会传到父控件, 为了让窗口统一处理事件，使子控件无法获取焦点。
     view->setFocusPolicy(Qt::NoFocus);
     m_tabLayout->addWidget(view);
-
-    // 聚焦初始化
-    if (m_tabLayout->count() == 1) {
-        m_tabLayout->setCurrentIndex(0);
-        m_pivot->setCurrentIndex(0);
-        focusTab(0);
-    }
 }
 
-void MgsMenu::reset()
+void MgsMenuDialog::reset()
 {
     for (const auto &name : m_tabNames) {
         m_pivot->removePivot(name);
@@ -113,7 +107,7 @@ void MgsMenu::reset()
     m_pivot->setCurrentIndex(-1);
 }
 
-void MgsMenu::keyPressEvent(QKeyEvent *event)
+void MgsMenuDialog::keyPressEvent(QKeyEvent *event)
 {
     int key = event->key();
 
@@ -161,8 +155,7 @@ void MgsMenu::keyPressEvent(QKeyEvent *event)
                 return;
             int row = current.row();
             if (!m_enableFuncsPerTab[tabIndex].contains(row)) {
-                emit GM_INSTANCE->m_signalMan->sigFuncUnavaliable(
-                    view->model()->data(current, Qt::DisplayRole).toString());
+                emit GM_INSTANCE->m_signalMan->sigFuncUnavaliable(view->model()->data(current, Qt::DisplayRole).toString());
             } else {
                 LOG_INFO().noquote() << "请求功能:" << view->model()->data(current, Qt::DisplayRole).toString();
                 emit GM_INSTANCE->m_signalMan->sigMenuRequest(current.row());
@@ -179,13 +172,22 @@ void MgsMenu::keyPressEvent(QKeyEvent *event)
     }
 }
 
-void MgsMenu::showEvent(QShowEvent *event)
+void MgsMenuDialog::showEvent(QShowEvent *event)
 {
-    Q_UNUSED(event);
+    // 窗口显示时，聚焦到第一页的第一项
+    if (m_tabLayout->count() > 0) {
+        m_tabLayout->setCurrentIndex(0);
+        m_pivot->setCurrentIndex(0);
+        focusTab(0);
+    }
+
     setFocus();
+    UiUtils::moveToCenter(this);
+
+    QDialog::showEvent(event);
 }
 
-void MgsMenu::focusTab(int index)
+void MgsMenuDialog::focusTab(int index)
 {
     if (index < 0 || index >= m_tabLayout->count())
         return;

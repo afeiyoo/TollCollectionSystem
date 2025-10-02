@@ -32,7 +32,7 @@ UiUtils::~UiUtils() {}
 void UiUtils::addLine(QBoxLayout *layout,
                       Qt::Orientation orientation /*= Qt::Vertical*/,
                       int thickness /*= 3*/,
-                      QString color /*= #e0e0e0*/)
+                      QString color /*= #cdcdcd*/)
 {
     if (!layout)
         return;
@@ -168,12 +168,12 @@ QMessageBox::StandardButton UiUtils::showMessageBoxInfo(const QString &title,
 {
     QMessageBox box;
     box.setWindowTitle(QObject::tr("提示"));
-    box.setWindowFlags(Qt::Dialog | Qt::WindowTitleHint | Qt::WindowSystemMenuHint);
+    box.setWindowFlags(Qt::Dialog | Qt::WindowTitleHint);
     box.setTextFormat(Qt::RichText);
     box.setIcon(QMessageBox::Information);
 
-    box.setText(QString("<span style='font-size:25px; font-weight:bold;'>%1</span>").arg(title));
-    box.setInformativeText(QString("<span style='font-size:17px;'>%1</span>").arg(informativeText));
+    box.setText(QString("<span style='font-size:20px; font-weight:bold;'>%1</span>").arg(title));
+    box.setInformativeText(QString("<span style='font-size:16px;'>%1</span>").arg(informativeText));
 
     box.setStandardButtons(buttons);
 
@@ -185,11 +185,11 @@ QMessageBox::StandardButton UiUtils::showMessageBoxInfo(const QString &title,
             if (auto btn = qobject_cast<QPushButton *>(box.button(b))) {
                 if (b == QMessageBox::Ok || b == QMessageBox::Yes) {
                     btn->setProperty("color", "blue");
-                    btn->setText(QObject::tr("确定"));
+                    btn->setText(QObject::tr("确认"));
                     okBtn = btn;
                 } else {
                     btn->setProperty("color", "gray");
-                    btn->setText(QObject::tr("取消"));
+                    btn->setText(QObject::tr("返回"));
                     cancelBtn = btn;
                 }
                 btn->setStyle(new ButtonStyle(btn->style()));
@@ -211,12 +211,12 @@ QMessageBox::StandardButton UiUtils::showMessageBoxQuestion(const QString &title
 {
     QMessageBox box;
     box.setWindowTitle(QObject::tr("选择"));
-    box.setWindowFlags(Qt::Dialog | Qt::WindowTitleHint | Qt::WindowSystemMenuHint);
+    box.setWindowFlags(Qt::Dialog | Qt::WindowTitleHint);
     box.setTextFormat(Qt::RichText);
     box.setIcon(QMessageBox::Question);
 
-    box.setText(QString("<span style='font-size:25px; font-weight:bold;'>%1</span>").arg(title));
-    box.setInformativeText(QString("<span style='font-size:17px;'>%1</span>").arg(informativeText));
+    box.setText(QString("<span style='font-size:20px; font-weight:bold;'>%1</span>").arg(title));
+    box.setInformativeText(QString("<span style='font-size:16px;'>%1</span>").arg(informativeText));
 
     box.setStandardButtons(buttons);
 
@@ -228,11 +228,11 @@ QMessageBox::StandardButton UiUtils::showMessageBoxQuestion(const QString &title
             if (auto btn = qobject_cast<QPushButton *>(box.button(b))) {
                 if (b == QMessageBox::Ok || b == QMessageBox::Yes) {
                     btn->setProperty("color", "blue");
-                    btn->setText(QObject::tr("确定"));
+                    btn->setText(QObject::tr("确认"));
                     okBtn = btn;
                 } else {
                     btn->setProperty("color", "gray");
-                    btn->setText(QObject::tr("取消"));
+                    btn->setText(QObject::tr("返回"));
                     cancelBtn = btn;
                 }
                 btn->setStyle(new ButtonStyle(btn->style()));
@@ -254,12 +254,12 @@ QMessageBox::StandardButton UiUtils::showMessageBoxWarning(const QString &title,
 {
     QMessageBox box;
     box.setWindowTitle(QObject::tr("警告"));
-    box.setWindowFlags(Qt::Dialog | Qt::WindowTitleHint | Qt::WindowSystemMenuHint);
+    box.setWindowFlags(Qt::Dialog | Qt::WindowTitleHint);
     box.setTextFormat(Qt::RichText);
     box.setIcon(QMessageBox::Warning);
 
-    box.setText(QString("<span style='font-size:25px; font-weight:bold;'>%1</span>").arg(title));
-    box.setInformativeText(QString("<span style='font-size:17px;'>%1</span>").arg(informativeText));
+    box.setText(QString("<span style='font-size:20px; font-weight:bold;'>%1</span>").arg(title));
+    box.setInformativeText(QString("<span style='font-size:16px;'>%1</span>").arg(informativeText));
 
     box.setStandardButtons(buttons);
 
@@ -271,11 +271,11 @@ QMessageBox::StandardButton UiUtils::showMessageBoxWarning(const QString &title,
             if (auto btn = qobject_cast<QPushButton *>(box.button(b))) {
                 if (b == QMessageBox::Ok || b == QMessageBox::Yes) {
                     btn->setProperty("color", "blue");
-                    btn->setText(QObject::tr("确定"));
+                    btn->setText(QObject::tr("确认"));
                     okBtn = btn;
                 } else {
                     btn->setProperty("color", "gray");
-                    btn->setText(QObject::tr("取消"));
+                    btn->setText(QObject::tr("返回"));
                     cancelBtn = btn;
                 }
                 btn->setStyle(new ButtonStyle(btn->style()));
@@ -297,12 +297,12 @@ QMessageBox::StandardButton UiUtils::showMessageBoxError(const QString &title,
 {
     QMessageBox box;
     box.setWindowTitle(QObject::tr("错误"));
-    box.setWindowFlags(Qt::Dialog | Qt::WindowTitleHint | Qt::WindowSystemMenuHint);
+    box.setWindowFlags(Qt::Dialog | Qt::WindowTitleHint);
     box.setTextFormat(Qt::RichText);
     box.setIcon(QMessageBox::Critical);
 
-    box.setText(QString("<span style='font-size:25px; font-weight:bold;'>%1</span>").arg(title));
-    box.setInformativeText(QString("<span style='font-size:17px;'>%1</span>").arg(informativeText));
+    box.setText(QString("<span style='font-size:20px; font-weight:bold;'>%1</span>").arg(title));
+    box.setInformativeText(QString("<span style='font-size:16px;'>%1</span>").arg(informativeText));
 
     box.setStandardButtons(buttons);
 
@@ -314,11 +314,11 @@ QMessageBox::StandardButton UiUtils::showMessageBoxError(const QString &title,
             if (auto btn = qobject_cast<QPushButton *>(box.button(b))) {
                 if (b == QMessageBox::Ok || b == QMessageBox::Yes) {
                     btn->setProperty("color", "blue");
-                    btn->setText(QObject::tr("确定"));
+                    btn->setText(QObject::tr("确认"));
                     okBtn = btn;
                 } else {
                     btn->setProperty("color", "gray");
-                    btn->setText(QObject::tr("取消"));
+                    btn->setText(QObject::tr("返回"));
                     cancelBtn = btn;
                 }
                 btn->setStyle(new ButtonStyle(btn->style()));
@@ -377,9 +377,9 @@ void ButtonStyle::drawControl(ControlElement element,
             QStyleOptionButton opt(*qstyleoption_cast<const QStyleOptionButton *>(option));
 
             if (btnColor == "blue") {
-                opt.palette.setColor(QPalette::ButtonText, Qt::white);
+                opt.palette.setColor(QPalette::ButtonText, QColor("#ffffff"));
             } else if (btnColor == "gray") {
-                opt.palette.setColor(QPalette::ButtonText, Qt::black);
+                opt.palette.setColor(QPalette::ButtonText, QColor("#000000"));
             }
 
             QProxyStyle::drawControl(element, &opt, painter, widget);

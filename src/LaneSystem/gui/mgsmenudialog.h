@@ -1,18 +1,16 @@
 #pragma once
 
+#include <QDialog>
 #include <QKeyEvent>
-#include <QWidget>
 
 class ElaPivot;
 class QStackedLayout;
-class MgsMenu : public QWidget
+class MgsMenuDialog : public QDialog
 {
     Q_OBJECT
 public:
-    explicit MgsMenu(QWidget *parent = nullptr);
-    ~MgsMenu() override;
-
-    void initUi();
+    explicit MgsMenuDialog(QWidget *parent = nullptr);
+    ~MgsMenuDialog() override;
 
     void addNewTab(const QString &tabName, const QStringList &funcs, const QList<uint> &enableFuncs);
     void reset();
@@ -22,9 +20,11 @@ protected:
     void showEvent(QShowEvent *event) override;
 
 private:
+    void initUi();
     void focusTab(int tabIndex);
 
 private:
+    QWidget *m_mainWidget = nullptr;
     // 功能导航栏
     ElaPivot *m_pivot = nullptr;
     // 功能堆栈

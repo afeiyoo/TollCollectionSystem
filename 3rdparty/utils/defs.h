@@ -9,6 +9,19 @@
 #include <QVariant>
 
 //==============================================================================
+// 界面显示结构体定义
+//==============================================================================
+// 称重信息
+struct ST_WeightInfoItem
+{
+    QString plate;
+    uint axisType;
+    uint axisNum;
+    qreal weight;
+    uint status; // 0-等待中，1-已交易
+};
+
+//==============================================================================
 // 配置结构体定义
 //==============================================================================
 namespace ConfigDef {
@@ -1630,3 +1643,13 @@ enum WarnType
 };
 Q_ENUM_CREATE(WarnType)
 Q_END_ENUM_CREATE(EM_WarnType)
+
+Q_BEGIN_ENUM_CREATE(EM_LogLevel)
+enum LogLevel{
+    DEBUG = 1,
+    INFO,
+    WARN,
+    ERROR
+};
+Q_ENUM_CREATE(LogLevel)
+Q_END_ENUM_CREATE(EM_LogLevel)

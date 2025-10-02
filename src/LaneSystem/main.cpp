@@ -5,13 +5,12 @@
 #include "bend/mtcin/mideskprocess.h"
 #include "config/config.h"
 #include "global/globalmanager.h"
-#include "gui/component/mgsoptionsdialog.h"
 #include "gui/mgsmainwindow.h"
+#include "utils/datadealutils.h"
 
-#include <QFile>
-#include <QNetworkAccessManager>
-#include <QNetworkReply>
 #include <QObject>
+
+using namespace Utils;
 
 int main(int argc, char *argv[])
 {
@@ -29,6 +28,7 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
 
     eApp->init();
+    // 基础初始化
     GM_INSTANCE->init();
 
     // 界面初始化
@@ -64,6 +64,9 @@ int main(int argc, char *argv[])
         LOG_ASSERT_X(false, "系统初始化失败：业务处理模块初始化失败（无对应车道类型）");
     }
     LOG_INFO().noquote() << "业务处理模块初始化完成";
+
+    LOG_INFO().noquote() << "系统正常启动: " << DataDealUtils::curDateTimeStr();
+    mainWindow.onShowLogAppend(EM_LogLevel::INFO, "系统正常启动");
 
     return a.exec();
 }

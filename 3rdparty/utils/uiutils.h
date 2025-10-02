@@ -21,7 +21,7 @@ public:
     static void addLine(QBoxLayout *layout,
                         Qt::Orientation orientation = Qt::Vertical,
                         int thickness = 3,
-                        QString color = "#e0e0e0");
+                        QString color = "#cdcdcd");
 
     // 为控件widget应用阴影效果
     static void applyShadow(QWidget *widget);

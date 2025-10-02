@@ -1,10 +1,12 @@
 #pragma once
 
-#include "ElaWindow.h"
+#include "ElaWidgetTools/ElaWindow.h"
+#include "utils/defs.h"
 
+class MgsOptionsDialog;
+class MgsAuthDialog;
 class MgsBasePage;
-class ElaToolButton;
-class ElaStatusBar;
+class MgsStateManager;
 class MgsMainWindow : public ElaWindow
 {
     Q_OBJECT
@@ -16,21 +18,34 @@ public:
     void initMtcOut();
     void initEtc();
 
+public slots:
     // 错误弹窗提示
-    void showFormErrorHint(const QString &title, const QStringList &strs);
+    void onShowFormErrorHint(const QString &title, const QStringList &strs);
     // 提示弹窗提示
-    void showFormInfoHint(const QString &title, const QStringList &strs);
+    void onShowFormInfoHint(const QString &title, const QStringList &strs);
     // 选择弹窗提示
-    void showFormQuestionHint(const QString &title, const QStringList &strs);
+    void onShowFormQuestionHint(const QString &title, const QStringList &strs);
     // 报警弹窗提示
-    void showFormWarningHint(const QString &title, const QStringList &strs);
+    void onShowFormWarningHint(const QString &title, const QStringList &strs);
+    // 登录窗口显示
+    void onShowFormLogin();
+    // 选项窗口显示
+    void onShowFormOptions(uint dlgID, const QString &title, const QStringList &options);
+    // 功能菜单窗口显示
+    void onShowFormMenu();
+    // 日志显示区刷新
+    void onShowLogAppend(EM_LogLevel::LogLevel logLevel, const QString &log);
+
+protected:
+    void showEvent(QShowEvent *event) override;
 
 private:
-    void initUi();
-
-private:
-    // 状态栏
-    ElaStatusBar *m_statusBar = nullptr;
     // 主页面
     MgsBasePage *m_mainPage = nullptr;
+    // 登录窗口
+    MgsAuthDialog *m_authDialog = nullptr;
+    // 选项对话框
+    MgsOptionsDialog *m_optionsDialog = nullptr;
+    // 状态控件管理对象
+    MgsStateManager *m_stateMan = nullptr;
 };

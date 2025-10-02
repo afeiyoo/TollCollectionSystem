@@ -1,6 +1,7 @@
 #include "mgsdevicepanel.h"
 
 #include "ElaWidgetTools/ElaIconButton.h"
+#include "global/constant.h"
 
 #include <QDebug>
 #include <QHBoxLayout>
@@ -33,7 +34,7 @@ void MgsDevicePanel::setDeviceList(const QList<uint> &devices)
         // 设备初始状态为 1
         QString path = iconPath(dev, 1);
         ElaIconButton *btn = new ElaIconButton(QPixmap(path), this);
-        btn->setFixedSize(50, 50);
+        btn->setFixedSize(45, 45);
         btn->setAttribute(Qt::WA_TransparentForMouseEvents, true);
 
         // 保存映射
@@ -55,7 +56,8 @@ void MgsDevicePanel::onDevStatusChange(uint dev, uint status)
 
 void MgsDevicePanel::initUi()
 {
-    setBackgroundColor(Qt::transparent);
+    setBackgroundColor(Constant::Color::PAGEAREA_NORMAL_BG);
+    setBorderRadius(0);
 
     m_iconLayout = new QHBoxLayout();
     m_iconLayout->setSpacing(5);

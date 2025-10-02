@@ -9,9 +9,6 @@
 #include "tools/laneauth.h"
 #include "utils/uiutils.h"
 
-#include <QApplication>
-#include <QMetaMethod>
-
 using namespace Utils;
 
 MIDeskProcess::MIDeskProcess(MgsMainWindow *mainWindow, QObject *parent)
@@ -51,17 +48,19 @@ void MIDeskProcess::onShiftIn()
         return;
     }
 
+#if 0
     // 1. 车道授权
     bool authOk = GM_INSTANCE->m_laneAuth->authCheck(GM_INSTANCE->m_config->m_businessConfig.stationID,
                                                      GM_INSTANCE->m_config->m_businessConfig.laneID,
                                                      GM_INSTANCE->m_config->m_businessConfig.laneIP,
                                                      GM_INSTANCE->m_config->m_businessConfig.CNLaneID);
-    // if (!authOk) {
-    //     m_mainWindow->showFormErrorHint("车道授权失败", {"该车道未在省中心平台注册", "</br>", "<strong>请及时联系运维人员处理!</strong>"});
-    //     return;
-    // }
+    if (!authOk) {
+        m_mainWindow->showFormErrorHint("车道授权失败", {"该车道未在省中心平台注册", "</br>", "<strong>请及时联系运维人员处理!</strong>"});
+        return;
+    }
     // 2. 检查程序更新，必须是最新程序才可以登班
     GM_INSTANCE->m_updater->checkForUpdates(GM_INSTANCE->m_config->m_systemConfig.updateUrl);
+#endif
 }
 
 void MIDeskProcess::onShiftOut() {}
@@ -71,10 +70,8 @@ void MIDeskProcess::onUpdateCheckingFinished(const QString &url)
     if (url == GM_INSTANCE->m_config->m_systemConfig.updateUrl) {
         bool networkErrorOccured = GM_INSTANCE->m_updater->getNetworkErrorOccured(url);
         if (networkErrorOccured) {
-            m_mainWindow->showFormErrorHint("检查更新失败",
-                                            {"车道与服务端网络连接异常，请稍后再试",
-                                             "</br>",
-                                             "<strong>请及时联系运维人员处理!</strong>"});
+            m_mainWindow->onShowFormErrorHint("检查更新失败",
+                                            {"车道与服务端网络连接异常，请稍后再试", "</br>", "<strong>请及时联系运维人员处理!</strong>"});
             return;
         }
         // 3. 更新检查完成，开始加载登班参数

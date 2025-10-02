@@ -4,7 +4,6 @@
 #include "RollingFileAppender.h"
 #include "config/config.h"
 #include "global/constant.h"
-#include "global/modemanager.h"
 #include "global/signalmanager.h"
 #include "laneservice.h"
 #include "tools/laneauth.h"
@@ -19,7 +18,6 @@ GlobalManager::GlobalManager(QObject *parent)
     : QObject{parent}
 {
     m_signalMan = new SignalManager(this);
-    m_modeMan = new ModeManager(this);
     m_updater = QSimpleUpdater::getInstance();
 
     m_jsonParser = new QJson::Parser();
@@ -82,7 +80,7 @@ void GlobalManager::init()
     m_jsonSerializer->setIndentMode(QJson::IndentCompact);
 
     // 软件配置加载
-    LOG_ASSERT_X(m_config->loadConfig(), "系统初始化失败: 系统配置加载异常");
+    LOG_ASSERT_X(m_config->loadConfig(), "系统初始化失败: 系统基础配置加载异常");
 
     // 更新对象初始化
     FileName downloadDir = FileName::fromString(FileUtils::curApplicationDirPath() + "/download");

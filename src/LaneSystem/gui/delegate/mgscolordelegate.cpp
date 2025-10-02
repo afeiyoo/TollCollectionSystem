@@ -27,12 +27,12 @@ void MgsColorDelegate::paint(QPainter *painter, const QStyleOptionViewItem &opti
     bool isSelected = option.state.testFlag(QStyle::State_Selected);
 
     // 始终绘制边框
-    painter->setPen(QPen(QColor(Constant::Color::GRAY_COLOR)));
+    painter->setPen(QPen(QColor(Constant::Color::BORDER)));
     painter->drawRect(rect.adjusted(0, 0, -1, -1));
 
     // 绘制选中背景
     if (isSelected) {
-        QColor bgColor = QColor(Constant::Color::ALICE_BULE_COLOR);
+        QColor bgColor = QColor(Constant::Color::SELECTED_BG);
         painter->fillRect(rect, bgColor);
     }
 
@@ -42,7 +42,7 @@ void MgsColorDelegate::paint(QPainter *painter, const QStyleOptionViewItem &opti
     font.setPixelSize(18);
     painter->setFont(font);
 
-    QColor textColor = isSelected ? QColor(Constant::Color::NAVY_BLUE_COLOR) : option.palette.color(QPalette::Text);
+    QColor textColor = isSelected ? QColor(Constant::Color::SELECTED_TEXT) : option.palette.color(QPalette::Text);
     painter->setPen(textColor);
     painter->drawText(textRect, Qt::AlignCenter, colorName);
 
@@ -51,7 +51,7 @@ void MgsColorDelegate::paint(QPainter *painter, const QStyleOptionViewItem &opti
         QRect underlineRect = textRect;
         underlineRect.setTop(underlineRect.bottom() - 3);
         underlineRect.setHeight(3);
-        painter->fillRect(underlineRect, QColor(Constant::Color::NAVY_BLUE_COLOR));
+        painter->fillRect(underlineRect, QColor(Constant::Color::SELECTED_TEXT));
     }
 
     // 根据颜色名称设置填充

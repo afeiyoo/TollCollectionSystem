@@ -1,5 +1,6 @@
 #include "mgsweightinfodelegate.h"
 
+#include "global/constant.h"
 #include "gui/component/mgsweightinfopanel.h"
 #include <QPainter>
 #include <QPainterPath>
@@ -17,13 +18,15 @@ void MgsWeightInfoDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
 
     QRect rect = option.rect;
 
-    // 背景（纯透明），边框浅灰色
-    QColor borderColor = QColor("#c8c8c8");
+    QColor bgColor(Constant::Color::PAGEAREA_STRESS_BG);
+    QPainterPath bgPath;
+    bgPath.addRoundRect(rect.adjusted(1, 1, -1, -1), 0, 0);
+    painter->fillPath(bgPath, bgColor);
 
-    QPainterPath path;
-    path.addRoundedRect(rect.adjusted(1, 1, -1, -1), 6, 6);
+    // 背景（纯透明），边框浅灰色
+    QColor borderColor = QColor(Constant::Color::BORDER);
     painter->setPen(QPen(borderColor, 1));
-    painter->drawPath(path);
+    painter->drawPath(bgPath);
 
     // 获取数据
     QString plate = index.data(WeightInfoModel::PlateRole).toString();
@@ -59,7 +62,7 @@ void MgsWeightInfoDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
     int textY = rect.top() + (rect.height() - (lineHeight * 3 + spacing * 2)) / 2;
 
     QFont font = option.font;
-    font.setPixelSize(15);
+    font.setPixelSize(Constant::FontSize::WEIGHTINFO_AREA_SIZE);
     painter->setFont(font);
     painter->setPen(Qt::black);
     painter->drawText(QRect(textX, textY, textWidth, lineHeight), Qt::AlignLeft | Qt::AlignVCenter, plate);
@@ -83,15 +86,23 @@ QSize MgsWeightInfoDelegate::sizeHint(const QStyleOptionViewItem &option, const 
 QPixmap MgsWeightInfoDelegate::getAxisTypePixmap(uint axisType, uint status) const
 {
     if (axisType == 0) {
-        return status == 0 ? QPixmap(":/static/images/axistype_unknown_waiting.png")
-                           : QPixmap(":/static/images/axistype_unknown_pass.png");
+        if (status == 0) {
+            return QPixmap(":/static/images/axistype_unknown_waiting.png");
+        } else if (status == 1) {
+            return QPixmap(":/static/images/axistype_unknown_pass.png");
+        } else {
+            return QPixmap(":/static/images/axistype_unknown_overload.png");
+        }
     }
 
     QString strStatus;
-    if (status == 0)
+    if (status == 0) {
         strStatus = "waiting";
-    else
+    } else if (status == 1) {
         strStatus = "pass";
+    } else {
+        strStatus = "overload";
+    }
 
     QString str = QString(":/static/images/axistype_%1_%2.png").arg(axisType).arg(strStatus);
     return QPixmap(str);

@@ -10,6 +10,15 @@ public:
     ~SignalManager() override;
 
 signals:
+    //==============================================================================
+    // 前端 <==> 前端的信号
+    //==============================================================================
+    // 请求功能菜单显示
+    void sigShowFormMenu();
+
+    //==============================================================================
+    // 前端 <==> 后端的信号
+    //==============================================================================
     // 车牌修改
     void sigPlateChanged(const QString &plate);
     // 功能不可用
@@ -24,12 +33,15 @@ signals:
     void sigCloseLane();
     // 开道
     void sigOpenLane();
+    // 选项对话框请求
+    void sigOptionSelected(int dlgID, uint option);
 
     //按键
     void sigKeyPress(uint key);
-    // 界面日志区刷新
-    void sigLogAppend(const QString &log);
 
-    // 选项对话框请求
-    void sigOptionSelected(int dlgID, uint option);
+    //==============================================================================
+    // 后端发往前端的信号
+    //==============================================================================
+    // 请求选项对话框显示
+    void sigShowFormOptions(uint dlgID, const QString &title, const QStringList &options);
 };
