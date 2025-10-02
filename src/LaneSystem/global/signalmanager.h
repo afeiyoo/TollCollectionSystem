@@ -2,6 +2,7 @@
 
 #include <QObject>
 
+class State;
 class SignalManager : public QObject
 {
     Q_OBJECT
@@ -21,14 +22,12 @@ signals:
     //==============================================================================
     // 车牌修改
     void sigPlateChanged(const QString &plate);
-    // 功能不可用
-    void sigFuncUnavaliable(const QString &func);
     // 上班
     void sigShiftIn();
     // 下班
     void sigShiftOut();
     // 菜单功能请求
-    void sigMenuRequest(uint index);
+    void sigMenuFuncDeal(uint tabIndex, uint funcIndex);
     // 闭道
     void sigCloseLane();
     // 开道
@@ -36,12 +35,11 @@ signals:
     // 选项对话框请求
     void sigOptionSelected(int dlgID, uint option);
 
-    //按键
-    void sigKeyPress(uint key);
-
-    //==============================================================================
-    // 后端发往前端的信号
-    //==============================================================================
     // 请求选项对话框显示
     void sigShowFormOptions(uint dlgID, const QString &title, const QStringList &options);
+    // 状态变更
+    void sigChangeState(State *newState);
+
+    //按键
+    void sigKeyPress(uint key);
 };

@@ -12,9 +12,6 @@ public:
     ~MIDeskProcess() override;
 
 public slots:
-    void onVDChanged(unsigned int newVD);
-    // 菜单功能请求
-    void onMenuRequest(uint index);
     // 闭道
     void onCloseLane();
     // 开道
@@ -23,8 +20,13 @@ public slots:
     void onShiftIn();
     // 下班
     void onShiftOut();
+    // 菜单功能执行
+    void onMenuFuncDeal(uint tabIndex, uint funcIndex);
 
     void onUpdateCheckingFinished(const QString &url);
+
+private:
+    void dealWeightLow();
 
 private:
     MIBizEnv *m_bizEnv = nullptr;

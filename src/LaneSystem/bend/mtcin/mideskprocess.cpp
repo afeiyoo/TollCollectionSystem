@@ -5,6 +5,7 @@
 #include "config/config.h"
 #include "global/globalmanager.h"
 #include "global/signalmanager.h"
+#include "gui/manager/mgsstatemanager.h"
 #include "gui/mgsmainwindow.h"
 #include "tools/laneauth.h"
 #include "utils/uiutils.h"
@@ -18,7 +19,7 @@ MIDeskProcess::MIDeskProcess(MgsMainWindow *mainWindow, QObject *parent)
     // 业务环境变量初始化
     m_bizEnv = new MIBizEnv(this);
 
-    connect(GM_INSTANCE->m_signalMan, &SignalManager::sigMenuRequest, this, &MIDeskProcess::onMenuRequest);
+    connect(GM_INSTANCE->m_signalMan, &SignalManager::sigMenuFuncDeal, this, &MIDeskProcess::onMenuFuncDeal);
     connect(GM_INSTANCE->m_signalMan, &SignalManager::sigCloseLane, this, &MIDeskProcess::onCloseLane);
     connect(GM_INSTANCE->m_signalMan, &SignalManager::sigOpenLane, this, &MIDeskProcess::onOpenLane);
     connect(GM_INSTANCE->m_signalMan, &SignalManager::sigShiftIn, this, &MIDeskProcess::onShiftIn);
@@ -29,12 +30,23 @@ MIDeskProcess::MIDeskProcess(MgsMainWindow *mainWindow, QObject *parent)
 
 MIDeskProcess::~MIDeskProcess() {}
 
-void MIDeskProcess::onVDChanged(unsigned int newVD) {}
-
-void MIDeskProcess::onMenuRequest(uint funcIndex)
+void MIDeskProcess::onMenuFuncDeal(uint tabIndex, uint funcIndex)
 {
-    LOG_INFO().noquote() << "测试成功进入" << funcIndex;
-    UiUtils::showMessageBoxInfo("测试", "弹窗测试", QMessageBox::Yes);
+    switch (tabIndex) {
+    case 0:
+        break;
+    case 1:
+        if (funcIndex == 0) {
+            // 功能：称重降级
+            dealWeightLow();
+        } else if (funcIndex == 1) {
+        }
+        break;
+    case 2:
+        break;
+    default:
+        break;
+    }
 }
 
 void MIDeskProcess::onCloseLane() {}
@@ -71,9 +83,20 @@ void MIDeskProcess::onUpdateCheckingFinished(const QString &url)
         bool networkErrorOccured = GM_INSTANCE->m_updater->getNetworkErrorOccured(url);
         if (networkErrorOccured) {
             m_mainWindow->onShowFormErrorHint("检查更新失败",
-                                            {"车道与服务端网络连接异常，请稍后再试", "</br>", "<strong>请及时联系运维人员处理!</strong>"});
+                                              {"车道与服务端网络连接异常，请稍后再试", "</br>", "<strong>请及时联系运维人员处理!</strong>"});
             return;
         }
         // 3. 更新检查完成，开始加载登班参数
     }
+}
+
+void MIDeskProcess::dealWeightLow()
+{
+    if (m_bizEnv->m_isWeightLow) {
+        m_bizEnv->m_isWeightLow = false;
+    } else {
+        m_bizEnv->m_isWeightLow = true;
+    }
+    m_bizEnv->m_curState->setWeightLow(m_bizEnv->m_isWeightLow);
+    m_mainWindow->onShowWeightLowUpdate(m_bizEnv->m_isWeightLow);
 }

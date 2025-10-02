@@ -14,10 +14,19 @@ public:
     virtual ~State() = default;
 
     virtual void setupMenu(MgsMenuDialog *menu) = 0;
+
+    // 是否称重降级
+    void setWeightLow(bool weightLow);
+
+protected:
+    bool m_weightLow = false; // 默认非称重降级
 };
 
+// 自定义信号参数
+Q_DECLARE_METATYPE(State *);
+
 //==============================================================================
-// 具体状态：混合入口自动发卡模式，混合入口手动发卡模式，混合入口手动发纸券模式
+// 具体状态：混合入口自动发卡模式，混合入口人工发卡模式，混合入口人工发纸券模式
 //==============================================================================
 class MtcInAutoMode : public State
 {
@@ -50,9 +59,9 @@ public:
     void showMenu();
 
 public slots:
-    void onStateChanged(State *newState);
+    void onChangeState(State *newState);
 
 private:
-    State *m_curState = nullptr;     // 当前模式
+    State *m_curState = nullptr;           // 当前模式
     MgsMenuDialog *m_menuDialog = nullptr; // 全局唯一的菜单
 };

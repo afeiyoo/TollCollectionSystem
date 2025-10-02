@@ -35,6 +35,8 @@ public slots:
     void onShowFormMenu();
     // 日志显示区刷新
     void onShowLogAppend(EM_LogLevel::LogLevel logLevel, const QString &log);
+    // 称重降级
+    void onShowWeightLowUpdate(bool isLow);
 
 protected:
     void showEvent(QShowEvent *event) override;

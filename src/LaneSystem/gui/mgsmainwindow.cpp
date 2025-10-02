@@ -344,6 +344,11 @@ void MgsMainWindow::onShowLogAppend(EM_LogLevel::LogLevel logLevel, const QStrin
     m_mainPage->logAppend(logLevel, log);
 }
 
+void MgsMainWindow::onShowWeightLowUpdate(bool isLow)
+{
+    m_mainPage->setWeightLow(isLow);
+}
+
 void MgsMainWindow::onShowFormErrorHint(const QString &title, const QStringList &strs)
 {
     m_mainPage->logAppend(EM_LogLevel::ERROR, title);

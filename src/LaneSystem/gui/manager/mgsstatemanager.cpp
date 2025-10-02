@@ -1,4 +1,7 @@
 #include "mgsstatemanager.h"
+
+#include "global/globalmanager.h"
+#include "global/signalmanager.h"
 #include "gui/mgsmenudialog.h"
 #include "utils/stdafx.h"
 
@@ -8,9 +11,10 @@
 MgsStateManager::MgsStateManager(QWidget *parent)
     : QObject{parent}
 {
-    m_curState = new MtcInAutoMode();
     m_menuDialog = new MgsMenuDialog(parent);
     m_menuDialog->hide();
+
+    connect(GM_INSTANCE->m_signalMan, &SignalManager::sigChangeState, this, &MgsStateManager::onChangeState);
 }
 
 MgsStateManager::~MgsStateManager()
@@ -28,13 +32,21 @@ void MgsStateManager::showMenu()
     m_menuDialog->exec();
 }
 
-void MgsStateManager::onStateChanged(State *newState)
+void MgsStateManager::onChangeState(State *newState)
 {
     if (!newState)
         return;
 
-    delete m_curState;
+    SAFE_DELETE(m_curState);
     m_curState = newState;
+}
+
+//==============================================================================
+// 抽象状态类
+//==============================================================================
+void State::setWeightLow(bool weightLow)
+{
+    m_weightLow = weightLow;
 }
 
 //==============================================================================
@@ -42,27 +54,39 @@ void MgsStateManager::onStateChanged(State *newState)
 //==============================================================================
 void MtcInAutoMode::setupMenu(MgsMenuDialog *menu)
 {
-    menu->addNewTab("常用", {"1. 切换模式", "2. 闽通卡复位", "3. 节假日参数查看", "4. 打开天线"}, {0, 1, 2, 3});
-    menu->addNewTab("维护", {"1. 修改软件配置", "2. 设备检测"}, {0});
+    menu->addNewTab("常用", {"0. 闽通卡圈存"}, {0});
+    if (!m_weightLow) {
+        menu->addNewTab("设备", {"0. 启用称重降级"}, {});
+    } else {
+        menu->addNewTab("设备", {"0. 取消称重降级"}, {});
+    }
     menu->addNewTab("系统", {"1. 关闭电脑", "2. 重启电脑", "3. 重启软件"}, {0, 1, 2});
 }
 
 //==============================================================================
-// 具体状态：混合入口手动发卡模式
+// 具体状态：混合入口人工发卡模式
 //==============================================================================
 void MtcInManaualMode::setupMenu(MgsMenuDialog *menu)
 {
-    menu->addNewTab("常用", {"1. 切换模式", "2. 闽通卡复位", "3. 节假日参数查看", "4. 打开天线"}, {0, 1, 2});
-    menu->addNewTab("维护", {"1. 修改软件配置", "2. 设备检测"}, {0, 1});
-    menu->addNewTab("系统", {"1. 关闭电脑", "2. 重启电脑"}, {0});
+    menu->addNewTab("常用", {"0. 闽通卡圈存"}, {0});
+    if (!m_weightLow) {
+        menu->addNewTab("设备", {"0. 启用称重降级"}, {0});
+    } else {
+        menu->addNewTab("设备", {"0. 取消称重降级"}, {0});
+    }
+    menu->addNewTab("系统", {"1. 关闭电脑", "2. 重启电脑", "3. 重启软件"}, {0, 1, 2});
 }
 
 //==============================================================================
-// 具体状态：混合入口手动发纸券模式
+// 具体状态：混合入口人工发纸券模式
 //==============================================================================
 void MtcInPaperMode::setupMenu(MgsMenuDialog *menu)
 {
-    menu->addNewTab("常用", {"1. 切换模式", "2. 闽通卡复位", "3. 节假日参数查看", "4. 打开天线"}, {0, 1});
-    menu->addNewTab("维护", {"1. 修改软件配置", "2. 设备检测"}, {0, 1});
-    menu->addNewTab("系统", {"1. 发纸券"}, {0});
+    menu->addNewTab("常用", {"0. 闽通卡圈存"}, {0});
+    if (m_weightLow) {
+        menu->addNewTab("设备", {"0. 启用称重降级"}, {});
+    } else {
+        menu->addNewTab("设备", {"0. 取消称重降级"}, {});
+    }
+    menu->addNewTab("系统", {"1. 关闭电脑", "2. 重启电脑", "3. 重启软件"}, {0, 1, 2});
 }
