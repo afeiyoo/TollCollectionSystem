@@ -3,9 +3,9 @@
 
 #include "HttpClient/src/http.h"
 #include "utils/datadealutils.h"
-#include "utils/uiutils.h"
 
 #include <QButtonGroup>
+#include <QMessageBox>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QNetworkRequest>
@@ -27,6 +27,7 @@ Widget::Widget(QWidget *parent)
     group->addButton(ui->chkBoxUTF);
     group->setExclusive(true); //开启互斥
 
+    ui->peditLog->setTextInteractionFlags(Qt::NoTextInteraction);
     ui->peditLog->setReadOnly(true);
 
     connect(ui->btnSend, &QPushButton::clicked, this, &Widget::postToPrinter);
@@ -37,19 +38,23 @@ Widget::~Widget()
     delete ui;
 }
 
-#if 1
 void Widget::postToPrinter(bool checked)
 {
     Q_UNUSED(checked);
 
     if (ui->peditSend->toPlainText().isEmpty()) {
-        QMessageBox::critical(this, "发送内容为空", "请检查发送内容!", QMessageBox::Cancel);
+        QMessageBox::critical(this, "内容错误", "请检查发送内容!", QMessageBox::Cancel);
         return;
     }
 
     QString content = ui->peditSend->toPlainText();
     QString urlStr = ui->leditUrl->text();
     QUrl url(urlStr);
+    if (!url.isValid()) {
+        QMessageBox::critical(this, "URL错误", "请检查URL是否正确!", QMessageBox::Cancel);
+        return;
+    }
+
     QByteArray encodingContent;
     if (ui->chkBoxGBK->isChecked()) {
         // 转GBK发送
@@ -60,75 +65,11 @@ void Widget::postToPrinter(bool checked)
     }
 
     ui->peditLog->appendPlainText(DataDealUtils::curDateTimeStr() + " | 发送内容:" + encodingContent + "\n");
-    QMap<QByteArray, QByteArray> reqHeader;
-    reqHeader["User-Agent"] = "QtClient/1.0";
 
-    Http::instance().setRequestHeaders(reqHeader);
     auto reply = Http::instance().post(url, encodingContent, "application/json");
     QString res = blockUtilResponse(reply, Http::instance().getReadTimeout());
     ui->peditLog->appendPlainText(DataDealUtils::curDateTimeStr() + " | " + res + "\n");
 }
-#endif
-
-#if 0
-void Widget::postToPrinter(bool checked)
-{
-    Q_UNUSED(checked);
-
-    if (ui->peditSend->toPlainText().isEmpty()) {
-        QMessageBox::critical(this, "发送内容为空", "请检查发送内容!", QMessageBox::Cancel);
-        return;
-    }
-
-    QString content = ui->peditSend->toPlainText();
-    QByteArray body;
-    if (ui->chkBoxGBK->isChecked()) {
-        body = DataDealUtils::encodeString(content, 1); // GBK
-    } else {
-        body = content.toUtf8(); // UTF-8
-    }
-
-    ui->peditLog->appendPlainText(DataDealUtils::curDateTimeStr() + " | 发送内容: " + QString::fromUtf8(body));
-
-    QString host = "192.168.41.101";
-    quint16 port = 9588;
-    QString path = "/paper";
-
-    // 构建 HTTP POST 请求
-    QByteArray request;
-    request.append("POST " + path.toUtf8() + " HTTP/1.1\r\n");
-    request.append("Host: " + host.toUtf8() + ":" + QByteArray::number(port) + "\r\n");
-    request.append("Content-Type: application/json\r\n");
-    request.append("Content-Length: " + QByteArray::number(body.size()) + "\r\n");
-    request.append("Connection: close\r\n");
-    request.append("\r\n");
-    request.append(body);
-
-    QTcpSocket *socket = new QTcpSocket(this);
-
-    connect(socket, &QTcpSocket::connected, this, [socket, request]() {
-        // 禁用 Nagle 算法，尽量一次性发送
-        socket->setSocketOption(QAbstractSocket::LowDelayOption, 1);
-        socket->write(request);
-        socket->flush();
-    });
-
-    connect(socket, &QTcpSocket::readyRead, this, [this, socket]() {
-        QByteArray response = socket->readAll();
-        ui->peditLog->appendPlainText(DataDealUtils::curDateTimeStr() + " | 响应: " + QString::fromUtf8(response));
-    });
-
-    connect(socket, &QTcpSocket::errorOccurred, this, [this, socket](QAbstractSocket::SocketError) {
-        ui->peditLog->appendPlainText(DataDealUtils::curDateTimeStr() + " | 网络错误: " + socket->errorString());
-        socket->deleteLater();
-    });
-
-    connect(socket, &QTcpSocket::disconnected, socket, &QTcpSocket::deleteLater);
-
-    QNetworkProxy::setApplicationProxy(QNetworkProxy::NoProxy);
-    socket->connectToHost(host, port);
-}
-#endif
 
 QString Widget::blockUtilResponse(HttpReply *reply, qint32 timeoutMs)
 {
