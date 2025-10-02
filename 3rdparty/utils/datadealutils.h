@@ -136,6 +136,9 @@ public:
     // Qt5.10前的版本，在获取随机数前需要先调用 qsrand(seed), 生成随机数种子
     static int getRandomNum(quint32 boundary);
 
+    // 将字符串转换成指定编码 1. 转GBK编码 2. 转UTF8编码
+    static QByteArray encodeString(const QString &text, int coding);
+
     /*******************************************************/
     /****                   SQL 相关                    ****/
     /*******************************************************/

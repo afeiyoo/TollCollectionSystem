@@ -66,12 +66,8 @@ void MgsWeightInfoDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
     painter->setFont(font);
     painter->setPen(Qt::black);
     painter->drawText(QRect(textX, textY, textWidth, lineHeight), Qt::AlignLeft | Qt::AlignVCenter, plate);
-    painter->drawText(QRect(textX, textY + lineHeight + spacing, textWidth, lineHeight),
-                      Qt::AlignLeft | Qt::AlignVCenter,
-                      axisInfo);
-    painter->drawText(QRect(textX, textY + (lineHeight + spacing) * 2, textWidth, lineHeight),
-                      Qt::AlignLeft | Qt::AlignVCenter,
-                      weightInfo);
+    painter->drawText(QRect(textX, textY + lineHeight + spacing, textWidth, lineHeight), Qt::AlignLeft | Qt::AlignVCenter, axisInfo);
+    painter->drawText(QRect(textX, textY + (lineHeight + spacing) * 2, textWidth, lineHeight), Qt::AlignLeft | Qt::AlignVCenter, weightInfo);
 
     painter->restore();
 }
