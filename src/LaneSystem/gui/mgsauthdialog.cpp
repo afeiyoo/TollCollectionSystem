@@ -23,11 +23,9 @@ MgsAuthDialog::MgsAuthDialog(QWidget *parent)
     setWindowModality(Qt::ApplicationModal);
     setFocusPolicy(Qt::StrongFocus);
     setWindowFlags(Qt::Window | Qt::WindowTitleHint);
-    setFixedSize(300, 380);
+    setFixedSize(300, 350);
 
     initUi();
-
-    UiUtils::moveToCenter(this);
 }
 
 MgsAuthDialog::~MgsAuthDialog() {}
@@ -119,7 +117,7 @@ void MgsAuthDialog::initUi()
     contentLayout->setRowStretch(6, 1); // bottom stretch
 
     // 提示
-    QHBoxLayout *tipLayout = Utils::UiUtils::createTipWidget("输入密码后，按【确认】键登录系统");
+    QHBoxLayout *tipLayout = UiUtils::createTipWidget("输入密码后，按【确认】键登录系统");
 
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
     mainLayout->setContentsMargins(0, 0, 0, 0);
@@ -141,7 +139,7 @@ bool MgsAuthDialog::eventFilter(QObject *obj, QEvent *event)
         int key = keyEvent->key();
 
         bool isDigit = (key >= Qt::Key_0 && key <= Qt::Key_9);
-        bool isControlKey = key == Qt::Key_Backspace || key == Qt::Key_Delete || key == Qt::Key_Left || key == Qt::Key_Right || key == Qt::Key_Tab;
+        bool isControlKey = key == Qt::Key_Backspace || key == Qt::Key_Delete || key == Qt::Key_Left || key == Qt::Key_Right;
 
         if (!(isDigit || isControlKey)) {
             // 交给父控件处理
@@ -150,7 +148,7 @@ bool MgsAuthDialog::eventFilter(QObject *obj, QEvent *event)
         }
     }
 
-    return QWidget::eventFilter(obj, event);
+    return QDialog::eventFilter(obj, event);
 }
 
 void MgsAuthDialog::keyPressEvent(QKeyEvent *event)
@@ -163,30 +161,16 @@ void MgsAuthDialog::keyPressEvent(QKeyEvent *event)
         event->accept();
     }
 
-    QWidget::keyPressEvent(event);
+    QDialog::keyPressEvent(event);
 }
 
 void MgsAuthDialog::showEvent(QShowEvent *event)
 {
-    Q_UNUSED(event);
-
     m_idEdit->clear();
     m_nameEdit->clear();
     m_passwordEdit->clear();
     m_passwordEdit->setFocus();
-}
 
-void MgsAuthDialog::paintEvent(QPaintEvent *event)
-{
-    // QPainter painter(this);
-    // painter.save();
-    // painter.setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing);
-    // painter.setPen(Qt::NoPen);
-    // painter.setBrush(QColor(Constant::Color::DIALOG_BG));
-    // // 背景绘制
-    // int layoutAreaHeight = m_title->height() + m_optionsView->height() + 5;
-    // painter.drawRect(QRectF(0, 0, width(), layoutAreaHeight));
-    // painter.restore();
-
-    QDialog::paintEvent(event);
+    UiUtils::moveToCenter(this);
+    QDialog::showEvent(event);
 }

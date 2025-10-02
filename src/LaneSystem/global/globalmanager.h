@@ -8,7 +8,6 @@
 #define GM_INSTANCE GlobalManager::instance()
 
 class SignalManager;
-class ModeManager;
 class LaneService;
 class Config;
 class MgsMainWindow;
@@ -26,7 +25,6 @@ public:
 
 public:
     SignalManager *m_signalMan = nullptr;
-    ModeManager *m_modeMan = nullptr;
     QSimpleUpdater *m_updater = nullptr;
     // Json解析对象
     QJson::Parser *m_jsonParser = nullptr;

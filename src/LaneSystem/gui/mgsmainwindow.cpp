@@ -1,20 +1,19 @@
 #include "mgsmainwindow.h"
 
 #include <QCoreApplication>
-#include <QDateTime>
-#include <QStackedLayout>
-#include <QTimer>
 #include <QVBoxLayout>
 
 #include "global/constant.h"
 #include "global/globalmanager.h"
 #include "global/signalmanager.h"
 #include "gui/component/mgsdevicepanel.h"
+#include "gui/manager/mgsstatemanager.h"
 #include "gui/mgsauthdialog.h"
 #include "gui/mgsbasepage.h"
 #include "gui/mgsetcpage.h"
 #include "gui/mgsmtcinpage.h"
 #include "gui/mgsmtcoutpage.h"
+#include "gui/mgsoptionsdialog.h"
 #include "utils/uiutils.h"
 
 using namespace Utils;
@@ -32,14 +31,19 @@ MgsMainWindow::MgsMainWindow(QWidget *parent)
     m_authDialog = new MgsAuthDialog(this);
     m_authDialog->hide();
 
-    connect(GM_INSTANCE->m_signalMan, &SignalManager::sigShowFormInfoHint, this, &MgsMainWindow::onShowFormInfoHint);
-    connect(GM_INSTANCE->m_signalMan, &SignalManager::sigShowFormQuestionHint, this, &MgsMainWindow::onShowFormQuestionHint);
-    connect(GM_INSTANCE->m_signalMan, &SignalManager::sigShowFormWarningHint, this, &MgsMainWindow::onShowFormWarningHint);
-    connect(GM_INSTANCE->m_signalMan, &SignalManager::sigShowFormErrorHint, this, &MgsMainWindow::onShowFormErrorHint);
-    connect(GM_INSTANCE->m_signalMan, &SignalManager::sigShowFormLogin, this, &MgsMainWindow::onShowFormLogin);
+    // 选项窗口初始化
+    m_optionsDialog = new MgsOptionsDialog(this);
+    m_optionsDialog->hide();
+
+    // 状态控件管理对象初始化
+    m_stateMan = new MgsStateManager(this);
 
     // 程序退出时，清理界面资源
     connect(qApp, &QCoreApplication::aboutToQuit, this, [this]() { MgsMainWindow::deleteLater(); });
+
+    // 调用信号连接
+    connect(GM_INSTANCE->m_signalMan, &SignalManager::sigShowFormMenu, this, &MgsMainWindow::onShowFormMenu);
+    connect(GM_INSTANCE->m_signalMan, &SignalManager::sigShowFormOptions, this, &MgsMainWindow::onShowFormOptions);
 }
 
 MgsMainWindow::~MgsMainWindow() {}
@@ -335,37 +339,53 @@ void MgsMainWindow::initEtc()
     m_mainPage->setFocus();
 }
 
+void MgsMainWindow::onShowLogAppend(EM_LogLevel::LogLevel logLevel, const QString &log)
+{
+    m_mainPage->logAppend(logLevel, log);
+}
+
 void MgsMainWindow::onShowFormErrorHint(const QString &title, const QStringList &strs)
 {
-    emit GM_INSTANCE->m_signalMan->sigLogAppend(EM_LogLevel::ERROR, title);
+    m_mainPage->logAppend(EM_LogLevel::ERROR, title);
     QString message = strs.join("<br/>");
     UiUtils::showMessageBoxError(title, message, QMessageBox::Yes | QMessageBox::Cancel);
 }
 
 void MgsMainWindow::onShowFormInfoHint(const QString &title, const QStringList &strs)
 {
-    emit GM_INSTANCE->m_signalMan->sigLogAppend(EM_LogLevel::INFO, title);
+    m_mainPage->logAppend(EM_LogLevel::INFO, title);
     QString message = strs.join("<br/>");
     UiUtils::showMessageBoxInfo(title, message, QMessageBox::Yes | QMessageBox::Cancel);
 }
 
 void MgsMainWindow::onShowFormQuestionHint(const QString &title, const QStringList &strs)
 {
-    emit GM_INSTANCE->m_signalMan->sigLogAppend(EM_LogLevel::INFO, title);
+    m_mainPage->logAppend(EM_LogLevel::INFO, title);
     QString message = strs.join("<br/>");
     UiUtils::showMessageBoxQuestion(title, message, QMessageBox::Yes | QMessageBox::Cancel);
 }
 
 void MgsMainWindow::onShowFormWarningHint(const QString &title, const QStringList &strs)
 {
-    emit GM_INSTANCE->m_signalMan->sigLogAppend(EM_LogLevel::WARN, title);
+    m_mainPage->logAppend(EM_LogLevel::WARN, title);
     QString message = strs.join("<br/>");
     UiUtils::showMessageBoxWarning(title, message, QMessageBox::Yes | QMessageBox::Cancel);
 }
 
 void MgsMainWindow::onShowFormLogin()
 {
-    m_authDialog->show();
+    m_authDialog->exec();
+}
+
+void MgsMainWindow::onShowFormOptions(uint dlgID, const QString &title, const QStringList &options)
+{
+    m_optionsDialog->setOptions(dlgID, title, options);
+    m_optionsDialog->exec();
+}
+
+void MgsMainWindow::onShowFormMenu()
+{
+    m_stateMan->showMenu();
 }
 
 void MgsMainWindow::showEvent(QShowEvent *event)

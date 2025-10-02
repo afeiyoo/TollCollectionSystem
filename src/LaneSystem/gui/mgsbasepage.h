@@ -4,7 +4,6 @@
 
 #include <QPlainTextEdit>
 #include <QSplitter>
-#include <QVBoxLayout>
 #include <QWidget>
 
 class MgsWeightInfoPanel;
@@ -95,10 +94,7 @@ public:
     // 交易提示区域API
     virtual void setTradeHint(const QString &tradeHint, const QString &color = "#007bff") = 0;
     virtual void setObuHint(const QString &obuHint, const QString &color = "#000000") = 0;
-    virtual void appendHintButton(const QString &hint,
-                                  const QString &fontColor = "#ffffff",
-                                  const QString &bgColor = "#08c134")
-        = 0;
+    virtual void appendHintButton(const QString &hint, const QString &fontColor = "#ffffff", const QString &bgColor = "#08c134") = 0;
 
     // 称重信息显示区域API
     void setCurWeightInfo(const QString &curWeightInfo);
@@ -112,8 +108,8 @@ public:
     // 设备图标显示区域API
     void setDeviceList(const QList<uint> &devList);
 
-public slots:
-    void onLogAppend(EM_LogLevel::LogLevel logLevel, const QString &log);
+    // 日志显示区域API
+    void logAppend(EM_LogLevel::LogLevel logLevel, const QString &log);
 
 protected:
     // 抓拍与流程区域初始化
@@ -126,19 +122,16 @@ protected:
     MgsPageArea *initScrollTipArea();
 
     // 车辆及卡内信息区域初始化（由子类各自实现）
-    virtual MgsPageArea *initVehInfoArea();
+    virtual MgsPageArea *initVehInfoArea() = 0;
 
     // 交易提示信息区域初始化（由子类各自实现）
-    virtual MgsPageArea *initTradeHintArea();
+    virtual MgsPageArea *initTradeHintArea() = 0;
     // 称重信息区域初始化
     MgsPageArea *initWeightInfoArea();
     // 近期交易记录查看区域初始化（由子类各自实现）
-    virtual MgsRecentTradePanel *initRecentTradeArea();
+    virtual MgsRecentTradePanel *initRecentTradeArea() = 0;
     // 设备状态栏区域初始化
     MgsDevicePanel *initDeviceIconArea();
-
-    // 各子类公用，界面截图
-    void screenShot();
 
 private:
     // 创建顶部信息栏

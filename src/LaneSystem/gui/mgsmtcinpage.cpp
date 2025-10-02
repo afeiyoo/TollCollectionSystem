@@ -6,9 +6,7 @@
 #include "config/config.h"
 #include "global/constant.h"
 #include "global/globalmanager.h"
-#include "global/modemanager.h"
 #include "global/signalmanager.h"
-#include "gui/component/mgsoptionsdialog.h"
 #include "gui/component/mgspagearea.h"
 #include "gui/component/mgsrecenttradepanel.h"
 #include "gui/component/mgsscrolltext.h"
@@ -18,19 +16,13 @@
 
 #include <QApplication>
 #include <QHBoxLayout>
-#include <QHeaderView>
 #include <QKeyEvent>
-#include <QLabel>
-#include <QSplitter>
 
 using namespace Utils;
 
 MgsMtcInPage::MgsMtcInPage(QWidget *parent)
     : MgsBasePage(parent)
-{
-    m_optionsDialog = new MgsOptionsDialog(this);
-    m_optionsDialog->hide();
-}
+{}
 
 MgsMtcInPage::~MgsMtcInPage() {}
 
@@ -203,8 +195,7 @@ void MgsMtcInPage::setPlate(const QString &plate)
     }
 
     if (!bgImage.isEmpty()) {
-        m_plate->setStyleSheet(
-            QString("border-image: url(%1) 0 0 0 0 stretch stretch; color: %2;").arg(bgImage, textColor.name()));
+        m_plate->setStyleSheet(QString("border-image: url(%1) 0 0 0 0 stretch stretch; color: %2;").arg(bgImage, textColor.name()));
     } else {
         m_plate->setStyleSheet(""); // 没有匹配到颜色，清除样式
     }
@@ -325,14 +316,12 @@ void MgsMtcInPage::keyPressEvent(QKeyEvent *event)
                          << QString("【%1】").arg(BizUtils::getKeyDescByCode(GM_INSTANCE->m_config->m_keyboard, key));
 
     if (key == Qt::Key_S) {
-        this->screenShot();
+        emit GM_INSTANCE->m_signalMan->sigShowFormOptions(Constant::DialogID::TEST_DLG, "测试", {"1. 功能1", "2. 功能2"});
         event->accept();
     } else if (key == Qt::Key_W) {
-        GM_INSTANCE->m_modeMan->showMenu();
+        emit GM_INSTANCE->m_signalMan->sigShowFormMenu();
         event->accept();
     } else if (key == Qt::Key_Y) {
-        m_optionsDialog->setOptions(Constant::DialogID::TEST_DLG, "测试窗口", {"0. 功能1", "1. 功能2", "2. 功能3"});
-        m_optionsDialog->exec();
         event->accept();
     } else if (key == Qt::Key_J) {
         static bool isLow = false;
@@ -349,6 +338,8 @@ void MgsMtcInPage::keyPressEvent(QKeyEvent *event)
         event->accept();
     } else if (key == Qt::Key_U) {
         emit GM_INSTANCE->m_signalMan->sigShiftOut();
+        event->accept();
+    } else if (key == Qt::Key_P) {
         event->accept();
     } else {
         qDebug() << "按键功能未实现";

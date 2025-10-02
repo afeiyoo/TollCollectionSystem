@@ -3,7 +3,6 @@
 #include "gui/mgsbasepage.h"
 
 class MgsPageArea;
-class MgsOptionsDialog;
 class ElaText;
 class MgsMtcInPage : public MgsBasePage
 {
@@ -57,9 +56,7 @@ public:
     // 交易提示区域API
     void setTradeHint(const QString &tradeHint, const QString &color = "#007bff") override;
     void setObuHint(const QString &obuHint, const QString &color = "#000000") override;
-    void appendHintButton(const QString &hint,
-                          const QString &fontColor = "#ffffff",
-                          const QString &bgColor = "#08c134") override;
+    void appendHintButton(const QString &hint, const QString &fontColor = "#ffffff", const QString &bgColor = "#08c134") override;
 
 protected:
     void keyPressEvent(QKeyEvent *event) override;
@@ -95,6 +92,4 @@ private:
     // 交易提示区域
     MgsScrollText *m_tradeHint = nullptr;
     ElaText *m_obuHint = nullptr;
-    // 子窗口
-    MgsOptionsDialog *m_optionsDialog = nullptr;
 };

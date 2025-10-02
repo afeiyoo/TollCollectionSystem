@@ -21,10 +21,10 @@ public:
 
 protected:
     void keyPressEvent(QKeyEvent *event) override;
-    void paintEvent(QPaintEvent *event) override;
     void showEvent(QShowEvent *event) override;
 
 private:
+    QWidget *m_mainWidget = nullptr;
     // 对话框标题
     ElaText *m_title = nullptr;
     // 选项视图

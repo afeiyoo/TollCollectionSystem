@@ -26,13 +26,10 @@ SOURCES += \
     dao/dataservice.cpp \
     dao/midataservice.cpp \
     global/globalmanager.cpp \
-    global/modemanager.cpp \
     global/signalmanager.cpp \
     gui/component/mgsbasedialog.cpp \
     gui/component/mgsdevicepanel.cpp \
     gui/component/mgsiconbutton.cpp \
-    gui/component/mgsmenu.cpp \
-    gui/component/mgsoptionsdialog.cpp \
     gui/component/mgspagearea.cpp \
     gui/component/mgsplateedit.cpp \
     gui/component/mgsrecenttradepanel.cpp \
@@ -41,13 +38,16 @@ SOURCES += \
     gui/delegate/mgscolordelegate.cpp \
     gui/delegate/mgskeydelegate.cpp \
     gui/delegate/mgsweightinfodelegate.cpp \
+    gui/manager/mgsstatemanager.cpp \
     gui/mgsauthdialog.cpp \
     gui/mgsbasepage.cpp \
     gui/mgsetcpage.cpp \
     gui/mgsmainwindow.cpp \
+    gui/mgsmenudialog.cpp \
     gui/mgsmtcinpage.cpp \
     gui/mgsmtcoutpage.cpp \
     gui/mgsplateeditdialog.cpp \
+    gui/mgsoptionsdialog.cpp \
     main.cpp\
     # claneform.cpp \
     # cbizenv.cpp \
@@ -68,13 +68,10 @@ HEADERS += \
     dao/midataservice.h \
     global/constant.h \
     global/globalmanager.h \
-    global/modemanager.h \
     global/signalmanager.h \
     gui/component/mgsbasedialog.h \
     gui/component/mgsdevicepanel.h \
     gui/component/mgsiconbutton.h \
-    gui/component/mgsmenu.h \
-    gui/component/mgsoptionsdialog.h \
     gui/component/mgspagearea.h \
     gui/component/mgsplateedit.h \
     gui/component/mgsrecenttradepanel.h \
@@ -83,13 +80,16 @@ HEADERS += \
     gui/delegate/mgscolordelegate.h \
     gui/delegate/mgskeydelegate.h \
     gui/delegate/mgsweightinfodelegate.h \
+    gui/manager/mgsstatemanager.h \
     gui/mgsauthdialog.h \
     gui/mgsbasepage.h \
     gui/mgsetcpage.h \
     gui/mgsmainwindow.h \
+    gui/mgsmenudialog.h \
     gui/mgsmtcinpage.h \
     gui/mgsmtcoutpage.h \
     gui/mgsplateeditdialog.h \
+    gui/mgsoptionsdialog.h \
     # cbizenv.h \
     bend/mtcout/cmodeskprocess.h \
     # bend/mtcout/csptprocess.h \

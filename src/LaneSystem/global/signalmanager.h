@@ -1,6 +1,5 @@
 #pragma once
 
-#include "utils/defs.h"
 #include <QObject>
 
 class SignalManager : public QObject
@@ -12,7 +11,13 @@ public:
 
 signals:
     //==============================================================================
-    // 前端发往后端的信号
+    // 前端 <==> 前端的信号
+    //==============================================================================
+    // 请求功能菜单显示
+    void sigShowFormMenu();
+
+    //==============================================================================
+    // 前端 <==> 后端的信号
     //==============================================================================
     // 车牌修改
     void sigPlateChanged(const QString &plate);
@@ -37,16 +42,6 @@ signals:
     //==============================================================================
     // 后端发往前端的信号
     //==============================================================================
-    // 错误弹窗提示
-    void sigShowFormErrorHint(const QString &title, const QStringList &strs);
-    // 提示弹窗提示
-    void sigShowFormInfoHint(const QString &title, const QStringList &strs);
-    // 选择弹窗提示
-    void sigShowFormQuestionHint(const QString &title, const QStringList &strs);
-    // 报警弹窗提示
-    void sigShowFormWarningHint(const QString &title, const QStringList &strs);
-    // 登录窗口显示
-    void sigShowFormLogin();
-    // 界面日志区刷新
-    void sigLogAppend(EM_LogLevel::LogLevel logLevel, const QString &log);
+    // 请求选项对话框显示
+    void sigShowFormOptions(uint dlgID, const QString &title, const QStringList &options);
 };

@@ -8,8 +8,6 @@
 #include "ElaWidgetTools/ElaToolButton.h"
 #include "Logger.h"
 #include "global/constant.h"
-#include "global/globalmanager.h"
-#include "global/signalmanager.h"
 #include "gui/component/mgsdevicepanel.h"
 #include "gui/component/mgsiconbutton.h"
 #include "gui/component/mgspagearea.h"
@@ -44,8 +42,6 @@ MgsBasePage::MgsBasePage(QWidget *parent)
     m_mainWidget->setStyleSheet(QString("#mainWidget { background-color: %1; }").arg(Constant::Color::MAIN_BG));
     UiUtils::disableMouseEvents(m_mainWidget);
     addCentralWidget(m_mainWidget);
-
-    connect(GM_INSTANCE->m_signalMan, &SignalManager::sigLogAppend, this, &MgsBasePage::onLogAppend);
 }
 
 MgsBasePage::~MgsBasePage() {}
@@ -311,20 +307,6 @@ MgsPageArea *MgsBasePage::initScrollTipArea()
     return scrollTipArea;
 }
 
-MgsPageArea *MgsBasePage::initVehInfoArea()
-{
-    MgsPageArea *vehInfoArea = new MgsPageArea();
-
-    return vehInfoArea;
-}
-
-MgsPageArea *MgsBasePage::initTradeHintArea()
-{
-    MgsPageArea *tradeHintArea = new MgsPageArea();
-
-    return tradeHintArea;
-}
-
 MgsPageArea *MgsBasePage::initWeightInfoArea()
 {
     MgsPageArea *weightInfoArea = new MgsPageArea();
@@ -338,9 +320,7 @@ MgsPageArea *MgsBasePage::initWeightInfoArea()
     m_curWeightInfo->setIsWrapAnywhere(false);
 
     // 称重降级提示
-    m_weightLow = new MgsIconButton(ElaIconType::TriangleExclamation,
-                                    Constant::FontSize::WEIGHTINFO_AREA_SIZE,
-                                    weightInfoArea);
+    m_weightLow = new MgsIconButton(ElaIconType::TriangleExclamation, Constant::FontSize::WEIGHTINFO_AREA_SIZE, weightInfoArea);
     m_weightLow->setColor(Constant::Color::WARN_TEXT);
     m_weightLow->setText("称重降级已开启!");
     m_weightLow->hide();
@@ -371,12 +351,6 @@ MgsPageArea *MgsBasePage::initWeightInfoArea()
     return weightInfoArea;
 }
 
-MgsRecentTradePanel *MgsBasePage::initRecentTradeArea()
-{
-    MgsRecentTradePanel *m_recentTradePanel = new MgsRecentTradePanel({});
-    return m_recentTradePanel;
-}
-
 MgsDevicePanel *MgsBasePage::initDeviceIconArea()
 {
     MgsDevicePanel *deviceIconPanel = new MgsDevicePanel();
@@ -384,17 +358,6 @@ MgsDevicePanel *MgsBasePage::initDeviceIconArea()
     deviceIconPanel->setMaximumHeight(70);
 
     return deviceIconPanel;
-}
-
-void MgsBasePage::screenShot()
-{
-    LOG_INFO().noquote() << "开始截图";
-    Utils::FileName saveDir = Utils::FileName::fromString(qApp->applicationDirPath() + "/captures");
-    QString error;
-    bool ok = Utils::UiUtils::screenShot(saveDir, &error);
-    if (!ok) {
-        LOG_ERROR().noquote() << error;
-    }
 }
 
 void MgsBasePage::initUi()
@@ -434,7 +397,7 @@ void MgsBasePage::setAppVer(const QString &ver)
 {
     if (!m_appVer)
         return;
-    m_appVer->setText(QString(" %1").arg(ver));
+    m_appVer->setText(QString("%1").arg(ver));
 }
 
 void MgsBasePage::setFeeRateVer(const QString &ver)
@@ -494,7 +457,7 @@ void MgsBasePage::setScrollTip(const QString &tip)
     m_scrollTip->setScrollText(tip);
 }
 
-void MgsBasePage::onLogAppend(EM_LogLevel::LogLevel logLevel, const QString &log)
+void MgsBasePage::logAppend(EM_LogLevel::LogLevel logLevel, const QString &log)
 {
     const int maxCount = 100;
     const int trimCount = 50;

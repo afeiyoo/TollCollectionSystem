@@ -3,11 +3,12 @@
 #include <QObject>
 
 class MIBizEnv;
+class MgsMainWindow;
 class MIDeskProcess : public QObject
 {
     Q_OBJECT
 public:
-    explicit MIDeskProcess(QObject *parent = 0);
+    explicit MIDeskProcess(MgsMainWindow *mainWindow, QObject *parent = 0);
     ~MIDeskProcess() override;
 
 public slots:
@@ -28,4 +29,5 @@ public slots:
 private:
     MIBizEnv *m_bizEnv = nullptr;
     QThread *m_thread = nullptr;
+    MgsMainWindow *m_mainWindow = nullptr;
 };

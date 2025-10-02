@@ -1,8 +1,8 @@
 #include "mgsoptionsdialog.h"
 
-#include <QDebug>
 #include <QKeyEvent>
 #include <QPainter>
+#include <QTimer>
 
 #include "ElaWidgetTools/ElaListView.h"
 #include "ElaWidgetTools/ElaPushButton.h"
@@ -31,15 +31,19 @@ MgsOptionsDialog::~MgsOptionsDialog() {}
 
 void MgsOptionsDialog::initUi()
 {
-    m_title = new ElaText(this);
+    // 视图区域
+    m_mainWidget = new QWidget(this);
+    m_mainWidget->setStyleSheet(QString("background-color: %1;").arg(Constant::Color::DIALOG_BG));
+
+    m_title = new ElaText(m_mainWidget);
     QFont titleFont = m_title->font();
     titleFont.setPixelSize(Constant::FontSize::DIALOG_TITLE_SIZE);
     titleFont.setBold(true);
     m_title->setFont(titleFont);
 
-    m_model = new QStandardItemModel(this);
+    m_model = new QStandardItemModel(m_mainWidget);
 
-    m_optionsView = new ElaListView(this);
+    m_optionsView = new ElaListView(m_mainWidget);
     m_optionsView->setModel(m_model);
     m_optionsView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     m_optionsView->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -49,6 +53,13 @@ void MgsOptionsDialog::initUi()
     m_optionsView->setFont(itemFont);
     m_optionsView->setFocusPolicy(Qt::NoFocus);
 
+    QVBoxLayout *mainVLayout = new QVBoxLayout(m_mainWidget);
+    mainVLayout->setContentsMargins(5, 5, 5, 5);
+    mainVLayout->setSpacing(0);
+    mainVLayout->addWidget(m_title);
+    mainVLayout->addWidget(m_optionsView);
+
+    // 按钮区域
     m_yesButton = new ElaPushButton("确认", this);
     m_yesButton->setLightDefaultColor(QColor(Constant::Color::CONFIRM_BUTTON_BG));
     m_yesButton->setLightTextColor(QColor(Constant::Color::CONFIRM_BUTTON_TEXT));
@@ -65,22 +76,19 @@ void MgsOptionsDialog::initUi()
         btn->setFixedSize(80, 30);
     }
 
-    QWidget *buttonWidget = new QWidget(this);
-    buttonWidget->setFixedHeight(35);
-    QHBoxLayout *buttonLayout = new QHBoxLayout(buttonWidget);
-    buttonLayout->setContentsMargins(0, 0, 5, 0);
-    buttonLayout->setSpacing(5);
-    buttonLayout->addStretch();
-    buttonLayout->addWidget(m_yesButton);
-    buttonLayout->addWidget(m_noButton);
+    QHBoxLayout *buttonHLayout = new QHBoxLayout();
+    buttonHLayout->setContentsMargins(5, 3, 5, 3);
+    buttonHLayout->setSpacing(5);
+    buttonHLayout->addStretch();
+    buttonHLayout->addWidget(m_yesButton);
+    buttonHLayout->addWidget(m_noButton);
 
     QWidget *centralWidget = new QWidget(this);
     QVBoxLayout *centralVLayout = new QVBoxLayout(centralWidget);
     centralVLayout->setContentsMargins(0, 0, 0, 0);
     centralVLayout->setSpacing(0);
-    centralVLayout->addWidget(m_title);
-    centralVLayout->addWidget(m_optionsView, 1);
-    centralVLayout->addWidget(buttonWidget);
+    centralVLayout->addWidget(m_mainWidget, 1);
+    centralVLayout->addLayout(buttonHLayout);
 
     setCentralWidget(centralWidget);
 }
@@ -158,33 +166,20 @@ void MgsOptionsDialog::keyPressEvent(QKeyEvent *event)
             if (newIndex.isValid()) {
                 m_optionsView->setCurrentIndex(newIndex);
                 emit GM_INSTANCE->m_signalMan->sigOptionSelected(m_dlgID, num);
+
+                // 延时 400ms 后关闭
+                QTimer::singleShot(400, this, [this]() { this->hide(); });
             }
         }
-        hide();
-
         event->accept();
     } else {
         QDialog::keyPressEvent(event); // 默认处理其他键
     }
 }
 
-void MgsOptionsDialog::paintEvent(QPaintEvent *event)
-{
-    QPainter painter(this);
-    painter.save();
-    painter.setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing);
-    painter.setPen(Qt::NoPen);
-    painter.setBrush(QColor(Constant::Color::DIALOG_BG));
-    // 背景绘制
-    int layoutAreaHeight = m_title->height() + m_optionsView->height() + 5;
-    painter.drawRect(QRectF(0, 0, width(), layoutAreaHeight));
-    painter.restore();
-
-    QDialog::paintEvent(event);
-}
-
 void MgsOptionsDialog::showEvent(QShowEvent *event)
 {
+    setFocus();
     UiUtils::moveToCenter(this);
     QDialog::showEvent(event);
 }

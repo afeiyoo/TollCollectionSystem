@@ -8,11 +8,9 @@
 #include "global/constant.h"
 #include "global/globalmanager.h"
 #include "global/signalmanager.h"
-#include "gui/component/mgsmenu.h"
 #include "gui/component/mgspagearea.h"
 #include "gui/component/mgsrecenttradepanel.h"
 #include "gui/component/mgsscrolltext.h"
-#include "gui/mgsauthdialog.h"
 #include "gui/mgsplateeditdialog.h"
 #include "utils/bizutils.h"
 #include "utils/uiutils.h"
@@ -26,13 +24,6 @@ using namespace Utils;
 MgsMtcOutPage::MgsMtcOutPage(QWidget *parent)
     : MgsBasePage(parent)
 {
-    menu = new MgsMenu(this);
-    menu->setFixedSize(350, 450);
-    menu->hide();
-
-    m_authDialog = new MgsAuthDialog(this);
-    m_authDialog->hide();
-
     connect(GM_INSTANCE->m_signalMan, &SignalManager::sigPlateChanged, this, &MgsMtcOutPage::onPlateChanged);
 }
 
@@ -207,8 +198,7 @@ void MgsMtcOutPage::setPlate(const QString &plate)
     }
 
     if (!bgImage.isEmpty()) {
-        m_plate->setStyleSheet(
-            QString("border-image: url(%1) 0 0 0 0 stretch stretch; color: %2;").arg(bgImage).arg(textColor.name()));
+        m_plate->setStyleSheet(QString("border-image: url(%1) 0 0 0 0 stretch stretch; color: %2;").arg(bgImage, textColor.name()));
     } else {
         m_plate->setStyleSheet(""); // 没有匹配到颜色，清除样式
     }
@@ -349,27 +339,19 @@ void MgsMtcOutPage::setTradeHint(const QString &tradeHint, const QString &color 
 void MgsMtcOutPage::keyPressEvent(QKeyEvent *event)
 {
     int key = event->key();
-    LOG_INFO().noquote() << "接收到按键:" << key << "，"
-                         << BizUtils::getKeyName(GM_INSTANCE->m_config->m_keyboard, key);
-    // if (key == Qt::Key_S) {
-    //     event->accept();
-    // } else if (key == Qt::Key_I) {
-    //     m_authDialog->show();
-    //     event->accept();
-    // } else if (key == Qt::Key_Right) {
-    //     MgsPlateEditDialog *dlg = new MgsPlateEditDialog();
-    //     dlg->setAttribute(Qt::WA_DeleteOnClose);
-    //     dlg->setPlate(m_plate->text());
-    //     dlg->show();
-    //     event->accept();
-    // } else if (key == Qt::Key_W) {
-    //     menu->show();
-    //     menu->setFocus();
-    //     event->accept();
-    // } else {
-    //     qDebug() << "无效按键";
-    //     MgsBasePage::keyPressEvent(event); // 默认处理其他键
-    // }
+    LOG_INFO().noquote() << "接收到按键:" << key << "，" << BizUtils::getKeyName(GM_INSTANCE->m_config->m_keyboard, key);
+    if (key == Qt::Key_S) {
+        event->accept();
+    } else if (key == Qt::Key_I) {
+        event->accept();
+    } else if (key == Qt::Key_Right) {
+        event->accept();
+    } else if (key == Qt::Key_W) {
+        event->accept();
+    } else {
+        qDebug() << "无效按键";
+        MgsBasePage::keyPressEvent(event); // 默认处理其他键
+    }
 }
 
 MgsPageArea *MgsMtcOutPage::initTradeInfoArea()
@@ -539,8 +521,7 @@ MgsPageArea *MgsMtcOutPage::initVehInfoArea()
     m_enPlate = new ElaText(cardInfoWidget);
     m_label1 = new ElaText(cardInfoWidget);
     m_splitProvincesInfo = new ElaText(cardInfoWidget);
-    QList<ElaText *> texts
-        = {m_cardType, m_cardNum, m_enStationName, m_enTime, m_weightInfo, m_enPlate, m_label1, m_splitProvincesInfo};
+    QList<ElaText *> texts = {m_cardType, m_cardNum, m_enStationName, m_enTime, m_weightInfo, m_enPlate, m_label1, m_splitProvincesInfo};
     for (auto *t : texts) {
         t->setTextPixelSize(Constant::FontSize::VEHINFO_AREA_SIZE);
         t->setIsWrapAnywhere(false);

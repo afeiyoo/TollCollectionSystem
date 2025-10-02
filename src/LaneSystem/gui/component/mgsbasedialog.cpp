@@ -1,6 +1,5 @@
 #include "mgsbasedialog.h"
 
-#include <QDebug>
 #include <QKeyEvent>
 #include <QVBoxLayout>
 
@@ -30,7 +29,7 @@ void MgsBaseDialog::initUi()
     m_tipLayout = UiUtils::createTipWidget("请按数字键选择对应的功能");
 
     m_mainLayout = new QVBoxLayout(this);
-    m_mainLayout->setContentsMargins(5, 5, 5, 5);
+    m_mainLayout->setContentsMargins(0, 0, 0, 0);
     m_mainLayout->setSpacing(0);
 
     m_mainLayout->addWidget(m_centralWidget, 1);

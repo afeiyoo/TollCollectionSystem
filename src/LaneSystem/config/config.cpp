@@ -59,11 +59,10 @@ bool Config::loadConfig()
     LOG_INFO().noquote() << "系统基础配置加载完成";
 
     // 系统键盘参数加载
-    LOG_INFO().noquote() << "加载系统键盘参数 键盘类型" << m_systemConfig.keyboardType;
+    LOG_INFO().noquote() << "加载系统键盘参数 键盘类型: " << m_systemConfig.keyboardType;
     FileName keyboardFile = configDir + QString("/Keyboard_%1.json").arg(m_systemConfig.keyboardType);
     if (!keyboardFile.exists()) {
-        LOG_WARNING().noquote() << "系统键盘参数文件 " << keyboardFile.fileName(0)
-                                << "不存在，开始创建默认系统键盘参数";
+        LOG_WARNING().noquote() << "系统键盘参数文件 " << keyboardFile.fileName(0) << "不存在，开始创建默认系统键盘参数";
         QString keyboardPath = QString(Constant::Path::KEYBOARD_FILE_PATH).arg(m_systemConfig.keyboardType);
         QByteArray keyboardJson = FileReader::fetchQrc(keyboardPath);
         FileSaver saver(keyboardFile.toString());

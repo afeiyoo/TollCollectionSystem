@@ -4,8 +4,6 @@
 
 #include <QHBoxLayout>
 
-class MgsMenu;
-class MgsAuthDialog;
 class MgsMtcOutPage : public MgsBasePage
 {
     Q_OBJECT
@@ -58,9 +56,7 @@ public:
     // 交易提示区域API
     void setTradeHint(const QString &tradeHint, const QString &color = "#007bff") override;
     void setObuHint(const QString &obuHint, const QString &color = "#08c134") override;
-    void appendHintButton(const QString &hint,
-                          const QString &fontColor = "#ffffff",
-                          const QString &bgColor = "#08c134") override;
+    void appendHintButton(const QString &hint, const QString &fontColor = "#ffffff", const QString &bgColor = "#08c134") override;
 
 public slots:
     void onPlateChanged(const QString &plate);
@@ -102,8 +98,4 @@ private:
     QHBoxLayout *m_hintButtonLayout = nullptr;
     MgsScrollText *m_tradeHint = nullptr;
     ElaText *m_obuHint = nullptr;
-
-    // 子窗口
-    MgsMenu *menu = nullptr;
-    MgsAuthDialog *m_authDialog = nullptr;
 };
