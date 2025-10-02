@@ -1,11 +1,9 @@
 #pragma once
 
-#include "gui/component/mgsmenu.h"
 #include "gui/mgsbasepage.h"
 
 #include <QHBoxLayout>
 
-class MgsAuthDialog;
 class MgsMtcOutPage : public MgsBasePage
 {
     Q_OBJECT
@@ -38,13 +36,11 @@ public:
     void setPrePayCardCnt(int cnt) override;        // 储值卡数
     void setLastShiftTotalVehCnt(int cnt) override; // 上个班次总车次
 
-    // 当前车辆信息显示区域API
+    // 当前车辆与卡内信息显示区域API
     void setPlate(const QString &plate) override;
     void setVehClass(const QString &vehClass) override;
     void setVehStatus(const QString &vehStatus) override;
     void setSituation(const QString &situation) override;
-
-    // 当前车辆卡内信息显示区域API
     void setCardType(const QString &cardType) override;           // 卡类型
     void setCardNum(const QString &cardNum) override;             // 卡号
     void setBalance(const QString &balance) override;             // 卡内余额
@@ -60,9 +56,7 @@ public:
     // 交易提示区域API
     void setTradeHint(const QString &tradeHint, const QString &color = "#007bff") override;
     void setObuHint(const QString &obuHint, const QString &color = "#08c134") override;
-    void appendHintButton(const QString &hint,
-                          const QString &fontColor = "#ffffff",
-                          const QString &bgColor = "#08c134") override;
+    void appendHintButton(const QString &hint, const QString &fontColor = "#ffffff", const QString &bgColor = "#08c134") override;
 
 public slots:
     void onPlateChanged(const QString &plate);
@@ -72,7 +66,6 @@ protected:
 
     MgsPageArea *initTradeInfoArea() override;
     MgsPageArea *initVehInfoArea() override;
-    MgsPageArea *initCardInfoArea() override;
     MgsPageArea *initTradeHintArea() override;
     MgsRecentTradePanel *initRecentTradeArea() override;
 
@@ -88,26 +81,21 @@ private:
     ElaText *m_etcCardCnt = nullptr;
     ElaText *m_fleetVehCnt = nullptr;
     ElaText *m_thirdPayCnt = nullptr;
-    // 当前车辆信息显示区域
-    ElaText *m_plate = nullptr;     // 车牌
-    ElaText *m_vehClass = nullptr;  // 车型
-    ElaText *m_vehStatus = nullptr; // 车种
-    ElaText *m_situation = nullptr; // 特情信息
-    // 当前车辆卡信息显示区域
-    ElaText *m_cardType = nullptr;      // 卡类型
-    ElaText *m_cardNum = nullptr;       // 卡号
-    ElaText *m_enStationName = nullptr; // 入口站名
-    ElaText *m_enTime = nullptr;        // 入口时间
-    ElaText *m_weightInfo = nullptr;    // 称重信息
-    ElaText *m_enPlate = nullptr;       // 入口车牌
-    ElaText *m_label1 = nullptr;        // 标签1
-    ElaText *m_splitProvincesInfo = nullptr;        // 标签2
+    // 当前车辆与卡内信息显示区域
+    ElaText *m_plate = nullptr;              // 车牌
+    ElaText *m_vehClass = nullptr;           // 车型
+    ElaText *m_vehStatus = nullptr;          // 车种
+    ElaText *m_situation = nullptr;          // 特情信息
+    ElaText *m_cardType = nullptr;           // 卡类型
+    ElaText *m_cardNum = nullptr;            // 卡号
+    ElaText *m_enStationName = nullptr;      // 入口站名
+    ElaText *m_enTime = nullptr;             // 入口时间
+    ElaText *m_weightInfo = nullptr;         // 称重信息
+    ElaText *m_enPlate = nullptr;            // 入口车牌
+    ElaText *m_label1 = nullptr;             // 标签1
+    ElaText *m_splitProvincesInfo = nullptr; // 标签2
     // 交易提示区域
     QHBoxLayout *m_hintButtonLayout = nullptr;
     MgsScrollText *m_tradeHint = nullptr;
     ElaText *m_obuHint = nullptr;
-
-    // 子窗口
-    MgsMenu *menu = nullptr;
-    MgsAuthDialog *m_authDialog = nullptr;
 };

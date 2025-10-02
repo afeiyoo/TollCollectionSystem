@@ -5,20 +5,23 @@
 
 #include <QVBoxLayout>
 
+//==============================================================================
+// 模型实现
+//==============================================================================
 WeightInfoModel::WeightInfoModel(QObject *parent)
     : QAbstractListModel(parent)
 {}
 
 WeightInfoModel::~WeightInfoModel() {}
 
-void WeightInfoModel::setItems(const QList<WeightInfoItem> &items)
+void WeightInfoModel::setItems(const QList<ST_WeightInfoItem> &items)
 {
     beginResetModel();
     m_dataList = items;
     endResetModel();
 }
 
-void WeightInfoModel::appendItem(const WeightInfoItem &item)
+void WeightInfoModel::appendItem(const ST_WeightInfoItem &item)
 {
     beginInsertRows(QModelIndex(), m_dataList.size(), m_dataList.size());
     m_dataList.append(item);
@@ -41,7 +44,7 @@ void WeightInfoModel::updateItem(const QModelIndex &index, uint status)
         return;
 
     m_dataList[index.row()].status = status;
-    emit dataChanged(index, index, {StatusRole});
+    emit dataChanged(index, index, {StatusRole}); // 刷新视图
 }
 
 int WeightInfoModel::rowCount(const QModelIndex &parent) const
@@ -55,7 +58,7 @@ QVariant WeightInfoModel::data(const QModelIndex &index, int role) const
     if (!index.isValid() || index.row() >= m_dataList.size())
         return QVariant();
 
-    const WeightInfoItem &item = m_dataList[index.row()];
+    const ST_WeightInfoItem &item = m_dataList[index.row()];
     switch (role) {
     case PlateRole:
         return item.plate;
@@ -84,8 +87,9 @@ QHash<int, QByteArray> WeightInfoModel::roleNames() const
     return roles;
 }
 
-// -------------------------------------------------------
-
+//==============================================================================
+// 视图实现
+//==============================================================================
 MgsWeightInfoPanel::MgsWeightInfoPanel(QWidget *parent)
     : QWidget(parent)
 {
@@ -94,7 +98,7 @@ MgsWeightInfoPanel::MgsWeightInfoPanel(QWidget *parent)
 
 MgsWeightInfoPanel::~MgsWeightInfoPanel() {}
 
-void MgsWeightInfoPanel::appendItem(const WeightInfoItem &item)
+void MgsWeightInfoPanel::appendItem(const ST_WeightInfoItem &item)
 {
     if (!m_weightInfoModel)
         return;

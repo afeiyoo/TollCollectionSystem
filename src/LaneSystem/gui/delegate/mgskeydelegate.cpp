@@ -16,16 +16,16 @@ void MgsKeyDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option
     painter->save();
 
     bool isSelected = option.state & QStyle::State_Selected;
-    QColor textColor = isSelected ? QColor(Constant::Color::NAVY_BLUE_COLOR) : Qt::black;
+    QColor textColor = isSelected ? QColor(Constant::Color::SELECTED_TEXT) : Qt::black;
 
     // 仅在选中时绘制背景
     if (isSelected) {
-        QColor bgColor = QColor(Constant::Color::ALICE_BULE_COLOR);
+        QColor bgColor = QColor(Constant::Color::SELECTED_BG);
         painter->fillRect(option.rect, bgColor);
     }
 
     // 始终绘制边框
-    painter->setPen(QPen(QColor(Constant::Color::GRAY_COLOR)));
+    painter->setPen(QPen(QColor(Constant::Color::BORDER)));
     painter->drawRect(option.rect.adjusted(0, 0, -1, -1));
 
     // 绘制文字
@@ -42,7 +42,7 @@ void MgsKeyDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option
         underlineRect.setTop(underlineRect.bottom() - 3);
         underlineRect.setHeight(3);
 
-        painter->fillRect(underlineRect, QColor(Constant::Color::NAVY_BLUE_COLOR));
+        painter->fillRect(underlineRect, QColor(Constant::Color::SELECTED_TEXT));
     }
 
     painter->restore();

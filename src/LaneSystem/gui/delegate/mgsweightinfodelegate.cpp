@@ -24,7 +24,7 @@ void MgsWeightInfoDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
     painter->fillPath(bgPath, bgColor);
 
     // 背景（纯透明），边框浅灰色
-    QColor borderColor = QColor("#c8c8c8");
+    QColor borderColor = QColor(Constant::Color::BORDER);
     painter->setPen(QPen(borderColor, 1));
     painter->drawPath(bgPath);
 
@@ -66,12 +66,8 @@ void MgsWeightInfoDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
     painter->setFont(font);
     painter->setPen(Qt::black);
     painter->drawText(QRect(textX, textY, textWidth, lineHeight), Qt::AlignLeft | Qt::AlignVCenter, plate);
-    painter->drawText(QRect(textX, textY + lineHeight + spacing, textWidth, lineHeight),
-                      Qt::AlignLeft | Qt::AlignVCenter,
-                      axisInfo);
-    painter->drawText(QRect(textX, textY + (lineHeight + spacing) * 2, textWidth, lineHeight),
-                      Qt::AlignLeft | Qt::AlignVCenter,
-                      weightInfo);
+    painter->drawText(QRect(textX, textY + lineHeight + spacing, textWidth, lineHeight), Qt::AlignLeft | Qt::AlignVCenter, axisInfo);
+    painter->drawText(QRect(textX, textY + (lineHeight + spacing) * 2, textWidth, lineHeight), Qt::AlignLeft | Qt::AlignVCenter, weightInfo);
 
     painter->restore();
 }
@@ -86,15 +82,23 @@ QSize MgsWeightInfoDelegate::sizeHint(const QStyleOptionViewItem &option, const 
 QPixmap MgsWeightInfoDelegate::getAxisTypePixmap(uint axisType, uint status) const
 {
     if (axisType == 0) {
-        return status == 0 ? QPixmap(":/static/images/axistype_unknown_waiting.png")
-                           : QPixmap(":/static/images/axistype_unknown_pass.png");
+        if (status == 0) {
+            return QPixmap(":/static/images/axistype_unknown_waiting.png");
+        } else if (status == 1) {
+            return QPixmap(":/static/images/axistype_unknown_pass.png");
+        } else {
+            return QPixmap(":/static/images/axistype_unknown_overload.png");
+        }
     }
 
     QString strStatus;
-    if (status == 0)
+    if (status == 0) {
         strStatus = "waiting";
-    else
+    } else if (status == 1) {
         strStatus = "pass";
+    } else {
+        strStatus = "overload";
+    }
 
     QString str = QString(":/static/images/axistype_%1_%2.png").arg(axisType).arg(strStatus);
     return QPixmap(str);

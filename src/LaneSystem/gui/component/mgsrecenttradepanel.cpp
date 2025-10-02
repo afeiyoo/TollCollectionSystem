@@ -4,7 +4,11 @@
 #include <QVBoxLayout>
 
 #include "ElaWidgetTools/ElaTableView.h"
+#include "global/constant.h"
 
+//==============================================================================
+// 模型实现
+//==============================================================================
 RecentTradeModel::RecentTradeModel(QObject *parent)
     : QAbstractTableModel(parent)
 {}
@@ -59,8 +63,9 @@ void RecentTradeModel::appendTrade(QStringList trade)
     endInsertRows();
 }
 
-// ------------------------------------------------------------------
-
+//==============================================================================
+// 视图实现
+//==============================================================================
 MgsRecentTradePanel::MgsRecentTradePanel(QStringList header, QWidget *parent)
     : QWidget{parent}
 {
@@ -89,7 +94,7 @@ void MgsRecentTradePanel::initUi()
     // 表头字体
     QFont headerFont = m_recentTradeView->horizontalHeader()->font();
     headerFont.setWeight(QFont::DemiBold);
-    headerFont.setPixelSize(15);
+    headerFont.setPixelSize(Constant::FontSize::TRADE_VIEW_SIZE);
     m_recentTradeView->horizontalHeader()->setFont(headerFont);
 
     // 表头行为
@@ -112,7 +117,7 @@ void MgsRecentTradePanel::initUi()
     m_recentTradeView->setStyleSheet(R"(QTableView { gridline-color: #d1d1d1; })");
 
     QVBoxLayout *layout = new QVBoxLayout(this);
-    layout->setContentsMargins(0, 1, 0, 1);
+    layout->setContentsMargins(0, 0, 0, 0);
     layout->addWidget(m_recentTradeView);
 }
 
