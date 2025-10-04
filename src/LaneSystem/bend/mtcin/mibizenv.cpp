@@ -1,7 +1,7 @@
 #include "mibizenv.h"
 #include "global/globalmanager.h"
 #include "global/signalmanager.h"
-#include "gui/manager/mgsstatemanager.h"
+#include "global/statemanager.h"
 
 MIBizEnv::MIBizEnv(QObject *parent)
     : QObject{parent}
