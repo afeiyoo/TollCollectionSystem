@@ -27,6 +27,7 @@ SOURCES += \
     dao/midataservice.cpp \
     global/globalmanager.cpp \
     global/signalmanager.cpp \
+    global/statemanager.cpp \
     gui/component/mgsbasedialog.cpp \
     gui/component/mgsdevicepanel.cpp \
     gui/component/mgsiconbutton.cpp \
@@ -38,7 +39,6 @@ SOURCES += \
     gui/delegate/mgscolordelegate.cpp \
     gui/delegate/mgskeydelegate.cpp \
     gui/delegate/mgsweightinfodelegate.cpp \
-    gui/manager/mgsstatemanager.cpp \
     gui/mgsauthdialog.cpp \
     gui/mgsbasepage.cpp \
     gui/mgsetcpage.cpp \
@@ -69,6 +69,7 @@ HEADERS += \
     global/constant.h \
     global/globalmanager.h \
     global/signalmanager.h \
+    global/statemanager.h \
     gui/component/mgsbasedialog.h \
     gui/component/mgsdevicepanel.h \
     gui/component/mgsiconbutton.h \
@@ -80,7 +81,6 @@ HEADERS += \
     gui/delegate/mgscolordelegate.h \
     gui/delegate/mgskeydelegate.h \
     gui/delegate/mgsweightinfodelegate.h \
-    gui/manager/mgsstatemanager.h \
     gui/mgsauthdialog.h \
     gui/mgsbasepage.h \
     gui/mgsetcpage.h \

@@ -1,4 +1,4 @@
-#include "mgsstatemanager.h"
+#include "statemanager.h"
 
 #include "global/globalmanager.h"
 #include "global/signalmanager.h"
@@ -8,21 +8,21 @@
 //==============================================================================
 // 状态管理类
 //==============================================================================
-MgsStateManager::MgsStateManager(QWidget *parent)
+StateManager::StateManager(QWidget *parent)
     : QObject{parent}
 {
     m_menuDialog = new MgsMenuDialog(parent);
     m_menuDialog->hide();
 
-    connect(GM_INSTANCE->m_signalMan, &SignalManager::sigChangeState, this, &MgsStateManager::onChangeState);
+    connect(GM_INSTANCE->m_signalMan, &SignalManager::sigChangeState, this, &StateManager::onChangeState);
 }
 
-MgsStateManager::~MgsStateManager()
+StateManager::~StateManager()
 {
     SAFE_DELETE(m_curState);
 }
 
-void MgsStateManager::showMenu()
+void StateManager::showMenu()
 {
     if (!m_curState || !m_menuDialog)
         return;
@@ -32,7 +32,7 @@ void MgsStateManager::showMenu()
     m_menuDialog->exec();
 }
 
-void MgsStateManager::onChangeState(State *newState)
+void StateManager::onChangeState(State *newState)
 {
     if (!newState)
         return;

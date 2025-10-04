@@ -49,12 +49,12 @@ public:
 //==============================================================================
 // 状态管理类
 //==============================================================================
-class MgsStateManager : public QObject
+class StateManager : public QObject
 {
     Q_OBJECT
 public:
-    explicit MgsStateManager(QWidget *parent = nullptr);
-    ~MgsStateManager() override;
+    explicit StateManager(QWidget *parent = nullptr);
+    ~StateManager() override;
 
     void showMenu();
 

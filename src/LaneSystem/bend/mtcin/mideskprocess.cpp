@@ -5,7 +5,7 @@
 #include "config/config.h"
 #include "global/globalmanager.h"
 #include "global/signalmanager.h"
-#include "gui/manager/mgsstatemanager.h"
+#include "global/statemanager.h"
 #include "gui/mgsmainwindow.h"
 #include "tools/laneauth.h"
 #include "utils/uiutils.h"

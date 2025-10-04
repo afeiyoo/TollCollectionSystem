@@ -6,7 +6,7 @@
 class MgsOptionsDialog;
 class MgsAuthDialog;
 class MgsBasePage;
-class MgsStateManager;
+class StateManager;
 class MgsMainWindow : public ElaWindow
 {
     Q_OBJECT
@@ -49,5 +49,5 @@ private:
     // 选项对话框
     MgsOptionsDialog *m_optionsDialog = nullptr;
     // 状态控件管理对象
-    MgsStateManager *m_stateMan = nullptr;
+    StateManager *m_stateMan = nullptr;
 };
