@@ -1,5 +1,5 @@
 #include "signalmanager.h"
-#include "gui/manager/mgsstatemanager.h"
+#include "global/statemanager.h"
 
 SignalManager::SignalManager(QObject *parent)
     : QObject{parent}
