@@ -66,7 +66,7 @@ int main(int argc, char *argv[])
     LOG_INFO().noquote() << "业务处理模块初始化完成";
 
     LOG_INFO().noquote() << "系统正常启动: " << DataDealUtils::curDateTimeStr();
-    mainWindow.onShowLogAppend(EM_LogLevel::INFO, "系统正常启动");
+    mainWindow.onShowUpdateLog(EM_LogLevel::INFO, "系统正常启动");
 
     return a.exec();
 }

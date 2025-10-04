@@ -3,6 +3,8 @@
 #include "ElaWidgetTools/ElaWindow.h"
 #include "utils/defs.h"
 
+#include <QMessageBox>
+
 class MgsOptionsDialog;
 class MgsAuthDialog;
 class MgsBasePage;
@@ -20,13 +22,13 @@ public:
 
 public slots:
     // 错误弹窗提示
-    void onShowFormErrorHint(const QString &title, const QStringList &strs);
+    QMessageBox::StandardButton onShowFormErrorHint(const QString &title, const QStringList &strs);
     // 提示弹窗提示
-    void onShowFormInfoHint(const QString &title, const QStringList &strs);
+    QMessageBox::StandardButton onShowFormInfoHint(const QString &title, const QStringList &strs);
     // 选择弹窗提示
-    void onShowFormQuestionHint(const QString &title, const QStringList &strs);
+    QMessageBox::StandardButton onShowFormQuestionHint(const QString &title, const QStringList &strs);
     // 报警弹窗提示
-    void onShowFormWarningHint(const QString &title, const QStringList &strs);
+    QMessageBox::StandardButton onShowFormWarningHint(const QString &title, const QStringList &strs);
     // 登录窗口显示
     void onShowFormLogin();
     // 选项窗口显示
@@ -34,9 +36,11 @@ public slots:
     // 功能菜单窗口显示
     void onShowFormMenu();
     // 日志显示区刷新
-    void onShowLogAppend(EM_LogLevel::LogLevel logLevel, const QString &log);
+    void onShowUpdateLog(EM_LogLevel::LogLevel logLevel, const QString &log);
     // 称重降级
-    void onShowWeightLowUpdate(bool isLow);
+    void onShowUpdateWeightLow(bool isLow);
+    // 界面提示信息刷新
+    void onShowUpdateTradeHint(const QString &hint, bool isWarning = false);
 
 protected:
     void showEvent(QShowEvent *event) override;

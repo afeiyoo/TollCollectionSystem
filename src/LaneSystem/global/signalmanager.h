@@ -32,6 +32,8 @@ signals:
     void sigCloseLane();
     // 开道
     void sigOpenLane();
+    // 系统退出
+    void sigSystemExit();
     // 选项对话框请求
     void sigOptionSelected(int dlgID, uint option);
 

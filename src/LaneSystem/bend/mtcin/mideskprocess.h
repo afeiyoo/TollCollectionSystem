@@ -20,6 +20,8 @@ public slots:
     void onShiftIn();
     // 下班
     void onShiftOut();
+    // 系统退出
+    void onSystemExit();
     // 菜单功能执行
     void onMenuFuncDeal(uint tabIndex, uint funcIndex);
 
