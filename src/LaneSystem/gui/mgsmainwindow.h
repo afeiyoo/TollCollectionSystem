@@ -6,7 +6,7 @@
 class MgsOptionsDialog;
 class MgsAuthDialog;
 class MgsBasePage;
-class MgsStateManager;
+class StateManager;
 class MgsMainWindow : public ElaWindow
 {
     Q_OBJECT
@@ -35,6 +35,8 @@ public slots:
     void onShowFormMenu();
     // 日志显示区刷新
     void onShowLogAppend(EM_LogLevel::LogLevel logLevel, const QString &log);
+    // 称重降级
+    void onShowWeightLowUpdate(bool isLow);
 
 protected:
     void showEvent(QShowEvent *event) override;
@@ -47,5 +49,5 @@ private:
     // 选项对话框
     MgsOptionsDialog *m_optionsDialog = nullptr;
     // 状态控件管理对象
-    MgsStateManager *m_stateMan = nullptr;
+    StateManager *m_stateMan = nullptr;
 };

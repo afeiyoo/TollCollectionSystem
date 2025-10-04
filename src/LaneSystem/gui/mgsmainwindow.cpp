@@ -6,8 +6,8 @@
 #include "global/constant.h"
 #include "global/globalmanager.h"
 #include "global/signalmanager.h"
+#include "global/statemanager.h"
 #include "gui/component/mgsdevicepanel.h"
-#include "gui/manager/mgsstatemanager.h"
 #include "gui/mgsauthdialog.h"
 #include "gui/mgsbasepage.h"
 #include "gui/mgsetcpage.h"
@@ -36,7 +36,7 @@ MgsMainWindow::MgsMainWindow(QWidget *parent)
     m_optionsDialog->hide();
 
     // 状态控件管理对象初始化
-    m_stateMan = new MgsStateManager(this);
+    m_stateMan = new StateManager(this);
 
     // 程序退出时，清理界面资源
     connect(qApp, &QCoreApplication::aboutToQuit, this, [this]() { MgsMainWindow::deleteLater(); });
@@ -342,6 +342,11 @@ void MgsMainWindow::initEtc()
 void MgsMainWindow::onShowLogAppend(EM_LogLevel::LogLevel logLevel, const QString &log)
 {
     m_mainPage->logAppend(logLevel, log);
+}
+
+void MgsMainWindow::onShowWeightLowUpdate(bool isLow)
+{
+    m_mainPage->setWeightLow(isLow);
 }
 
 void MgsMainWindow::onShowFormErrorHint(const QString &title, const QStringList &strs)

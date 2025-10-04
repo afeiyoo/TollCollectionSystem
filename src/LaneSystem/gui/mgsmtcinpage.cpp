@@ -315,10 +315,8 @@ void MgsMtcInPage::keyPressEvent(QKeyEvent *event)
     LOG_INFO().noquote() << "按键: " << BizUtils::getKeyName(GM_INSTANCE->m_config->m_keyboard, key)
                          << QString("【%1】").arg(BizUtils::getKeyDescByCode(GM_INSTANCE->m_config->m_keyboard, key));
 
-    if (key == Qt::Key_S) {
-        emit GM_INSTANCE->m_signalMan->sigShowFormOptions(Constant::DialogID::TEST_DLG, "测试", {"1. 功能1", "2. 功能2"});
-        event->accept();
-    } else if (key == Qt::Key_W) {
+    if (key == Qt::Key_W) {
+        // 功能菜单显示
         emit GM_INSTANCE->m_signalMan->sigShowFormMenu();
         event->accept();
     } else if (key == Qt::Key_Y) {

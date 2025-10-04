@@ -322,7 +322,7 @@ MgsPageArea *MgsBasePage::initWeightInfoArea()
     // 称重降级提示
     m_weightLow = new MgsIconButton(ElaIconType::TriangleExclamation, Constant::FontSize::WEIGHTINFO_AREA_SIZE, weightInfoArea);
     m_weightLow->setColor(Constant::Color::WARN_TEXT);
-    m_weightLow->setText("称重降级已开启!");
+    m_weightLow->setText("注意: 称重降级已启用!!!");
     m_weightLow->hide();
 
     // 称重队列车辆数

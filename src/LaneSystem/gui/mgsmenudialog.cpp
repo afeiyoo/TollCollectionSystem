@@ -155,13 +155,13 @@ void MgsMenuDialog::keyPressEvent(QKeyEvent *event)
                 return;
             int row = current.row();
             if (!m_enableFuncsPerTab[tabIndex].contains(row)) {
-                emit GM_INSTANCE->m_signalMan->sigFuncUnavaliable(view->model()->data(current, Qt::DisplayRole).toString());
+                LOG_INFO().noquote() << "当前模式下该功能不可用: " << view->model()->data(current, Qt::DisplayRole).toString();
             } else {
                 LOG_INFO().noquote() << "请求功能:" << view->model()->data(current, Qt::DisplayRole).toString();
-                emit GM_INSTANCE->m_signalMan->sigMenuRequest(current.row());
+                emit GM_INSTANCE->m_signalMan->sigMenuFuncDeal(tabIndex, current.row());
+                hide();
             }
         }
-
         event->accept();
     } else if (key == Qt::Key_X) {
         hide();
