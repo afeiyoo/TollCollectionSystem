@@ -332,7 +332,7 @@ void MgsMtcOutPage::onPlateChanged(const QString &plate)
 
 void MgsMtcOutPage::setTradeHint(const QString &tradeHint, const QString &color /*= #007bff*/)
 {
-    m_tradeHint->setText(tradeHint);
+    m_tradeHint->setScrollText(tradeHint);
     m_tradeHint->setStyleSheet(QString("color: %1;").arg(color));
 }
 

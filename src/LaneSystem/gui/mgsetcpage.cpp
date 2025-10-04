@@ -185,8 +185,7 @@ void MgsEtcPage::setPlate(const QString &plate)
     }
 
     if (!bgImage.isEmpty()) {
-        m_plate->setStyleSheet(
-            QString("border-image: url(%1) 0 0 0 0 stretch stretch; color: %2;").arg(bgImage).arg(textColor.name()));
+        m_plate->setStyleSheet(QString("border-image: url(%1) 0 0 0 0 stretch stretch; color: %2;").arg(bgImage).arg(textColor.name()));
     } else {
         m_plate->setStyleSheet(""); // 没有匹配到颜色，清除样式
     }
@@ -293,7 +292,7 @@ void MgsEtcPage::appendHintButton(const QString &hint, const QString &fontColor,
 
 void MgsEtcPage::setTradeHint(const QString &tradeHint, const QString &color)
 {
-    m_tradeHint->setText(tradeHint);
+    m_tradeHint->setScrollText(tradeHint);
     m_tradeHint->setStyleSheet(QString("color: %1;").arg(color));
 }
 

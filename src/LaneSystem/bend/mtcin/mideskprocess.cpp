@@ -1,5 +1,7 @@
 #include "mideskprocess.h"
 
+#include <QApplication>
+
 #include "Logger.h"
 #include "bend/mtcin/mibizenv.h"
 #include "config/config.h"
@@ -8,6 +10,7 @@
 #include "global/statemanager.h"
 #include "gui/mgsmainwindow.h"
 #include "tools/laneauth.h"
+#include "utils/datadealutils.h"
 #include "utils/uiutils.h"
 
 using namespace Utils;
@@ -24,6 +27,7 @@ MIDeskProcess::MIDeskProcess(MgsMainWindow *mainWindow, QObject *parent)
     connect(GM_INSTANCE->m_signalMan, &SignalManager::sigOpenLane, this, &MIDeskProcess::onOpenLane);
     connect(GM_INSTANCE->m_signalMan, &SignalManager::sigShiftIn, this, &MIDeskProcess::onShiftIn);
     connect(GM_INSTANCE->m_signalMan, &SignalManager::sigShiftOut, this, &MIDeskProcess::onShiftOut);
+    connect(GM_INSTANCE->m_signalMan, &SignalManager::sigSystemExit, this, &MIDeskProcess::onSystemExit);
 
     connect(GM_INSTANCE->m_updater, &QSimpleUpdater::checkingFinished, this, &MIDeskProcess::onUpdateCheckingFinished);
 }
@@ -77,6 +81,25 @@ void MIDeskProcess::onShiftIn()
 
 void MIDeskProcess::onShiftOut() {}
 
+void MIDeskProcess::onSystemExit()
+{
+    if (m_bizEnv->m_isOpen) {
+        LOG_WARNING().noquote() << "当前未闭道，无法退出系统";
+        m_mainWindow->onShowUpdateTradeHint("请先闭道后，再退出系统", true);
+        return;
+    }
+    if (m_bizEnv->m_isShifted) {
+        LOG_WARNING().noquote() << "当前未下班，无法退出系统";
+        m_mainWindow->onShowUpdateTradeHint("请先下班后，再退出系统", true);
+        return;
+    }
+    QMessageBox::StandardButton btn = m_mainWindow->onShowFormQuestionHint("请确认是否退出系统?", {"按【确认】键退出，按【返回】键取消"});
+    if (btn == QMessageBox::Yes) {
+        LOG_INFO().noquote() << "系统正常退出: " << DataDealUtils::curDateTimeStr();
+        QApplication::quit();
+    }
+}
+
 void MIDeskProcess::onUpdateCheckingFinished(const QString &url)
 {
     if (url == GM_INSTANCE->m_config->m_systemConfig.updateUrl) {
@@ -98,5 +121,5 @@ void MIDeskProcess::dealWeightLow()
         m_bizEnv->m_isWeightLow = true;
     }
     m_bizEnv->m_curState->setWeightLow(m_bizEnv->m_isWeightLow);
-    m_mainWindow->onShowWeightLowUpdate(m_bizEnv->m_isWeightLow);
+    m_mainWindow->onShowUpdateWeightLow(m_bizEnv->m_isWeightLow);
 }

@@ -305,7 +305,7 @@ void MgsMtcInPage::appendHintButton(const QString &hint, const QString &fontColo
 
 void MgsMtcInPage::setTradeHint(const QString &tradeHint, const QString &color)
 {
-    m_tradeHint->setText(tradeHint);
+    m_tradeHint->setScrollText(tradeHint);
     m_tradeHint->setStyleSheet(QString("color: %1;").arg(color));
 }
 
@@ -338,6 +338,9 @@ void MgsMtcInPage::keyPressEvent(QKeyEvent *event)
         emit GM_INSTANCE->m_signalMan->sigShiftOut();
         event->accept();
     } else if (key == Qt::Key_P) {
+        event->accept();
+    } else if (key == Qt::Key_X) {
+        emit GM_INSTANCE->m_signalMan->sigSystemExit();
         event->accept();
     } else {
         qDebug() << "按键功能未实现";

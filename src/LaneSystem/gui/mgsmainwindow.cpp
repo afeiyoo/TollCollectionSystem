@@ -1,8 +1,10 @@
 #include "mgsmainwindow.h"
 
 #include <QCoreApplication>
+#include <QThread>
 #include <QVBoxLayout>
 
+#include "Logger.h"
 #include "global/constant.h"
 #include "global/globalmanager.h"
 #include "global/signalmanager.h"
@@ -339,42 +341,51 @@ void MgsMainWindow::initEtc()
     m_mainPage->setFocus();
 }
 
-void MgsMainWindow::onShowLogAppend(EM_LogLevel::LogLevel logLevel, const QString &log)
+void MgsMainWindow::onShowUpdateLog(EM_LogLevel::LogLevel logLevel, const QString &log)
 {
     m_mainPage->logAppend(logLevel, log);
 }
 
-void MgsMainWindow::onShowWeightLowUpdate(bool isLow)
+void MgsMainWindow::onShowUpdateWeightLow(bool isLow)
 {
     m_mainPage->setWeightLow(isLow);
 }
 
-void MgsMainWindow::onShowFormErrorHint(const QString &title, const QStringList &strs)
+void MgsMainWindow::onShowUpdateTradeHint(const QString &hint, bool isWarning /*= false*/)
+{
+    if (!isWarning) {
+        m_mainPage->setTradeHint(hint, Constant::Color::INFO_TEXT);
+        m_mainPage->logAppend(EM_LogLevel::WARN, hint);
+    } else {
+        m_mainPage->setTradeHint(hint, Constant::Color::STRESS_TEXT);
+        m_mainPage->logAppend(EM_LogLevel::INFO, hint);
+    }
+}
+
+QMessageBox::StandardButton MgsMainWindow::onShowFormErrorHint(const QString &title, const QStringList &strs)
 {
     m_mainPage->logAppend(EM_LogLevel::ERROR, title);
     QString message = strs.join("<br/>");
-    UiUtils::showMessageBoxError(title, message, QMessageBox::Yes | QMessageBox::Cancel);
+    return UiUtils::showMessageBoxError(title, message, QMessageBox::Yes | QMessageBox::Cancel);
 }
 
-void MgsMainWindow::onShowFormInfoHint(const QString &title, const QStringList &strs)
+QMessageBox::StandardButton MgsMainWindow::onShowFormInfoHint(const QString &title, const QStringList &strs)
 {
-    m_mainPage->logAppend(EM_LogLevel::INFO, title);
     QString message = strs.join("<br/>");
-    UiUtils::showMessageBoxInfo(title, message, QMessageBox::Yes | QMessageBox::Cancel);
+    return UiUtils::showMessageBoxInfo(title, message, QMessageBox::Yes | QMessageBox::Cancel);
 }
 
-void MgsMainWindow::onShowFormQuestionHint(const QString &title, const QStringList &strs)
+QMessageBox::StandardButton MgsMainWindow::onShowFormQuestionHint(const QString &title, const QStringList &strs)
 {
-    m_mainPage->logAppend(EM_LogLevel::INFO, title);
     QString message = strs.join("<br/>");
-    UiUtils::showMessageBoxQuestion(title, message, QMessageBox::Yes | QMessageBox::Cancel);
+    return UiUtils::showMessageBoxQuestion(title, message, QMessageBox::Yes | QMessageBox::Cancel);
 }
 
-void MgsMainWindow::onShowFormWarningHint(const QString &title, const QStringList &strs)
+QMessageBox::StandardButton MgsMainWindow::onShowFormWarningHint(const QString &title, const QStringList &strs)
 {
     m_mainPage->logAppend(EM_LogLevel::WARN, title);
     QString message = strs.join("<br/>");
-    UiUtils::showMessageBoxWarning(title, message, QMessageBox::Yes | QMessageBox::Cancel);
+    return UiUtils::showMessageBoxWarning(title, message, QMessageBox::Yes | QMessageBox::Cancel);
 }
 
 void MgsMainWindow::onShowFormLogin()
